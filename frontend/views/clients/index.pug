@@ -1,0 +1,411 @@
+extends ../layouts/layout
+
+block content
+
+  //- ============================================
+  //- HEADER
+  //- ============================================
+  .d-flex.flex-wrap.flex-md-nowrap.align-items-center.justify-content-between.pb-3.mb-4.border-bottom
+    .d-flex.align-items-center
+      .bg-primary.bg-opacity-10.rounded-3.p-3.me-3
+        i.fas.fa-users.text-primary.fa-2x
+      div
+        h1.h2.mb-0.fw-bold Clientes
+        p.text-muted.mb-0
+          i.fas.fa-info-circle.me-1
+          | Gestión de clientes registrados
+    div.d-flex.gap-2
+      a.btn.btn-primary.rounded-pill.px-4.shadow-sm(href="/clients/create")
+        i.fas.fa-plus-circle.me-1
+        | Nuevo Cliente
+
+  //- ============================================
+  //- TARJETAS DE ESTADÍSTICAS
+  //- ============================================
+  .row.g-3.mb-4
+    .col-sm-6.col-lg-3
+      .card.border-0.shadow-sm.rounded-3.stat-card.h-100
+        .card-body.d-flex.justify-content-between.align-items-center
+          div
+            h6.card-title.mb-1.small.text-uppercase.text-muted.fw-semibold Total Clientes
+            h2.card-text.mb-0.fw-bold.text-dark #{clients.length}
+            small.text-primary
+              i.fas.fa-users.me-1
+              | Registrados
+          .stat-icon.bg-primary.bg-opacity-10.text-primary.rounded-3
+            i.fas.fa-users.fa-lg
+
+    .col-sm-6.col-lg-3
+      .card.border-0.shadow-sm.rounded-3.stat-card.h-100
+        .card-body.d-flex.justify-content-between.align-items-center
+          div
+            h6.card-title.mb-1.small.text-uppercase.text-muted.fw-semibold Activos
+            h2.card-text.mb-0.fw-bold.text-success #{clients.filter(c => c.isActive).length}
+            small.text-success
+              i.fas.fa-check-circle.me-1
+              | Disponibles
+          .stat-icon.bg-success.bg-opacity-10.text-success.rounded-3
+            i.fas.fa-user-check.fa-lg
+
+    .col-sm-6.col-lg-3
+      .card.border-0.shadow-sm.rounded-3.stat-card.h-100
+        .card-body.d-flex.justify-content-between.align-items-center
+          div
+            h6.card-title.mb-1.small.text-uppercase.text-muted.fw-semibold Jurídicos
+            h2.card-text.mb-0.fw-bold.text-info #{clients.filter(c => c.type === 'Jurídico').length}
+            small.text-info
+              i.fas.fa-building.me-1
+              | Empresas
+          .stat-icon.bg-info.bg-opacity-10.text-info.rounded-3
+            i.fas.fa-building.fa-lg
+
+    .col-sm-6.col-lg-3
+      .card.border-0.shadow-sm.rounded-3.stat-card.h-100
+        .card-body.d-flex.justify-content-between.align-items-center
+          div
+            h6.card-title.mb-1.small.text-uppercase.text-muted.fw-semibold Naturales
+            h2.card-text.mb-0.fw-bold.text-warning #{clients.filter(c => c.type === 'Natural').length}
+            small.text-warning
+              i.fas.fa-user.me-1
+              | Personas
+          .stat-icon.bg-warning.bg-opacity-10.text-warning.rounded-3
+            i.fas.fa-user.fa-lg
+
+  //- ============================================
+  //- FILTROS
+  //- ============================================
+  .card.border-0.shadow-sm.rounded-3.mb-3
+    .card-body.p-3
+      .row.g-3.align-items-center
+        .col-md-5
+          .input-group
+            span.input-group-text.bg-white.border-end-0
+              i.fas.fa-search.text-muted
+            input.form-control.border-start-0(
+              type="text"
+              id="searchClient"
+              placeholder="Buscar por nombre, RUC o email..."
+            )
+        .col-md-3
+          select.form-select#filterType
+            option(value="") Todos los tipos
+            option(value="Jurídico") 🏢 Jurídicos
+            option(value="Natural") 👤 Naturales
+        .col-md-2
+          select.form-select#filterStatus
+            option(value="") Todos
+            option(value="active") ✅ Activos
+            option(value="inactive") ❌ Inactivos
+        .col-md-2.text-md-end
+          span.text-muted.small
+            i.fas.fa-filter.me-1
+            span#resultsCount #{clients.length} resultados
+
+  //- ============================================
+  //- TABLA
+  //- ============================================
+  .card.border-0.shadow-sm.rounded-3.overflow-hidden
+    .card-body.p-0
+      .table-responsive
+        table.table.table-hover.align-middle.mb-0#clientsTable
+          thead.bg-light
+            tr
+              th(style="min-width: 250px;") Cliente
+              th(style="min-width: 130px;") RUC / DNI
+              th(style="min-width: 150px;") Contacto
+              th.text-center(style="min-width: 120px;") Tipo
+              th.text-center(style="min-width: 110px;") Estado
+              th.text-center(style="min-width: 140px;") Acciones
+          tbody
+            if clients.length
+              each client in clients
+                tr(
+                  data-type=client.type
+                  data-status=client.isActive ? 'active' : 'inactive'
+                )
+                  td
+                    .d-flex.align-items-center
+                      .bg-primary.bg-opacity-10.rounded-circle.me-3(
+                        style="width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"
+                      )
+                        i.fas.text-primary.fa-lg(
+                          class=client.type === 'Jurídico' ? 'fa-building' : 'fa-user'
+                        )
+                      div
+                        a.text-decoration-none.fw-semibold.d-block.text-dark(
+                          href=`/clients/${client._id}`
+                        ) #{client.businessName}
+                        small.text-muted
+                          i.fas.fa-hashtag.me-1
+                          | #{client._id.toString().slice(-6).toUpperCase()}
+                  td
+                    if client.ruc
+                      div.fw-semibold #{client.ruc}
+                      small.text-muted RUC
+                    else
+                      span.text-muted.fst-italic Sin documento
+                  td
+                    if client.phone
+                      div
+                        i.fas.fa-phone.text-success.me-1
+                        | #{client.phone}
+                    if client.email
+                      div
+                        small.text-muted
+                          i.fas.fa-envelope.me-1
+                          | #{client.email}
+                    if !client.phone && !client.email
+                      span.text-muted.fst-italic Sin contacto
+                  td.text-center
+                    if client.type === 'Jurídico'
+                      span.badge.bg-info-subtle.text-info.px-3.py-2.rounded-pill.border.border-info-subtle
+                        i.fas.fa-building.me-1
+                        | Jurídico
+                    else
+                      span.badge.bg-secondary-subtle.text-secondary.px-3.py-2.rounded-pill.border.border-secondary-subtle
+                        i.fas.fa-user.me-1
+                        | Natural
+                  td.text-center
+                    if client.isActive
+                      span.badge.bg-success-subtle.text-success.px-3.py-2.rounded-pill.border.border-success-subtle
+                        i.fas.fa-check-circle.me-1
+                        | Activo
+                    else
+                      span.badge.bg-danger-subtle.text-danger.px-3.py-2.rounded-pill.border.border-danger-subtle
+                        i.fas.fa-times-circle.me-1
+                        | Inactivo
+                  td
+                    .d-flex.justify-content-center.gap-1
+                      a.btn.btn-sm.btn-outline-primary.rounded-circle.action-btn(
+                        href=`/clients/${client._id}`
+                        title="Ver detalle"
+                      )
+                        i.fas.fa-eye
+                      a.btn.btn-sm.btn-outline-warning.rounded-circle.action-btn(
+                        href=`/clients/${client._id}/edit`
+                        title="Editar"
+                      )
+                        i.fas.fa-pen
+                      button.btn.btn-sm.btn-outline-danger.rounded-circle.action-btn.btn-delete-client(
+                        type="button"
+                        title="Eliminar"
+                        data-client-id=client._id
+                        data-client-name=client.businessName
+                      )
+                        i.fas.fa-trash
+            else
+              tr#emptyRow
+                td(colspan="6").text-center.py-5
+                  .mb-3
+                    i.fas.fa-users.fa-3x.text-muted.opacity-25
+                  h5.text-muted.fw-semibold No hay clientes registrados
+                  p.text-muted.mb-4 Comienza agregando tu primer cliente
+                  a.btn.btn-primary.rounded-pill.px-4(href="/clients/create")
+                    i.fas.fa-plus-circle.me-1
+                    | Crear Primer Cliente
+
+  //- ============================================
+  //- MODAL CONFIRMAR ELIMINACIÓN
+  //- ============================================
+  .modal.fade#modalDeleteClient(tabindex="-1")
+    .modal-dialog.modal-dialog-centered
+      .modal-content.rounded-4.border-0.shadow-lg
+
+        .modal-header.bg-danger.text-white.rounded-top-4
+          h5.modal-title
+            i.fas.fa-exclamation-triangle.me-2
+            | Eliminar Cliente
+          button.btn-close.btn-close-white(type="button" data-bs-dismiss="modal")
+
+        .modal-body.p-4
+          .text-center.mb-4
+            .bg-danger.bg-opacity-10.rounded-circle.d-inline-flex.align-items-center.justify-content-center.mb-3(
+              style="width: 80px; height: 80px;"
+            )
+              i.fas.fa-trash.text-danger.fa-2x
+
+            h5.fw-bold.mb-2 ¿Estás seguro de eliminar este cliente?
+            p.text-muted.mb-0
+              | Se eliminará el cliente 
+              strong#deleteClientName.text-primary -
+              | . Esta acción no se puede deshacer.
+
+          .alert.alert-warning.rounded-3.mb-0
+            i.fas.fa-info-circle.me-2
+            small
+              strong Nota:
+              |  Si el cliente tiene ventas o cotizaciones asociadas, no se podrá eliminar.
+
+        .modal-footer.border-top-0.p-3
+          button.btn.btn-outline-secondary.rounded-pill.px-4(
+            type="button"
+            data-bs-dismiss="modal"
+          )
+            i.fas.fa-times.me-1
+            | Cancelar
+          form#formDeleteClient(method="POST" action="")
+            input(type="hidden" name="_method" value="DELETE")
+            button.btn.btn-danger.rounded-pill.px-4(
+              type="submit"
+              id="btnConfirmarDelete"
+            )
+              i.fas.fa-trash.me-1
+              | Sí, eliminar
+
+  //- ============================================
+  //- ESTILOS
+  //- ============================================
+  style.
+    .stat-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.08) !important;
+    }
+    .stat-icon {
+      width: 52px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .table th {
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: #f8fafc;
+      color: #64748b;
+      padding: 1rem 0.75rem;
+      border-bottom: 2px solid #e2e8f0;
+      white-space: nowrap;
+    }
+    .table td {
+      vertical-align: middle;
+      padding: 0.9rem 0.75rem;
+    }
+    .table tbody tr {
+      transition: background 0.15s ease;
+    }
+    .table tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+
+    .action-btn {
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    .action-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .input-group-text {
+      background-color: #fff !important;
+    }
+    .input-group:focus-within .input-group-text,
+    .input-group:focus-within .form-control {
+      border-color: #86b7fe;
+      box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.1);
+    }
+
+    .form-select:focus, .form-control:focus {
+      border-color: #86b7fe;
+      box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.1);
+    }
+
+    @media (max-width: 768px) {
+      .table-responsive {
+        font-size: 0.85rem;
+      }
+      .stat-icon {
+        width: 44px;
+        height: 44px;
+      }
+    }
+
+  //- ============================================
+  //- SCRIPT
+  //- ============================================
+  script.
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchInput = document.getElementById('searchClient');
+      const filterType = document.getElementById('filterType');
+      const filterStatus = document.getElementById('filterStatus');
+      const table = document.getElementById('clientsTable');
+      const resultsCount = document.getElementById('resultsCount');
+
+      // ============================================
+      // FILTROS
+      // ============================================
+      function filterTable() {
+        const term = searchInput.value.toLowerCase().trim();
+        const type = filterType.value;
+        const status = filterStatus.value;
+        const rows = table.querySelectorAll('tbody tr');
+        let visible = 0;
+
+        rows.forEach(row => {
+          if (row.id === 'emptyRow') return;
+
+          const text = row.textContent.toLowerCase();
+          const rowType = row.dataset.type || '';
+          const rowStatus = row.dataset.status || '';
+
+          let show = text.includes(term);
+          if (type) show = show && (rowType === type);
+          if (status) show = show && (rowStatus === status);
+
+          row.style.display = show ? '' : 'none';
+          if (show) visible++;
+        });
+
+        if (resultsCount) {
+          resultsCount.textContent = visible + (visible === 1 ? ' resultado' : ' resultados');
+        }
+      }
+
+      if (searchInput) searchInput.addEventListener('input', filterTable);
+      if (filterType) filterType.addEventListener('change', filterTable);
+      if (filterStatus) filterStatus.addEventListener('change', filterTable);
+
+      // ============================================
+      // ELIMINAR CLIENTE
+      // ============================================
+      const modalDelete = new bootstrap.Modal(document.getElementById('modalDeleteClient'));
+      const deleteClientName = document.getElementById('deleteClientName');
+      const formDeleteClient = document.getElementById('formDeleteClient');
+      const btnConfirmarDelete = document.getElementById('btnConfirmarDelete');
+
+      document.querySelectorAll('.btn-delete-client').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const clientId = this.dataset.clientId;
+          const clientName = this.dataset.clientName;
+
+          deleteClientName.textContent = clientName;
+          formDeleteClient.action = `/clients/${clientId}?_method=DELETE`;
+
+          modalDelete.show();
+        });
+      });
+
+      if (formDeleteClient) {
+        formDeleteClient.addEventListener('submit', function() {
+          btnConfirmarDelete.disabled = true;
+          btnConfirmarDelete.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Eliminando...';
+        });
+      }
+    });

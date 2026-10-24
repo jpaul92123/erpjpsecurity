@@ -1,0 +1,64 @@
+extends ../layouts/layout
+
+block content
+  .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pb-2.mb-3.border-bottom
+    h1.h2
+      i.fas.fa-sync-alt.me-2
+      | Detalle de Mantenimiento
+    div
+      a.btn.btn-outline-secondary.me-2(href="/maintenances")
+        i.fas.fa-arrow-left.me-1
+        | Volver
+      a.btn.btn-warning(href=`/maintenances/${maintenance._id}/edit`)
+        i.fas.fa-edit.me-1
+        | Editar
+
+  .row
+    .col-md-8
+      .card.border-0.shadow-sm
+        .card-body
+          .row
+            .col-md-6
+              p
+                strong Cliente: 
+                | #{maintenance.client ? maintenance.client.businessName : '-'}
+              p
+                strong Equipo: 
+                | #{maintenance.equipment}
+              p
+                strong Tipo: 
+                span.badge.bg-info #{maintenance.type}
+            .col-md-6
+              p
+                strong N° Serie: 
+                | #{maintenance.serialNumber || '-'}
+              p
+                strong Técnico: 
+                | #{maintenance.technician}
+              p
+                strong Estado: 
+                span.badge(class=maintenance.status === 'Completado' ? 'bg-success' : maintenance.status === 'Cancelado' ? 'bg-danger' : 'bg-warning') #{maintenance.status}
+          hr
+          p
+            strong Fecha Programada: 
+            | #{new Date(maintenance.scheduledDate).toLocaleString()}
+          if maintenance.completionDate
+            p
+              strong Fecha de Finalización: 
+              | #{new Date(maintenance.completionDate).toLocaleString()}
+          p
+            strong Costo: 
+            | S/. #{maintenance.cost.toFixed(2)}
+          p
+            strong Descripción:
+          p #{maintenance.description || 'Sin descripción'}
+    .col-md-4
+      .card.border-0.shadow-sm
+        .card-header.bg-light
+          h6.mb-0 Información Adicional
+        .card-body
+          p
+            strong Creado por: 
+            | #{maintenance.createdBy ? maintenance.createdBy.name : '-'}
+          p
+            small.text-muted Registrado: #{new Date(maintenance.createdAt).toLocaleString()}

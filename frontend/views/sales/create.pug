@@ -1,0 +1,590 @@
+extends ../layouts/layout
+
+block content
+
+  //- ============================================
+  //- HEADER
+  //- ============================================
+  .d-flex.flex-wrap.justify-content-between.align-items-center.pb-3.mb-4.border-bottom
+    div
+      nav(aria-label="breadcrumb")
+        ol.breadcrumb.mb-1
+          li.breadcrumb-item
+            a.text-decoration-none(href="/sales") Ventas
+          li.breadcrumb-item.active Nueva Venta
+      h1.h2.mb-0
+        i.fas.fa-cart-plus.text-success.me-2
+        | Nueva Venta
+    a.btn.btn-outline-secondary.rounded-pill.px-3(href="/sales")
+      i.fas.fa-arrow-left.me-1
+      | Volver
+
+  //- ============================================
+  //- PASO 1: SELECCIONAR ORIGEN
+  //- ============================================
+  .row.g-4.mb-4
+    .col-lg-6
+      .card.border-0.shadow-sm.rounded-3.h-100.option-card#optionFromQuotation(data-option="quotation")
+        .card-body.p-4
+          .d-flex.align-items-center.mb-3
+            .option-icon.bg-primary.text-white.me-3
+              i.fas.fa-file-invoice.fa-lg
+            div
+              h5.fw-bold.mb-1
+                | Desde una Cotización
+                span.badge.bg-success.ms-2 Nueva
+              p.text-muted.small.mb-0
+                | Trae los datos de una cotización pendiente
+          p.text-muted.mb-3
+            | Convierte una cotización existente en venta. Los items, cliente y precios se cargan automáticamente.
+          button.btn.btn-primary.w-100.rounded-pill(type="button" id="btnFromQuotation")
+            i.fas.fa-arrow-right.me-2
+            | Seleccionar Cotización
+
+    .col-lg-6
+      .card.border-0.shadow-sm.rounded-3.h-100.option-card#optionFromScratch(data-option="scratch")
+        .card-body.p-4
+          .d-flex.align-items-center.mb-3
+            .option-icon.bg-success.text-white.me-3
+              i.fas.fa-plus-circle.fa-lg
+            div
+              h5.fw-bold.mb-1 Venta desde Cero
+              p.text-muted.small.mb-0
+                | Agrega productos manualmente
+          p.text-muted.mb-3
+            | Crea una venta completamente nueva. Busca productos, agrega cantidades y define el cliente.
+          button.btn.btn-success.w-100.rounded-pill(type="button" id="btnFromScratch")
+            i.fas.fa-plus.me-2
+            | Empezar desde Cero
+
+  //- ============================================
+  //- PASO 2A: LISTA DE COTIZACIONES PENDIENTES
+  //- ============================================
+  #quotationListSection.d-none
+    .card.border-0.shadow-sm.rounded-3.mb-4
+      .card-header.bg-white.border-bottom.py-3
+        .d-flex.justify-content-between.align-items-center
+          h5.mb-0
+            i.fas.fa-file-invoice.text-primary.me-2
+            | Cotizaciones Pendientes
+          button.btn.btn-sm.btn-outline-secondary.rounded-pill(type="button" id="btnBackToOptions1")
+            i.fas.fa-arrow-left.me-1
+            | Cambiar opción
+
+      .card-body.p-0
+        if quotations && quotations.length
+          .table-responsive
+            table.table.table-hover.align-middle.mb-0
+              thead.bg-light
+                tr
+                  th N° Cotización
+                  th Cliente
+                  th Fecha
+                  th Total
+                  th.text-center Acción
+              tbody
+                each quotation in quotations
+                  tr.quotation-row(data-quotation-id=quotation._id)
+                    td
+                      strong.text-primary #{quotation.number}
+                    td
+                      if quotation.client
+                        div #{quotation.client.businessName}
+                        small.text-muted #{quotation.client.ruc || 'Sin RUC'}
+                      else
+                        span.text-muted Cliente Anónimo
+                    td
+                      = new Date(quotation.createdAt).toLocaleDateString('es-PE')
+                    td
+                      strong.text-success S/. #{quotation.total.toFixed(2)}
+                    td.text-center
+                      button.btn.btn-sm.btn-primary.rounded-pill.px-3.btn-select-quotation(
+                        type="button"
+                        data-quotation-id=quotation._id
+                      )
+                        i.fas.fa-arrow-right.me-1
+                        | Seleccionar
+        else
+          .text-center.py-5
+            i.fas.fa-file-invoice.fa-3x.text-muted.mb-3.d-block.opacity-50
+            h5.text-muted No hay cotizaciones pendientes
+            p.text-muted.small Todas las cotizaciones ya fueron convertidas o no hay ninguna creada
+            a.btn.btn-outline-primary.rounded-pill.px-4(href="/quotations/create")
+              i.fas.fa-plus-circle.me-1
+              | Crear Cotización
+
+  //- ============================================
+  //- PASO 2B: FORMULARIO DE VENTA
+  //- ============================================
+  #saleFormSection.d-none
+    form#formCreateSale(method="POST" action="/sales")
+      input(type="hidden" name="convertedFromQuotation" id="convertedFromQuotation" value="")
+
+      .row.g-4
+        //- ========== COLUMNA IZQUIERDA ==========
+        .col-lg-8
+
+          //- Banner si viene de cotización
+          #quotationBanner.d-none.alert.alert-info.rounded-3.mb-3
+            .d-flex.justify-content-between.align-items-center
+              div
+                i.fas.fa-file-invoice.me-2
+                | Cotización cargada:
+                strong.ms-1#quotationNumberBanner -
+                br
+                small Los items se cargaron automáticamente. Puedes modificarlos si lo necesitas.
+              button.btn.btn-sm.btn-outline-secondary.rounded-pill(type="button" id="btnClearQuotation")
+                i.fas.fa-times.me-1
+                | Quitar
+
+          //- Datos del cliente
+          .card.border-0.shadow-sm.rounded-3.mb-3
+            .card-header.bg-white.border-bottom.py-3
+              h6.mb-0
+                i.fas.fa-user.text-primary.me-2
+                | Datos del Cliente
+            .card-body
+              .row.g-3
+                .col-md-6
+                  label.form-label.fw-semibold Cliente
+                  select.form-select#clientSelect(name="client")
+                    option(value="") -- Seleccionar cliente --
+                    each client in clients
+                      option(value=client._id)= client.businessName + ' - ' + (client.ruc || 'Sin RUC')
+                .col-md-6
+                  label.form-label.fw-semibold Método de Pago
+                  select.form-select(name="paymentMethod")
+                    option(value="Efectivo") 💵 Efectivo
+                    option(value="Transferencia") 🏦 Transferencia
+                    option(value="Tarjeta") 💳 Tarjeta
+                    option(value="Yape") 📱 Yape
+                    option(value="Plin") 📱 Plin
+                    option(value="Otro") Otro
+
+          //- Productos
+          .card.border-0.shadow-sm.rounded-3.mb-3
+            .card-header.bg-white.border-bottom.py-3
+              .d-flex.justify-content-between.align-items-center
+                h6.mb-0
+                  i.fas.fa-box.text-primary.me-2
+                  | Productos
+                button.btn.btn-sm.btn-outline-primary.rounded-pill(type="button" id="btnAddProduct")
+                  i.fas.fa-plus.me-1
+                  | Agregar producto
+
+            .card-body.p-0
+              .table-responsive
+                table.table.align-middle.mb-0#productsTable
+                  thead.bg-light
+                    tr
+                      th(style="width: 40%;") Producto
+                      th(style="width: 15%;") Cantidad
+                      th(style="width: 20%;") Precio Unit.
+                      th(style="width: 15%;") Subtotal
+                      th(style="width: 10%;") Acción
+                  tbody#productsBody
+                    //- Las filas se generan con JS
+
+          //- Notas
+          .card.border-0.shadow-sm.rounded-3
+            .card-header.bg-white.border-bottom.py-3
+              h6.mb-0
+                i.fas.fa-sticky-note.text-primary.me-2
+                | Notas adicionales
+            .card-body
+              textarea.form-control(name="notes" rows="3" placeholder="Notas para la venta (opcional)")
+
+        //- ========== COLUMNA DERECHA ==========
+        .col-lg-4
+          .card.border-0.shadow-sm.rounded-3.sticky-top(style="top: 100px;")
+            .card-header.bg-white.border-bottom.py-3
+              h6.mb-0
+                i.fas.fa-calculator.text-primary.me-2
+                | Resumen
+
+            .card-body
+              //- Checkbox IGV
+              .form-check.mb-3
+                input.form-check-input(type="checkbox" id="includeIgv" name="includeIgv" checked)
+                label.form-check-label(for="includeIgv")
+                  | Precio incluye IGV
+                  small.text-muted.d-block (si está desmarcado se agrega 18%)
+
+              //- Descuento
+              .mb-3
+                label.form-label.fw-semibold Descuento (S/.)
+                input.form-control(type="number" name="discount" id="discountInput" value="0" min="0" step="0.01")
+
+              hr
+
+              //- Totales
+              .d-flex.justify-content-between.mb-2
+                span.text-muted Subtotal
+                strong#subtotalDisplay S/. 0.00
+
+              .d-flex.justify-content-between.mb-2#igvRow(style="display: none;")
+                span.text-muted IGV (18%)
+                strong#igvDisplay S/. 0.00
+
+              .d-flex.justify-content-between.mb-2#discountRow(style="display: none;")
+                span.text-muted Descuento
+                strong.text-danger#discountDisplay - S/. 0.00
+
+              hr
+
+              .d-flex.justify-content-between.mb-3
+                span.fw-bold Total
+                strong.text-success.fs-4#totalDisplay S/. 0.00
+
+              button.btn.btn-success.w-100.rounded-pill.py-3.fw-bold(type="submit")
+                i.fas.fa-check.me-2
+                | Registrar Venta
+
+              button.btn.btn-outline-secondary.w-100.rounded-pill.mt-2(type="button" id="btnCancel")
+                | Cancelar
+
+  //- ============================================
+  //- ESTILOS
+  //- ============================================
+  style.
+    .option-card {
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 2px solid transparent !important;
+    }
+    .option-card:hover {
+      border-color: var(--brand) !important;
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.1) !important;
+    }
+    .option-card#optionFromScratch:hover {
+      border-color: #198754 !important;
+    }
+    .option-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .product-row input,
+    .product-row select {
+      border: 1px solid #e2e8f0;
+      border-radius: 0.5rem;
+      padding: 0.5rem;
+      font-size: 0.9rem;
+    }
+    .product-row input:focus,
+    .product-row select:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px rgba(13,110,253,0.1);
+    }
+
+    .quotation-row {
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .quotation-row:hover {
+      background: #f8fafc;
+    }
+
+    .sticky-top {
+      position: sticky;
+    }
+
+  //- ============================================
+  //- SCRIPTS
+  //- ============================================
+  script.
+    document.addEventListener('DOMContentLoaded', function() {
+
+      // ============================================
+      // ELEMENTOS
+      // ============================================
+      const optionFromQuotation = document.getElementById('optionFromQuotation');
+      const optionFromScratch = document.getElementById('optionFromScratch');
+      const btnFromQuotation = document.getElementById('btnFromQuotation');
+      const btnFromScratch = document.getElementById('btnFromScratch');
+      const btnBackToOptions1 = document.getElementById('btnBackToOptions1');
+      const btnBackToOptions2 = document.getElementById('btnBackToOptions2');
+
+      const quotationListSection = document.getElementById('quotationListSection');
+      const saleFormSection = document.getElementById('saleFormSection');
+
+      const btnAddProduct = document.getElementById('btnAddProduct');
+      const productsBody = document.getElementById('productsBody');
+      const btnCancel = document.getElementById('btnCancel');
+
+      const includeIgv = document.getElementById('includeIgv');
+      const discountInput = document.getElementById('discountInput');
+
+      const convertedFromQuotation = document.getElementById('convertedFromQuotation');
+      const quotationBanner = document.getElementById('quotationBanner');
+      const quotationNumberBanner = document.getElementById('quotationNumberBanner');
+      const btnClearQuotation = document.getElementById('btnClearQuotation');
+
+      const clientSelect = document.getElementById('clientSelect');
+
+      // ============================================
+      // PRODUCTOS DISPONIBLES (JSON embebido)
+      // ============================================
+      const products = !{JSON.stringify(products || [])};
+
+      // ============================================
+      // MOSTRAR/OCULTAR SECCIONES
+      // ============================================
+      function showQuotationList() {
+        document.querySelectorAll('.row.g-4.mb-4')[0].classList.add('d-none');
+        quotationListSection.classList.remove('d-none');
+        saleFormSection.classList.add('d-none');
+      }
+
+      function showSaleForm() {
+        document.querySelectorAll('.row.g-4.mb-4')[0].classList.add('d-none');
+        quotationListSection.classList.add('d-none');
+        saleFormSection.classList.remove('d-none');
+
+        // Si no hay productos aún, agregar uno por defecto
+        if (productsBody.querySelectorAll('.product-row').length === 0) {
+          addProductRow();
+        }
+      }
+
+      function showOptions() {
+        document.querySelectorAll('.row.g-4.mb-4')[0].classList.remove('d-none');
+        quotationListSection.classList.add('d-none');
+        saleFormSection.classList.add('d-none');
+      }
+
+      if (btnFromQuotation) btnFromQuotation.addEventListener('click', showQuotationList);
+      if (btnFromScratch) btnFromScratch.addEventListener('click', showSaleForm);
+      if (btnBackToOptions1) btnBackToOptions1.addEventListener('click', showOptions);
+      if (btnBackToOptions2) btnBackToOptions2.addEventListener('click', showOptions);
+      if (btnCancel) btnCancel.addEventListener('click', function() {
+        if (confirm('¿Cancelar la creación de la venta?')) {
+          window.location.href = '/sales';
+        }
+      });
+
+      // ============================================
+      // SELECCIONAR COTIZACIÓN
+      // ============================================
+      document.querySelectorAll('.btn-select-quotation').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const quotationId = this.dataset.quotationId;
+          loadQuotationData(quotationId);
+        });
+      });
+
+      document.querySelectorAll('.quotation-row').forEach(row => {
+        row.addEventListener('click', function() {
+          const quotationId = this.dataset.quotationId;
+          loadQuotationData(quotationId);
+        });
+      });
+
+      function loadQuotationData(quotationId) {
+        fetch(`/quotations/${quotationId}/data`)
+          .then(r => r.json())
+          .then(data => {
+            if (data.error) {
+              alert('Error: ' + data.error);
+              return;
+            }
+
+            // Cargar cliente
+            if (data.client) {
+              clientSelect.value = data.client._id;
+            }
+
+            // Limpiar items
+            productsBody.innerHTML = '';
+
+            // Cargar items
+            if (data.items && data.items.length) {
+              data.items.forEach(item => {
+                addProductRow({
+                  productId: item.product ? item.product._id : '',
+                  description: item.description,
+                  quantity: item.quantity,
+                  unitPrice: item.unitPrice
+                });
+              });
+            }
+
+            // Guardar referencia a la cotización
+            convertedFromQuotation.value = quotationId;
+
+            // Mostrar banner
+            quotationNumberBanner.textContent = data.number;
+            quotationBanner.classList.remove('d-none');
+
+            // Si tiene descuento, cargarlo
+            if (data.discount) {
+              discountInput.value = data.discount;
+            }
+
+            // Si no incluye IGV, desmarcar
+            if (data.includeIgv === false) {
+              includeIgv.checked = false;
+            }
+
+            // Mostrar formulario
+            showSaleForm();
+
+            // Recalcular
+            recalcTotals();
+          })
+          .catch(err => {
+            console.error('Error cargando cotización:', err);
+            alert('Error al cargar la cotización');
+          });
+      }
+
+      if (btnClearQuotation) {
+        btnClearQuotation.addEventListener('click', function() {
+          convertedFromQuotation.value = '';
+          quotationBanner.classList.add('d-none');
+        });
+      }
+
+      // ============================================
+      // AGREGAR FILA DE PRODUCTO
+      // ============================================
+      function addProductRow(data = {}) {
+        const row = document.createElement('tr');
+        row.className = 'product-row';
+
+        // Generar opciones de productos
+        let productOptions = '<option value="">-- Seleccionar producto --</option>';
+        products.forEach(p => {
+          const selected = (data.productId && String(p._id) === String(data.productId)) ? 'selected' : '';
+          const price = p.customerPrice || 0;
+          productOptions += `<option value="${p._id}" data-price="${price}" data-image="${p.image || ''}" ${selected}>${p.name} - S/. ${price.toFixed(2)}</option>`;
+        });
+
+        row.innerHTML = `
+          <td>
+            <select class="form-select form-select-sm product-select" name="items[][product]">
+              ${productOptions}
+            </select>
+            <input type="text" class="form-control form-control-sm mt-1 product-description" name="items[][description]" placeholder="Descripción adicional" value="${data.description || ''}">
+          </td>
+          <td>
+            <input type="number" class="form-control form-control-sm product-quantity" name="items[][quantity]" value="${data.quantity || 1}" min="1" step="1">
+          </td>
+          <td>
+            <input type="number" class="form-control form-control-sm product-price" name="items[][unitPrice]" value="${data.unitPrice || 0}" min="0" step="0.01">
+          </td>
+          <td>
+            <span class="product-subtotal fw-bold">S/. 0.00</span>
+          </td>
+          <td>
+            <button type="button" class="btn btn-sm btn-outline-danger rounded-circle btn-remove-product">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        `;
+
+        productsBody.appendChild(row);
+
+        // ============================================
+        // EVENTOS DE LA FILA
+        // ============================================
+        const select = row.querySelector('.product-select');
+        const quantity = row.querySelector('.product-quantity');
+        const price = row.querySelector('.product-price');
+        const description = row.querySelector('.product-description');
+        const btnRemove = row.querySelector('.btn-remove-product');
+
+        // Cuando cambia el select de producto
+        select.addEventListener('change', function() {
+          const opt = this.options[this.selectedIndex];
+          if (opt && opt.value) {
+            const p = opt.dataset.price;
+            price.value = parseFloat(p) || 0;
+            // Auto-llenar descripción con el nombre del producto
+            const productName = opt.text.split(' - ')[0];
+            if (!description.value) {
+              description.value = productName;
+            }
+          }
+          recalcTotals();
+        });
+
+        // Recalcular al cambiar valores
+        [quantity, price, description].forEach(el => {
+          el.addEventListener('input', recalcTotals);
+        });
+
+        // Eliminar fila
+        btnRemove.addEventListener('click', function() {
+          row.remove();
+          recalcTotals();
+        });
+
+        // Si viene con datos, pre-seleccionar
+        if (data.productId) {
+          select.value = data.productId;
+        }
+
+        recalcTotals();
+      }
+
+      if (btnAddProduct) {
+        btnAddProduct.addEventListener('click', function() {
+          addProductRow();
+        });
+      }
+
+      // ============================================
+      // RECALCULAR TOTALES
+      // ============================================
+      function recalcTotals() {
+        const rows = productsBody.querySelectorAll('.product-row');
+        let subtotal = 0;
+
+        rows.forEach(row => {
+          const q = parseFloat(row.querySelector('.product-quantity').value) || 0;
+          const p = parseFloat(row.querySelector('.product-price').value) || 0;
+          const itemSubtotal = q * p;
+          subtotal += itemSubtotal;
+          row.querySelector('.product-subtotal').textContent = 'S/. ' + itemSubtotal.toFixed(2);
+        });
+
+        const includeIgvBool = includeIgv.checked;
+        const igv = includeIgvBool ? 0 : subtotal * 0.18;
+        const discount = parseFloat(discountInput.value) || 0;
+        const total = subtotal + igv - discount;
+
+        document.getElementById('subtotalDisplay').textContent = 'S/. ' + subtotal.toFixed(2);
+
+        const igvRow = document.getElementById('igvRow');
+        const igvDisplay = document.getElementById('igvDisplay');
+        if (!includeIgvBool && igv > 0) {
+          igvRow.style.display = 'flex';
+          igvDisplay.textContent = 'S/. ' + igv.toFixed(2);
+        } else {
+          igvRow.style.display = 'none';
+        }
+
+        const discountRow = document.getElementById('discountRow');
+        const discountDisplay = document.getElementById('discountDisplay');
+        if (discount > 0) {
+          discountRow.style.display = 'flex';
+          discountDisplay.textContent = '- S/. ' + discount.toFixed(2);
+        } else {
+          discountRow.style.display = 'none';
+        }
+
+        document.getElementById('totalDisplay').textContent = 'S/. ' + total.toFixed(2);
+      }
+
+      includeIgv.addEventListener('change', recalcTotals);
+      discountInput.addEventListener('input', recalcTotals);
+
+    });

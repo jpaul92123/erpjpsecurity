@@ -1,0 +1,176 @@
+extends ../layouts/layout
+
+block content
+  .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pb-2.mb-3.border-bottom
+    h1.h2
+      i.fas.fa-edit.me-2
+      | Editar Producto: #{product.name}
+    a.btn.btn-outline-secondary(href="/products")
+      i.fas.fa-arrow-left.me-1
+      | Volver
+
+  .card.border-0.shadow-sm
+    .card-body
+      form(method="POST", action=`/products/${product._id}?_method=PUT`)
+        .row
+          .col-md-6
+            .mb-3
+              label.form-label Nombre *
+              input.form-control(type="text", name="name", value=product.name, required)
+          .col-md-6
+            .mb-3
+              label.form-label Modelo
+              input.form-control(type="text", name="model", value=product.model)
+        .mb-3
+          label.form-label Imagen (URL)
+          input.form-control(type="text", name="image", value=product.image || '')
+        .row
+          .col-md-6
+            .mb-3
+              label.form-label Categoría *
+              select#categorySelect.form-control(name="category", required)
+                each cat in categories
+                  option(value=cat._id, selected=cat._id.toString() === product.category.toString()) #{cat.name}
+          .col-md-6
+            .mb-3
+              label.form-label Subcategoría
+              select#subcategorySelect.form-control(name="subcategory")
+                option(value="") Ninguna
+                each sub in subcategories
+                  - var selected = (product.subcategory && product.subcategory.toString() === sub._id.toString()) ? 'selected' : ''
+                  option(value=sub._id, data-parent=sub.parent.toString(), selected=selected) #{sub.name}
+
+          .col-md-6
+            .mb-3
+              label.form-label.fw-semibold Marca
+              select.form-select(name="brand")
+                option(value="") — Sin marca —
+                each brand in brands
+                  option(
+                    value=brand._id
+                    selected=(product && product.brand && product.brand.toString() === brand._id.toString())
+                  )= brand.name         
+
+        //- Sección de precios con calculadora
+        .card.bg-light.mb-3
+          .card-body
+            h5.text-primary
+              i.fas.fa-calculator.me-2
+              | Calculadora de Precios
+            .row
+              .col-md-4
+                .mb-3
+                  label.form-label Precio Proveedor (S/.) *
+                  input#supplierPrice.form-control(type="number", name="supplierPrice", step="0.01", min="0", value=product.supplierPrice, required)
+              .col-md-4
+                .mb-3
+                  label.form-label % Ganancia
+                  .input-group
+                    input#profitPercent.form-control(type="number", name="profitPercent", step="1", min="0")
+                    span.input-group-text %
+              .col-md-4
+                .mb-3
+                  label.form-label Precio Cliente (S/.)
+                  .input-group
+                    input#customerPrice.form-control(type="number", name="customerPrice", step="0.01", min="0", value=product.customerPrice)
+                    button.btn.btn-outline-secondary(type="button", onclick="calculatePrice()")
+                      i.fas.fa-sync-alt
+            .row
+              .col-md-12
+                .alert.alert-success
+                  .d-flex.justify-content-between
+                    span Ganancia por unidad:
+                    span#profitDisplay.fw-bold S/. 0.00
+                small.text-muted * El IGV ya está incluido en todos los precios.
+
+        //- Descuento y otros campos
+        .row
+          .col-md-4
+            .mb-3
+              label.form-label Descuento (%)
+              input#discountInput.form-control(type="number", name="discount", step="0.01", min="0", max="100", value=product.discount || 0)
+          .col-md-8
+            .mb-3
+              label.form-label Precio con Descuento (S/.)
+              input#priceWithDiscount.form-control(type="text", readonly, style="font-weight:bold; color:#0d6efd;")
+        .mb-3
+          label.form-label Descripción
+          textarea.form-control(name="description", rows="2") #{product.description}
+        .mb-3
+          label.form-label Ficha Técnica (URL)
+          input.form-control(type="text", name="techSheet", value=product.techSheet || '')
+        .form-check.mb-3
+          input#isActive.form-check-input(type="checkbox", name="isActive", checked=product.isActive)
+          label.form-check-label(for="isActive") Activo
+        button.btn.btn-primary(type="submit")
+          i.fas.fa-save.me-1
+          | Actualizar
+        a.btn.btn-outline-secondary.ms-2(href="/products") Cancelar
+
+  script.
+    // ============== CALCULADORA DE PRECIOS ==============
+    function calculatePrice() {
+      const supplierPrice = parseFloat(document.getElementById('supplierPrice').value) || 0;
+      const profitPercent = parseFloat(document.getElementById('profitPercent').value) || 0;
+      
+      // Calcular precio cliente
+      const customerPrice = supplierPrice * (1 + profitPercent / 100);
+      document.getElementById('customerPrice').value = customerPrice.toFixed(2);
+      
+      // Calcular ganancia
+      const profit = customerPrice - supplierPrice;
+      document.getElementById('profitDisplay').textContent = 'S/. ' + profit.toFixed(2);
+      
+      // Calcular precio con descuento
+      calculateDiscount();
+    }
+
+    function calculateDiscount() {
+      const customerPrice = parseFloat(document.getElementById('customerPrice').value) || 0;
+      const discount = parseFloat(document.getElementById('discountInput').value) || 0;
+      const priceWithDiscount = customerPrice * (1 - discount / 100);
+      document.getElementById('priceWithDiscount').value = 'S/. ' + priceWithDiscount.toFixed(2);
+    }
+
+    // Inicializar calculadora al cargar
+    document.addEventListener('DOMContentLoaded', function() {
+      // Filtro de subcategorías
+      const catSelect = document.getElementById('categorySelect');
+      const subSelect = document.getElementById('subcategorySelect');
+      const allSubs = subSelect.querySelectorAll('option[data-parent]');
+      const currentSub = '#{product.subcategory || ''}';
+
+      function filterSubs() {
+        const selectedCat = catSelect.value;
+        subSelect.innerHTML = '<option value="">Ninguna</option>';
+        allSubs.forEach(opt => {
+          if (opt.dataset.parent === selectedCat) {
+            const clone = opt.cloneNode(true);
+            if (clone.value === currentSub) clone.selected = true;
+            subSelect.appendChild(clone);
+          }
+        });
+      }
+
+      catSelect.addEventListener('change', filterSubs);
+      filterSubs();
+
+      // Calcular el porcentaje de ganancia basado en los valores actuales
+      const supplierPrice = parseFloat(document.getElementById('supplierPrice').value) || 0;
+      const customerPrice = parseFloat(document.getElementById('customerPrice').value) || 0;
+      if (supplierPrice > 0 && customerPrice > 0) {
+        const profitPercent = ((customerPrice - supplierPrice) / supplierPrice) * 100;
+        document.getElementById('profitPercent').value = profitPercent.toFixed(0);
+      } else {
+        document.getElementById('profitPercent').value = 30;
+      }
+
+      // Eventos de precios
+      document.getElementById('supplierPrice').addEventListener('input', calculatePrice);
+      document.getElementById('profitPercent').addEventListener('input', calculatePrice);
+      document.getElementById('discountInput').addEventListener('input', calculateDiscount);
+
+      // Calcular precios iniciales
+      calculatePrice();
+      calculateDiscount();
+    });

@@ -1,0 +1,48 @@
+//- ============================================================
+//- PARTIAL: Exponer setting al JS del navegador
+//- Uso: include ../partials/setting-globals
+//- ============================================================
+
+script(type="text/javascript").
+  (function() {
+    var rawSetting = !{JSON.stringify(locals.setting || {})};
+    var s = rawSetting || {};
+    window.APP_SETTING = {
+      siteName: s.siteName || 'JP Security',
+      siteTagline: s.siteTagline || '',
+      logo: s.logo || '',
+      favicon: s.favicon || '',
+      icon: s.icon || 'fa-shield-halved',
+      colors: {
+        primary: (s.colors && s.colors.primary) || '#0d6efd',
+        secondary: (s.colors && s.colors.secondary) || '#0a58ca',
+        accent: (s.colors && s.colors.accent) || '#ffc107'
+      },
+      company: {
+        legalName: (s.company && s.company.legalName) || '',
+        ruc: (s.company && s.company.ruc) || '',
+        phone: (s.company && s.company.phone) || '',
+        email: (s.company && s.company.email) || '',
+        address: (s.company && s.company.address) || '',
+        city: (s.company && s.company.city) || 'Lima',
+        country: (s.company && s.company.country) || 'Perú'
+      },
+      social: {
+        facebook: (s.social && s.social.facebook) || '',
+        instagram: (s.social && s.social.instagram) || '',
+        whatsapp: (s.social && s.social.whatsapp) || '',
+        youtube: (s.social && s.social.youtube) || '',
+        tiktok: (s.social && s.social.tiktok) || '',
+        linkedin: (s.social && s.social.linkedin) || '',
+        twitter: (s.social && s.social.twitter) || ''
+      },
+      schedule: {
+        weekdays: (s.schedule && s.schedule.weekdays) || '',
+        saturday: (s.schedule && s.schedule.saturday) || '',
+        sunday: (s.schedule && s.schedule.sunday) || '',
+        holidays: (s.schedule && s.schedule.holidays) || ''
+      },
+      metaDescription: s.metaDescription || '',
+      metaKeywords: s.metaKeywords || ''
+    };
+  })();

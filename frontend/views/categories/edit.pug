@@ -1,0 +1,48 @@
+extends ../layouts/layout
+
+block content
+  .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pb-2.mb-3.border-bottom
+    h1.h2
+      i.fas.fa-edit.me-2
+      if isSubcategory
+        | Editar Subcategoría: #{category.name}
+      else
+        | Editar Categoría: #{category.name}
+    a.btn.btn-outline-secondary(href="/categories")
+      i.fas.fa-arrow-left.me-1
+      | Volver
+
+  .card.border-0.shadow-sm
+    .card-body
+      form(method="POST", action=`/categories/${category._id}?_method=PUT`)
+        .mb-3
+          label.form-label Nombre *
+          input.form-control(type="text", name="name", value=category.name, required)
+        .mb-3
+          label.form-label Descripción
+          textarea.form-control(name="description", rows="2") #{category.description}
+        .mb-3
+          label.form-label Imagen (URL)
+          input.form-control(type="text", name="image", value=category.image || '')
+          small.text-muted Deja vacío para conservar la imagen actual o eliminar la existente.
+        if isSubcategory && parents && parents.length
+          .mb-3
+            label.form-label Categoría Padre
+            select.form-control(name="parent")
+              option(value="") Ninguna (convertir a categoría principal)
+              each p in parents
+                - var selected = (category.parent && category.parent.toString() === p._id.toString()) ? 'selected' : ''
+                option(value=p._id, selected=selected) #{p.name}
+        else if isSubcategory
+          //- Si no hay padres disponibles, solo mostramos el padre actual como readonly
+          .mb-3
+            label.form-label Categoría Padre
+            input.form-control(type="text", value=category.parent ? category.parent.name : 'Ninguna', readonly)
+            input(type="hidden", name="parent", value=category.parent ? category.parent._id : '')
+        .form-check.mb-3
+          input#isActive.form-check-input(type="checkbox", name="isActive", checked=category.isActive)
+          label.form-check-label(for="isActive") Activo
+        button.btn.btn-primary(type="submit")
+          i.fas.fa-save.me-1
+          | Actualizar
+        a.btn.btn-outline-secondary.ms-2(href="/categories") Cancelar

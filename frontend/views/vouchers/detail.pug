@@ -1,0 +1,63 @@
+extends ../layouts/layout
+
+block content
+  .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pb-2.mb-3.border-bottom
+    h1.h2
+      i.fas.fa-file-pdf.me-2
+      | Comprobante #{voucher.number}
+    div
+      a.btn.btn-outline-secondary.me-2(href="/vouchers")
+        i.fas.fa-arrow-left.me-1
+        | Volver
+      if voucher.status === 'Emitido'
+        form.d-inline(method="POST", action=`/vouchers/${voucher._id}/annul`, onsubmit="return confirm('¿Anular este comprobante?')")
+          button.btn.btn-warning(type="submit")
+            i.fas.fa-ban.me-1
+            | Anular
+
+  .card.border-0.shadow-sm
+    .card-body
+      .row
+        .col-md-6
+          p
+            strong Tipo: 
+            span.badge.bg-info #{voucher.type}
+          p
+            strong N° Comprobante: 
+            code #{voucher.number}
+          p
+            strong Fecha: 
+            | #{new Date(voucher.date).toLocaleString()}
+        .col-md-6
+          p
+            strong Cliente: 
+            | #{voucher.businessName}
+          p
+            strong RUC: 
+            | #{voucher.ruc}
+          p
+            strong Estado: 
+            if voucher.status === 'Emitido'
+              span.badge.bg-success Emitido
+            else
+              span.badge.bg-danger Anulado
+      hr
+      .row
+        .col-md-4
+          p
+            strong Subtotal: 
+            | S/. #{voucher.subtotal.toFixed(2)}
+        .col-md-4
+          p
+            strong IGV (18%): 
+            | S/. #{voucher.igv.toFixed(2)}
+        .col-md-4
+          p
+            strong TOTAL: 
+            span.text-primary.fw-bold S/. #{voucher.total.toFixed(2)}
+      hr
+      p
+        strong Venta asociada: 
+        a(href=`/sales/${voucher.sale._id}`) #{voucher.sale.number}
+      p
+        small.text-muted Creado por: #{voucher.createdBy ? voucher.createdBy.name : '-'}

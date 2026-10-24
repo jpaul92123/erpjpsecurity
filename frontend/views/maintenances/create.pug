@@ -1,0 +1,64 @@
+extends ../layouts/layout
+
+block content
+  .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pb-2.mb-3.border-bottom
+    h1.h2
+      i.fas.fa-plus-circle.me-2
+      | Nuevo Mantenimiento
+    a.btn.btn-outline-secondary(href="/maintenances")
+      i.fas.fa-arrow-left.me-1
+      | Volver
+
+  .card.border-0.shadow-sm
+    .card-body
+      form(method="POST", action="/maintenances")
+        .row
+          .col-md-6
+            .mb-3
+              label.form-label Cliente *
+              select.form-control(name="client", required)
+                option(value="") Seleccionar...
+                each client in clients || []
+                  option(value=client._id) #{client.businessName}
+          .col-md-6
+            .mb-3
+              label.form-label Tipo *
+              select.form-control(name="type", required)
+                option(value="") Seleccionar...
+                option(value="Preventivo") Preventivo
+                option(value="Correctivo") Correctivo
+                option(value="Emergencia") Emergencia
+        .row
+          .col-md-6
+            .mb-3
+              label.form-label Equipo *
+              input.form-control(type="text", name="equipment", required)
+          .col-md-6
+            .mb-3
+              label.form-label N° Serie
+              input.form-control(type="text", name="serialNumber")
+        .row
+          .col-md-6
+            .mb-3
+              label.form-label Fecha Programada *
+              input.form-control(type="date", name="scheduledDate", required)
+          .col-md-6
+            .mb-3
+              label.form-label Técnico *
+              input.form-control(type="text", name="technician", required)
+        .row
+          .col-md-6
+            .mb-3
+              label.form-label Costo (S/.)
+              input.form-control(type="number", name="cost", step="0.01", min="0")
+          .col-md-6
+            .mb-3
+              label.form-label Fecha de Finalización
+              input.form-control(type="date", name="completionDate")
+        .mb-3
+          label.form-label Descripción
+          textarea.form-control(name="description", rows="2")
+        button.btn.btn-primary(type="submit")
+          i.fas.fa-save.me-1
+          | Guardar
+        a.btn.btn-outline-secondary.ms-2(href="/maintenances") Cancelar

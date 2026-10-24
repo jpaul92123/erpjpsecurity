@@ -1,0 +1,2223 @@
+doctype html
+html(lang="es")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+
+    //- ============================================
+    //- SEO DINÁMICO
+    //- ============================================
+    - const pageTitle = (setting && setting.siteName) ? (setting.siteName + ' - ' + (setting.siteTagline || 'Soluciones en Seguridad')) : 'JP Security - Soluciones en Seguridad'
+    - const pageDescription = (setting && setting.metaDescription) ? setting.metaDescription : 'Sistemas de seguridad, cámaras, alarmas e instalación profesional.'
+    - const pageKeywords = (setting && setting.metaKeywords) ? setting.metaKeywords : 'seguridad, cámaras, alarmas, Lima, Perú'
+
+    title= pageTitle
+    meta(name="description" content=pageDescription)
+    meta(name="keywords" content=pageKeywords)
+
+    if setting && setting.favicon
+      link(rel="icon" href=setting.favicon)
+
+    link(rel="stylesheet" href="/bootstrap/css/bootstrap.min.css")
+    link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css")
+    link(rel="stylesheet" href="/css/styles.css")
+
+    - const brandPrimary = (setting && setting.colors && setting.colors.primary) ? setting.colors.primary : '#0d6efd'
+    - const brandSecondary = (setting && setting.colors && setting.colors.secondary) ? setting.colors.secondary : '#0a58ca'
+    - const brandAccent = (setting && setting.colors && setting.colors.accent) ? setting.colors.accent : '#ffc107'
+
+    style.
+      :root {
+        --brand: #{brandPrimary};
+        --brand-dark: #{brandSecondary};
+        --brand-darker: #084298;
+        --accent: #{brandAccent};
+        --dark: #0f172a;
+      }
+
+    style.
+      /* ================================================
+         BASE
+         ================================================ */
+      body {
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        color: #1f2937;
+      }
+
+      /* ================================================
+         TOPBAR
+         ================================================ */
+      .topbar {
+        background: var(--dark);
+        color: #cbd5e1;
+        font-size: 0.8rem;
+        padding: 0.5rem 0;
+      }
+      .topbar-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        color: #cbd5e1;
+        text-decoration: none;
+        font-size: 0.8rem;
+        transition: color 0.15s;
+      }
+      .topbar-item:hover { color: white; }
+      .topbar-item i { font-size: 0.75rem; opacity: 0.75; }
+
+      /* ================================================
+         NAVBAR
+         ================================================ */
+      .navbar { padding: 0.75rem 0; }
+      .navbar-brand { font-weight: 700; font-size: 1.35rem; letter-spacing: -0.5px; }
+      .navbar-brand img { max-height: 100px; }
+
+      .main-nav .nav-item { margin: 0 0.15rem; }
+      .main-nav .nav-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 500;
+        font-size: 0.9rem;
+        color: #475569;
+        padding: 0.5rem 0.9rem !important;
+        border-radius: 0.5rem;
+        transition: all 0.2s;
+      }
+      .main-nav .nav-link .nav-icon {
+        font-size: 0.85rem;
+        color: var(--brand);
+        opacity: 0.7;
+        transition: all 0.2s;
+      }
+      .main-nav .nav-link:hover {
+        background: #f1f5f9;
+        color: var(--brand);
+      }
+      .main-nav .nav-link:hover .nav-icon {
+        opacity: 1;
+        transform: scale(1.1);
+      }
+      .main-nav .nav-link.active {
+        background: rgba(13, 110, 253, 0.08);
+        color: var(--brand);
+      }
+      .main-nav .nav-link.active .nav-icon { opacity: 1; }
+      .main-nav .dropdown-toggle::after {
+        margin-left: 0.3rem;
+        font-size: 0.7rem;
+        opacity: 0.5;
+      }
+      .main-nav .dropdown-menu {
+        margin-top: 0.5rem;
+        padding: 0.5rem;
+      }
+      .main-nav .dropdown-item {
+        border-radius: 0.4rem;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.88rem;
+        transition: background 0.15s;
+      }
+      .main-nav .dropdown-item:hover { background: #f1f5f9; }
+
+      .actions-nav .nav-item { margin-left: 0.25rem; }
+      .actions-nav .icon-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 0.95rem;
+      }
+
+      .login-btn {
+        font-weight: 600;
+        font-size: 0.88rem;
+        transition: all 0.2s;
+      }
+      .login-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+      }
+
+      /* ================================================
+         BUSCADOR
+         ================================================ */
+      .search-wrapper {
+        flex: 1;
+        max-width: 500px;
+        position: relative;
+      }
+      .search-bar {
+        background: #f1f5f9;
+        border-radius: 50rem;
+        padding: 0.35rem 0.35rem 0.35rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .search-bar input {
+        border: none;
+        background: transparent;
+        outline: none;
+        flex: 1;
+        font-size: 0.9rem;
+      }
+      .search-bar button {
+        border-radius: 50rem;
+        padding: 0.4rem 1.1rem;
+        font-size: 0.85rem;
+        background: var(--brand);
+        border-color: var(--brand);
+      }
+      .search-bar button:hover { background: var(--brand-dark); border-color: var(--brand-dark); }
+
+      .search-results {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        right: 0;
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+        max-height: 420px;
+        overflow-y: auto;
+        z-index: 1050;
+        display: none;
+        padding: 0.5rem;
+      }
+      .search-results.show { display: block; }
+      .search-result-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.6rem 0.75rem;
+        border-radius: 0.75rem;
+        text-decoration: none;
+        color: inherit;
+        transition: background 0.15s;
+      }
+      .search-result-item:hover { background: #f1f5f9; color: inherit; }
+      .search-result-img {
+        width: 48px;
+        height: 48px;
+        border-radius: 0.5rem;
+        background: #f8fafc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        overflow: hidden;
+      }
+      .search-result-img img { max-width: 100%; max-height: 100%; object-fit: contain; }
+      .search-result-info { flex: 1; min-width: 0; }
+      .search-result-title {
+        font-weight: 600;
+        font-size: 0.875rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .search-result-meta { font-size: 0.75rem; color: #64748b; }
+      .search-result-price { font-weight: 700; color: var(--brand); font-size: 0.875rem; white-space: nowrap; }
+      .search-footer { border-top: 1px solid #e5e7eb; padding: 0.5rem; text-align: center; }
+      .search-footer a { font-size: 0.8rem; color: var(--brand); text-decoration: none; font-weight: 600; }
+      .search-footer a:hover { text-decoration: underline; }
+
+      /* ================================================
+         ICON BUTTONS
+         ================================================ */
+      .icon-btn {
+        position: relative;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #f1f5f9;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #1f2937;
+        border: none;
+        transition: all 0.2s;
+        text-decoration: none;
+      }
+      .icon-btn:hover { background: var(--brand); color: white; }
+      .icon-btn .badge-count {
+        position: absolute;
+        top: -2px;
+        right: -2px;
+        background: #dc3545;
+        color: white;
+        font-size: 0.65rem;
+        min-width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        padding: 0 4px;
+      }
+      .btn-primary { background: var(--brand); border-color: var(--brand); }
+      .btn-primary:hover { background: var(--brand-dark); border-color: var(--brand-dark); }
+      .text-primary { color: var(--brand) !important; }
+      .bg-primary { background: var(--brand) !important; }
+
+      /* ================================================
+         HERO SLIDER
+         ================================================ */
+      .hero-slide {
+        min-height: 520px;
+        display: flex;
+        align-items: center;
+        border-radius: 1.25rem;
+        position: relative;
+        overflow: hidden;
+        padding: 3rem;
+        background-color: var(--slide-bg);
+        color: var(--slide-text);
+      }
+      .hero-slide-image {
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+      .hero-slide .hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg,
+          rgba(0, 0, 0, 0.75) 0%,
+          rgba(0, 0, 0, 0.55) 40%,
+          rgba(0, 0, 0, 0.2) 70%,
+          rgba(0, 0, 0, 0.1) 100%);
+        z-index: 1;
+      }
+      .hero-slide::before {
+        content: '';
+        position: absolute;
+        top: -30%;
+        right: -10%;
+        width: 500px;
+        height: 500px;
+        background: rgba(255,255,255,0.08);
+        border-radius: 50%;
+        z-index: 0;
+      }
+      .hero-slide::after {
+        content: '';
+        position: absolute;
+        bottom: -40%;
+        right: 20%;
+        width: 350px;
+        height: 350px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 50%;
+        z-index: 0;
+      }
+      .hero-slide-image::before,
+      .hero-slide-image::after { display: none; }
+      .hero-content { position: relative; z-index: 2; }
+      .hero-slide .hero-icon {
+        font-size: 14rem;
+        opacity: 0.15;
+        position: absolute;
+        right: 5%;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 1;
+      }
+      .hero-slide .hero-image {
+        max-width: 100%;
+        max-height: 400px;
+        object-fit: contain;
+        position: relative;
+        z-index: 2;
+      }
+
+      /* ================================================
+         SECCIONES
+         ================================================ */
+      .section-title {
+        font-weight: 700;
+        position: relative;
+        display: inline-block;
+        padding-bottom: 0.5rem;
+      }
+      .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        height: 4px;
+        background: var(--brand);
+        border-radius: 4px;
+      }
+      .section-title.text-center::after {
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .hover-lift { transition: transform 0.25s, box-shadow 0.25s; }
+      .hover-lift:hover { transform: translateY(-6px); box-shadow: 0 1rem 2rem rgba(0,0,0,0.12) !important; }
+
+      /* ================================================
+         CARRUSEL DE CATEGORÍAS
+         ================================================ */
+      .category-carousel-wrapper {
+        position: relative;
+        overflow: hidden;
+        border-radius: 1rem;
+        padding: 0.5rem;
+        margin: 0 -0.5rem;
+      }
+      .category-carousel {
+        display: flex;
+        gap: 1rem;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-behavior: smooth;
+        scroll-snap-type: x mandatory;
+        padding: 0.5rem 0.5rem 1rem;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+      .category-carousel::-webkit-scrollbar { display: none; }
+
+      .category-slide-card {
+        position: relative;
+        flex: 0 0 auto;
+        width: 280px;
+        height: 320px;
+        border-radius: 1.25rem;
+        overflow: hidden;
+        scroll-snap-align: start;
+        text-decoration: none;
+        color: white;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                    box-shadow 0.35s ease;
+        cursor: pointer;
+      }
+      .category-slide-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.18);
+        color: white;
+      }
+
+      .category-slide-image {
+        position: absolute;
+        inset: 0;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .category-slide-card:hover .category-slide-image { transform: scale(1.08); }
+
+      .category-slide-icon {
+        font-size: 5rem;
+        opacity: 0.35;
+        color: white;
+      }
+
+      .category-slide-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top,
+          rgba(0,0,0,0.85) 0%,
+          rgba(0,0,0,0.55) 35%,
+          rgba(0,0,0,0.15) 65%,
+          rgba(0,0,0,0) 100%);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 1.25rem;
+        transition: background 0.35s ease;
+      }
+      .category-slide-card:hover .category-slide-overlay {
+        background: linear-gradient(to top,
+          rgba(0,0,0,0.9) 0%,
+          rgba(0,0,0,0.7) 40%,
+          rgba(0,0,0,0.3) 70%,
+          rgba(0,0,0,0.1) 100%);
+      }
+      .category-slide-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin-bottom: 0.35rem;
+        line-height: 1.2;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      }
+      .category-slide-desc {
+        font-size: 0.8rem;
+        opacity: 0.85;
+        margin: 0;
+        line-height: 1.3;
+        text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .category-slide-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(255,255,255,0.95);
+        color: var(--brand);
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 0.3rem 0.65rem;
+        border-radius: 50rem;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        display: inline-flex;
+        align-items: center;
+      }
+      .category-slide-arrow {
+        position: absolute;
+        bottom: 1.25rem;
+        right: 1.25rem;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--brand);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        opacity: 0;
+        transform: translateX(-10px);
+        transition: all 0.35s ease;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      }
+      .category-slide-card:hover .category-slide-arrow {
+        opacity: 1;
+        transform: translateX(0);
+      }
+      .cat-nav-btn {
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+      }
+      .cat-nav-btn:hover {
+        background: var(--brand);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(13,110,253,0.3);
+      }
+      .cat-nav-btn:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+        pointer-events: none;
+      }
+
+      /* ================================================
+         CARRUSEL DE MARCAS
+         ================================================ */
+      .brands-marquee-section {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.5rem 0;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        overflow: hidden;
+      }
+      .brands-marquee-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 1.5rem 1rem;
+        border-bottom: 1px solid #f1f5f9;
+        margin-bottom: 1rem;
+      }
+      .brands-marquee-header h5 {
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .brands-marquee-header .badge-count-brands {
+        background: rgba(13, 110, 253, 0.1);
+        color: var(--brand);
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 0.25rem 0.65rem;
+        border-radius: 50rem;
+      }
+      .brands-marquee {
+        position: relative;
+        overflow: hidden;
+        padding: 0.5rem 0;
+      }
+      .brands-marquee::before,
+      .brands-marquee::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 60px;
+        z-index: 2;
+        pointer-events: none;
+      }
+      .brands-marquee::before {
+        left: 0;
+        background: linear-gradient(to right, white 0%, rgba(255,255,255,0) 100%);
+      }
+      .brands-marquee::after {
+        right: 0;
+        background: linear-gradient(to left, white 0%, rgba(255,255,255,0) 100%);
+      }
+      .brands-marquee-inner {
+        display: flex;
+        gap: 14px;
+        width: max-content;
+        animation: brands-scroll 30s linear infinite;
+        will-change: transform;
+        padding: 0 20px;
+      }
+      .brands-marquee:hover .brands-marquee-inner {
+        animation-play-state: paused;
+      }
+      @keyframes brands-scroll {
+        0% { transform: translate3d(0, 0, 0); }
+        100% { transform: translate3d(-50%, 0, 0); }
+      }
+      .brand-chip {
+        display: flex !important;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 16px 8px 8px;
+        background: #ffffff;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 999px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+        min-width: 120px;
+        max-width: 180px;
+      }
+      .brand-chip:hover {
+        border-color: var(--brand);
+        background: #f0f7ff;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(13, 110, 253, 0.15);
+      }
+      .brand-chip-logo {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        flex-shrink: 0;
+        color: #64748b;
+        font-size: 15px;
+        transition: all 0.3s ease;
+      }
+      .brand-chip:hover .brand-chip-logo {
+        background: #dbeafe;
+        color: var(--brand);
+      }
+      .brand-chip-logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 4px;
+      }
+      .brand-chip-name {
+        font-size: 12px;
+        font-weight: 700;
+        color: #1e293b;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: color 0.3s ease;
+      }
+      .brand-chip:hover .brand-chip-name { color: var(--brand); }
+
+      /* ================================================
+         PRODUCTOS
+         ================================================ */
+      .product-card {
+        border-radius: 1rem;
+        overflow: hidden;
+        background: white;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        position: relative;
+      }
+      .product-img-wrap {
+        position: relative;
+        height: 220px;
+        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        overflow: hidden;
+      }
+      .product-img-wrap img {
+        max-height: 100%;
+        max-width: 100%;
+        object-fit: contain;
+        transition: transform 0.4s;
+      }
+      .product-card:hover .product-img-wrap img { transform: scale(1.08); }
+      .product-badge {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        padding: 0.35rem 0.75rem;
+        border-radius: 50rem;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .badge-new { background: #10b981; color: white; }
+      .badge-sale { background: #dc3545; color: white; }
+      .badge-hot { background: #f59e0b; color: white; }
+      .product-actions {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        opacity: 0;
+        transform: translateX(10px);
+        transition: all 0.3s;
+      }
+      .product-card:hover .product-actions {
+        opacity: 1;
+        transform: translateX(0);
+      }
+      .product-actions .icon-btn {
+        width: 36px;
+        height: 36px;
+        background: white;
+        color: #1f2937;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+      .product-actions .icon-btn:hover { background: var(--brand); color: white; }
+      .product-info { padding: 1rem; flex: 1; display: flex; flex-direction: column; }
+      .product-cat {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6b7280;
+        font-weight: 600;
+        margin-bottom: 0.35rem;
+      }
+      .product-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.35rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        min-height: 2.5rem;
+      }
+      .product-title:hover { color: var(--brand); }
+      .product-price {
+        display: flex;
+        align-items: baseline;
+        gap: 0.5rem;
+        margin-top: auto;
+        margin-bottom: 0.75rem;
+      }
+      .price-current { font-size: 1.15rem; font-weight: 700; color: var(--brand); }
+      .price-old { font-size: 0.85rem; color: #9ca3af; text-decoration: line-through; }
+      .btn-add-cart {
+        width: 100%;
+        border-radius: 50rem;
+        padding: 0.55rem;
+        font-weight: 600;
+        font-size: 0.85rem;
+        background: var(--brand);
+        color: white;
+        border: none;
+        transition: all 0.2s;
+      }
+      .btn-add-cart:hover { background: var(--brand-dark); transform: translateY(-2px); }
+
+      /* ================================================
+         SERVICIOS
+         ================================================ */
+      .service-card {
+        border-radius: 1rem;
+        padding: 2rem 1.5rem;
+        text-align: center;
+        background: white;
+        transition: all 0.25s;
+        height: 100%;
+      }
+      .service-card:hover { transform: translateY(-6px); box-shadow: 0 1rem 2rem rgba(0,0,0,0.08); }
+      .service-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 1.25rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin-bottom: 1rem;
+      }
+
+      /* ================================================
+         NOSOTROS PREVIEW
+         ================================================ */
+      .about-preview {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        color: white;
+        border-radius: 1.5rem;
+        padding: 3rem;
+        position: relative;
+        overflow: hidden;
+      }
+      .about-preview::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 400px;
+        height: 400px;
+        background: rgba(13, 110, 253, 0.15);
+        border-radius: 50%;
+        filter: blur(60px);
+      }
+      .about-preview-badge {
+        display: inline-flex;
+        align-items: center;
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        padding: 0.5rem 1.25rem;
+        border-radius: 50rem;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 1rem;
+      }
+      .about-preview-stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-top: 2rem;
+      }
+      .about-preview-stat {
+        background: rgba(255,255,255,0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 1rem;
+        padding: 1.25rem;
+        text-align: center;
+      }
+      .about-preview-stat-number {
+        font-size: 2rem;
+        font-weight: 800;
+        letter-spacing: -1px;
+      }
+      .about-preview-stat-label {
+        font-size: 0.75rem;
+        opacity: 0.7;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 0.25rem;
+      }
+
+      /* ================================================
+         TESTIMONIOS
+         ================================================ */
+      .testimonial-card {
+        border-radius: 1rem;
+        padding: 1.5rem;
+        background: white;
+        height: 100%;
+        position: relative;
+        transition: all 0.25s;
+      }
+      .testimonial-card::before {
+        content: '\201C';
+        position: absolute;
+        top: 0.5rem;
+        right: 1.25rem;
+        font-size: 5rem;
+        color: #e0e7ff;
+        font-family: Georgia, serif;
+        line-height: 1;
+      }
+      .testimonial-card:hover { transform: translateY(-4px); box-shadow: 0 1rem 2rem rgba(0,0,0,0.08); }
+
+      /* ================================================
+         CARRITO LATERAL
+         ================================================ */
+      .cart-sidebar {
+        position: fixed;
+        top: 0;
+        right: -420px;
+        width: 400px;
+        max-width: 100%;
+        height: 100vh;
+        background: white;
+        box-shadow: -8px 0 24px rgba(0,0,0,0.1);
+        z-index: 1060;
+        transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+      }
+      .cart-sidebar.open { right: 0; }
+      .cart-header {
+        padding: 1.25rem;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .cart-body { flex: 1; overflow-y: auto; padding: 1rem; }
+      .cart-footer {
+        padding: 1.25rem;
+        border-top: 1px solid #e5e7eb;
+        background: #f8fafc;
+      }
+      .cart-item {
+        display: flex;
+        gap: 0.75rem;
+        padding: 0.75rem;
+        border-radius: 0.75rem;
+        background: #f8fafc;
+        margin-bottom: 0.75rem;
+      }
+      .cart-item img {
+        width: 60px;
+        height: 60px;
+        object-fit: contain;
+        background: white;
+        border-radius: 0.5rem;
+        padding: 0.25rem;
+      }
+      .cart-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 1055;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s;
+      }
+      .cart-overlay.open { opacity: 1; visibility: visible; }
+
+      /* ================================================
+         FOOTER
+         ================================================ */
+      footer { background: var(--dark); color: #cbd5e1; }
+      footer h5 { color: white; font-weight: 600; margin-bottom: 1rem; }
+      footer a { color: #94a3b8; text-decoration: none; transition: color 0.2s; }
+      footer a:hover { color: white; }
+      .footer-social a {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.1);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 0.5rem;
+        transition: all 0.2s;
+      }
+      .footer-social a:hover { background: var(--brand); transform: translateY(-3px); }
+
+      /* ================================================
+         SCROLL TOP + WHATSAPP
+         ================================================ */
+      .scroll-top {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: var(--brand);
+        color: white;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(13,110,253,0.4);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s;
+        z-index: 1040;
+      }
+      .scroll-top.visible { opacity: 1; visibility: visible; }
+      .scroll-top:hover { background: var(--brand-dark); transform: translateY(-3px); }
+      .whatsapp-float {
+        position: fixed;
+        bottom: 24px;
+        left: 24px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: #25d366;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        box-shadow: 0 4px 16px rgba(37,211,102,0.5);
+        z-index: 1040;
+        transition: all 0.25s;
+      }
+      .whatsapp-float:hover { color: white; transform: scale(1.1); }
+
+      /* ================================================
+         RESPONSIVE
+         ================================================ */
+      @media (max-width: 991px) {
+        .navbar-collapse {
+          padding: 1rem 0;
+          border-top: 1px solid #e5e7eb;
+          margin-top: 1rem;
+        }
+        .main-nav {
+          width: 100%;
+          align-items: stretch !important;
+          gap: 0.25rem;
+          margin-bottom: 0.75rem;
+        }
+        .main-nav .nav-item {
+          margin: 0;
+          width: 100%;
+        }
+        .main-nav .nav-link {
+          display: flex;
+          justify-content: flex-start;
+          padding: 0.75rem 1rem !important;
+          font-size: 0.95rem;
+        }
+        .main-nav .nav-link .nav-icon {
+          width: 20px;
+          font-size: 1rem;
+        }
+        .main-nav .dropdown-menu {
+          border: none;
+          box-shadow: none !important;
+          background: #f8fafc;
+          margin: 0.25rem 0;
+          padding: 0.25rem;
+        }
+        .actions-nav {
+          width: 100%;
+          padding-top: 0.75rem;
+          border-top: 1px solid #e5e7eb;
+          justify-content: center;
+        }
+        .actions-nav .nav-item {
+          margin: 0 0.25rem;
+        }
+        .actions-nav .login-btn {
+          width: 100%;
+          justify-content: center;
+          margin-top: 0.5rem;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .hero-slide { min-height: 420px; padding: 2rem 1.5rem; }
+        .hero-slide .hero-icon { font-size: 8rem; opacity: 0.1; }
+        .hero-slide .hero-image { max-height: 200px; }
+        .search-wrapper { display: none; }
+
+        .category-slide-card { width: 220px; height: 260px; }
+        .category-slide-title { font-size: 1rem; }
+        .category-slide-desc { font-size: 0.75rem; }
+        .category-slide-icon { font-size: 3.5rem; }
+        .cat-nav-btn { width: 38px; height: 38px; }
+
+        .about-preview { padding: 2rem 1.5rem; }
+
+        .brands-marquee-inner { animation-duration: 20s; }
+        .brand-chip { min-width: 100px; padding: 6px 12px 6px 6px; }
+        .brand-chip-logo { width: 30px; height: 30px; font-size: 13px; }
+        .brand-chip-name { font-size: 11px; }
+      }
+
+      @media (max-width: 576px) {
+        .category-slide-card { width: 180px; height: 230px; }
+        .category-slide-overlay { padding: 1rem; }
+        .category-slide-title { font-size: 0.95rem; }
+        .category-slide-arrow { display: none; }
+
+        #productos .row.g-4 > [class*="col-"] {
+          flex: 0 0 50%;
+          max-width: 50%;
+          padding-left: 6px;
+          padding-right: 6px;
+        }
+        #productos .row.g-4 { --bs-gutter-x: 12px; }
+        .product-card .product-img-wrap { height: 140px; padding: 0.5rem; }
+        .product-info { padding: 0.75rem; }
+        .product-title { font-size: 0.82rem; min-height: 2.2rem; }
+        .product-cat { font-size: 0.65rem; }
+        .price-current { font-size: 1rem; }
+        .price-old { font-size: 0.75rem; }
+        .btn-add-cart { padding: 0.45rem; font-size: 0.8rem; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .category-carousel { scroll-behavior: auto; }
+        .category-slide-card,
+        .category-slide-image,
+        .brands-marquee-inner { transition: none; animation: none; }
+      }
+
+  body
+
+    //- ============================================
+    //- TOPBAR
+    //- ============================================
+    .topbar
+      .container.d-flex.justify-content-between.align-items-center
+        .d-flex.gap-3.align-items-center
+          if setting && setting.company && setting.company.phone
+            a.topbar-item(href=`tel:${setting.company.phone}`)
+              i.fas.fa-phone
+              span.d-none.d-sm-inline= setting.company.phone
+          if setting && setting.company && setting.company.email
+            a.topbar-item.d-none.d-md-inline-flex(href=`mailto:${setting.company.email}`)
+              i.fas.fa-envelope
+              span= setting.company.email
+        .d-flex.gap-3.align-items-center
+          span.topbar-item.d-none.d-sm-inline-flex
+            i.fas.fa-truck
+            span Envío gratis en Lima
+          a.topbar-item(href="/about")
+            i.fas.fa-headset
+            span Soporte
+
+    //- ============================================
+    //- NAVBAR
+    //- ============================================
+    nav.navbar.navbar-expand-lg.navbar-light.bg-white.shadow-sm.sticky-top
+      .container
+
+        a.navbar-brand.d-flex.align-items-center(href="/")
+          if setting && setting.logo
+            img.me-2(src=setting.logo alt=(setting.siteName || 'Logo'))
+            span.d-none.d-sm-inline= setting.siteName || 'JP Security'
+          else
+            i.fas(class=(setting && setting.icon ? setting.icon : 'fa-shield-halved')).text-primary.me-2.fa-lg
+            span= setting && setting.siteName ? setting.siteName : 'JP Security'
+
+        button.navbar-toggler(type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain")
+          span.navbar-toggler-icon
+
+        .collapse.navbar-collapse#navbarMain
+
+          .search-wrapper.ms-lg-3.me-lg-3.my-2.my-lg-0
+            form.search-bar(action="/products" method="GET")
+              i.fas.fa-search.text-muted
+              input#liveSearch(
+                type="text"
+                name="q"
+                placeholder="Buscar productos, marcas..."
+                autocomplete="off"
+              )
+              button.btn.btn-primary(type="submit")
+                i.fas.fa-search.d-lg-none
+                span.d-none.d-lg-inline Buscar
+            .search-results#searchResults
+              .search-loading.d-none.text-center.py-3
+                .spinner-border.spinner-border-sm.text-primary
+                span.ms-2.text-muted Buscando...
+              .search-empty.d-none.text-center.py-3.text-muted
+                i.fas.fa-search.fa-2x.mb-2.d-block.opacity-25
+                | No se encontraron resultados
+              .search-list#searchList
+
+          ul.navbar-nav.main-nav.ms-auto.align-items-center
+            li.nav-item
+              a.nav-link(href="/")
+                i.nav-icon.fas.fa-home
+                span Inicio
+
+            li.nav-item
+              a.nav-link(href="/products")
+                i.nav-icon.fas.fa-cubes
+                span Productos
+
+            li.nav-item
+              a.nav-link(href="/about")
+                i.nav-icon.fas.fa-building
+                span Nosotros
+
+            li.nav-item
+              a.nav-link(href="/checkout/track")
+                i.nav-icon.fas.fa-search-location
+                span Seguir pedido
+
+            li.nav-item.dropdown
+              a.nav-link.dropdown-toggle(href="#" role="button" data-bs-toggle="dropdown")
+                i.nav-icon.fas.fa-list
+                span Categorías
+              ul.dropdown-menu.shadow-lg.rounded-3.border-0
+                if categories && categories.length
+                  each cat in categories
+                    li
+                      a.dropdown-item(href=`/products?category=${cat._id}`)
+                        i.fas.fa-folder-open.me-2.text-primary
+                        = cat.name
+                    if cat.subcategories && cat.subcategories.length
+                      each sub in cat.subcategories
+                        li
+                          a.dropdown-item.ps-4(href=`/products?category=${sub._id}`)
+                            i.fas.fa-tag.me-2.text-muted
+                            = sub.name
+                      li: hr.dropdown-divider
+                else
+                  li: span.dropdown-item.text-muted Sin categorías
+
+          ul.navbar-nav.actions-nav.align-items-center.ms-lg-3
+            li.nav-item
+              button.icon-btn(type="button" title="Favoritos")
+                i.fas.fa-heart
+
+            li.nav-item
+              button.icon-btn#cartBtn(type="button" title="Carrito")
+                i.fas.fa-shopping-cart
+                span.badge-count#cartCount 0
+
+            if user
+              li.nav-item.dropdown.ms-lg-2
+                a.icon-btn.dropdown-toggle(
+                  href="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  title=user.name
+                )
+                  i.fas.fa-user
+                ul.dropdown-menu.dropdown-menu-end.shadow-lg.rounded-3.border-0
+                  li
+                    h6.dropdown-header.mb-0.px-3.py-2
+                      div.fw-bold= user.name
+                      small.text-muted= user.email || ''
+                  li: hr.dropdown-divider
+                  li: a.dropdown-item(href="/dashboard")
+                    i.fas.fa-gauge.me-2.text-primary
+                    | Dashboard
+                  li: a.dropdown-item(href="/profile")
+                    i.fas.fa-user-cog.me-2.text-primary
+                    | Mi Perfil
+                  li: hr.dropdown-divider
+                  li: a.dropdown-item.text-danger(href="/logout")
+                    i.fas.fa-sign-out-alt.me-2
+                    | Cerrar Sesión
+            else
+              li.nav-item.ms-lg-2
+                a.btn.btn-primary.rounded-pill.px-3.login-btn(href="/login")
+                  i.fas.fa-sign-in-alt.me-1
+                  span.d-none.d-sm-inline Ingresar
+
+    //- ============================================
+    //- HERO SLIDER
+    //- ============================================
+    - const slides = (setting && setting.heroSlides && setting.heroSlides.length) ? setting.heroSlides.filter(s => s.isActive !== false && (s.title || s.subtitle || s.image)) : []
+
+    if slides.length
+      section#hero-slider.carousel.slide.mb-5.mt-3(data-bs-ride="carousel")
+        .container
+          .carousel-indicators
+            each slide, i in slides
+              button(
+                type="button"
+                data-bs-target="#hero-slider"
+                data-bs-slide-to=i
+                class=(i === 0 ? 'active' : '')
+              )
+          .carousel-inner.rounded-4
+            each slide, i in slides
+              .carousel-item(class=(i === 0 ? 'active' : ''))
+                .hero-slide(
+                  class=(slide.image ? 'hero-slide-image' : '')
+                  style=`--slide-bg: ${slide.bgColor || 'var(--brand)'}; --slide-text: ${slide.textColor || '#ffffff'}; ${slide.image ? `background-image: url('${slide.image}');` : ''}`
+                )
+                  if slide.image
+                    .hero-overlay
+                  if !slide.image
+                    i.fas(class=(setting.icon || 'fa-shield-halved')).hero-icon
+                  .hero-content.w-100
+                    .row.align-items-center
+                      .col-lg-8
+                        if slide.category
+                          span.badge.bg-white.text-primary.rounded-pill.mb-3.px-3.py-2
+                            i.fas.fa-folder-open.me-1
+                            = slide.category.name || 'Categoría'
+                        h1.display-4.fw-bold.mb-3= slide.title || ''
+                        p.lead.mb-4= slide.subtitle || ''
+                        if slide.buttonText
+                          .d-flex.flex-wrap.gap-2
+                            a.btn.btn-light.btn-lg.rounded-pill.px-4(
+                              href=slide.buttonLink || (slide.category ? '/products?category=' + slide.category._id : '/products')
+                            )
+                              i.fas.fa-arrow-right.me-2
+                              = slide.buttonText
+          button.carousel-control-prev(type="button" data-bs-target="#hero-slider" data-bs-slide="prev")
+            span.carousel-control-prev-icon
+          button.carousel-control-next(type="button" data-bs-target="#hero-slider" data-bs-slide="next")
+            span.carousel-control-next-icon
+
+    //- ============================================
+    //- BENEFICIOS
+    //- ============================================
+    section.mb-5
+      .container
+        .row.g-3
+          .col-6.col-md-3
+            .card.border-0.shadow-sm.h-100.p-3.d-flex.flex-row.align-items-center.gap-3
+              .service-icon.bg-primary-subtle.text-primary(style="width:52px;height:52px;font-size:1.3rem;")
+                i.fas.fa-shipping-fast
+              div
+                h6.fw-bold.mb-0 Envío Gratis
+                small.text-muted En Lima Metropolitana
+          .col-6.col-md-3
+            .card.border-0.shadow-sm.h-100.p-3.d-flex.flex-row.align-items-center.gap-3
+              .service-icon.bg-success-subtle.text-success(style="width:52px;height:52px;font-size:1.3rem;")
+                i.fas.fa-shield-alt
+              div
+                h6.fw-bold.mb-0 Garantía
+                small.text-muted 12 meses en equipos
+          .col-6.col-md-3
+            .card.border-0.shadow-sm.h-100.p-3.d-flex.flex-row.align-items-center.gap-3
+              .service-icon.bg-warning-subtle.text-warning(style="width:52px;height:52px;font-size:1.3rem;")
+                i.fas.fa-headset
+              div
+                h6.fw-bold.mb-0 Soporte 24/7
+                small.text-muted Asesoría personalizada
+          .col-6.col-md-3
+            .card.border-0.shadow-sm.h-100.p-3.d-flex.flex-row.align-items-center.gap-3
+              .service-icon.bg-info-subtle.text-info(style="width:52px;height:52px;font-size:1.3rem;")
+                i.fas.fa-credit-card
+              div
+                h6.fw-bold.mb-0 Pago Seguro
+                small.text-muted Múltiples métodos
+
+    //- ============================================
+    //- CATEGORÍAS
+    //- ============================================
+    section#categorias.mb-5
+      .container
+        .d-flex.justify-content-between.align-items-end.mb-4.flex-wrap.gap-3
+          div
+            h2.section-title.mb-2 Categorías
+            p.text-muted.mb-0 Explora nuestra amplia gama de productos por categoría
+          if categories && categories.length > 4
+            .d-flex.gap-2
+              button.btn.btn-outline-primary.rounded-circle.cat-nav-btn(
+                type="button"
+                id="catPrev"
+                aria-label="Anterior"
+              )
+                i.fas.fa-chevron-left
+              button.btn.btn-outline-primary.rounded-circle.cat-nav-btn(
+                type="button"
+                id="catNext"
+                aria-label="Siguiente"
+              )
+                i.fas.fa-chevron-right
+
+        if categories && categories.length
+          .category-carousel-wrapper
+            .category-carousel#categoryCarousel
+              each cat in categories
+                a.category-slide-card(
+                  href=`/products?category=${cat._id}`
+                  title=cat.name
+                )
+                  .category-slide-image(
+                    style=(cat.image
+                      ? `background-image: url('${cat.image}');`
+                      : `background: linear-gradient(135deg, var(--brand), var(--brand-dark));`)
+                  )
+                    if !cat.image
+                      i.fas.fa-folder-open.category-slide-icon
+
+                    .category-slide-overlay
+                      h5.category-slide-title= cat.name
+                      if cat.description
+                        p.category-slide-desc= cat.description
+                      else if cat.subcategories && cat.subcategories.length
+                        p.category-slide-desc= cat.subcategories.length + ' subcategorías'
+                      else
+                        p.category-slide-desc Ver productos
+
+                    if cat.subcategories && cat.subcategories.length
+                      span.category-slide-badge
+                        i.fas.fa-layer-group.me-1
+                        = cat.subcategories.length
+
+                    .category-slide-arrow
+                      i.fas.fa-arrow-right
+        else
+          .text-center.py-5
+            i.fas.fa-folder-open.fa-3x.text-muted.mb-3
+            p.text-muted No hay categorías disponibles.
+
+    //- ============================================
+    //- CARRUSEL DE MARCAS
+    //- ============================================
+    if brands && brands.length
+      section#marcas.mb-5
+        .container
+          .brands-marquee-section
+            .brands-marquee-header
+              h5
+                i.fas.fa-trademark.text-primary.me-2
+                | Nuestras Marcas
+                span.badge-count-brands.ms-2= brands.length
+              
+
+            .brands-marquee
+              .brands-marquee-inner
+
+                //- Primera vuelta
+                each brand in brands
+                  a.brand-chip(href=`/brands/${brand._id}` title=brand.name)
+                    .brand-chip-logo
+                      if brand.logo && !brand.logo.includes('default')
+                        img(
+                          src=brand.logo
+                          alt=brand.name
+                          loading="lazy"
+                          onerror="this.style.display='none'; this.parentElement.classList.add('no-logo');"
+                        )
+                      else
+                        i.fas.fa-trademark
+                    .brand-chip-info
+                      span.brand-chip-name= brand.name
+
+                //- Segunda vuelta (loop infinito)
+                each brand in brands
+                  a.brand-chip(href=`/brands/${brand._id}` title=brand.name)
+                    .brand-chip-logo
+                      if brand.logo && !brand.logo.includes('default')
+                        img(
+                          src=brand.logo
+                          alt=brand.name
+                          loading="lazy"
+                          onerror="this.style.display='none'; this.parentElement.classList.add('no-logo');"
+                        )
+                      else
+                        i.fas.fa-trademark
+                    .brand-chip-info
+                      span.brand-chip-name= brand.name
+
+    //- ============================================
+    //- PRODUCTOS DESTACADOS
+    //- ============================================
+    section#productos.mb-5
+      .container
+        .d-flex.justify-content-between.align-items-end.mb-5.flex-wrap.gap-3
+          div
+            h2.section-title.mb-2 Últimos Productos
+            p.text-muted.mb-0 Descubre las novedades en seguridad electrónica
+          a.btn.btn-outline-primary.rounded-pill.px-4(href="/products")
+            | Ver Todos
+            i.fas.fa-arrow-right.ms-2
+        if latestProducts && latestProducts.length
+          .row.g-4
+            each product in latestProducts
+              .col-6.col-md-4.col-lg-3
+                .product-card.card.border-0.shadow-sm.hover-lift
+                  .product-img-wrap
+                    if product.discount && product.discount > 0
+                      span.product-badge.badge-sale= '-' + product.discount + '%'
+                    else if product.isNew
+                      span.product-badge.badge-new Nuevo
+                    if product.image
+                      img(src=product.image, alt=product.name)
+                    else
+                      i.fas.fa-image.fa-4x.text-muted
+                    .product-actions
+                      button.icon-btn(type="button" title="Favoritos")
+                        i.fas.fa-heart
+                      a.icon-btn(href="/products/" + product._id title="Ver detalle")
+                        i.fas.fa-eye
+                  .product-info
+                    if product.category
+                      .product-cat= product.category.name
+                    a.product-title.text-decoration-none(href="/products/" + product._id)= product.name
+                    if product.model
+                      small.text-muted.d-block.mb-2
+                        i.fas.fa-tag.me-1
+                        = product.model
+                    .product-price
+                      if product.discount && product.discount > 0
+                        span.price-current S/. #{product.finalPrice}
+                        span.price-old S/. #{product.customerPrice}
+                      else
+                        span.price-current S/. #{product.customerPrice}
+                    button.btn-add-cart(
+                      type="button"
+                      data-id=product._id
+                      data-name=product.name
+                      data-price=(product.finalPrice || product.customerPrice)
+                      data-image=(product.image || '')
+                    )
+                      i.fas.fa-cart-plus.me-1
+                      | Agregar
+        else
+          .text-center.py-5
+            i.fas.fa-box-open.fa-4x.text-muted.mb-3
+            p.text-muted No hay productos disponibles.
+
+    //- ============================================
+    //- OFERTA ESPECIAL
+    //- ============================================
+    section.mb-5
+      .container
+        .row.g-4
+          .col-lg-8
+            .p-5.rounded-4.h-100.position-relative.overflow-hidden(style="background: linear-gradient(135deg, #1e293b, #0f172a); color: white;")
+              .position-relative(style="z-index:2;")
+                span.badge.bg-warning.text-dark.rounded-pill.mb-3.px-3.py-2 Oferta Especial
+                h3.fw-bold.mb-3 Kit de seguridad completo
+                p.mb-4 Cámaras + Alarma + Instalación. Todo lo que necesitas para proteger tu hogar en un solo paquete.
+                .d-flex.align-items-baseline.gap-3.mb-4
+                  span.display-5.fw-bold.text-warning S/. 1,299
+                  span.text-muted.text-decoration-line-through S/. 1,899
+                a.btn.btn-warning.rounded-pill.px-4.text-dark.fw-bold(href="/products")
+                  | Aprovechar Oferta
+                  i.fas.fa-arrow-right.ms-2
+          .col-lg-4
+            .p-5.rounded-4.h-100.position-relative.overflow-hidden(style="background: linear-gradient(135deg, #7c3aed, #5b21b6); color: white;")
+              .position-relative(style="z-index:2;")
+                i.fas.fa-percent.fa-3x.mb-3.opacity-50
+                h3.fw-bold.mb-3 Descuentos hasta 40%
+                p.mb-4 En equipos seleccionados
+                a.btn.btn-light.rounded-pill.px-4(href="/products")
+                  | Ver Ofertas
+
+    //- ============================================
+    //- SERVICIOS
+    //- ============================================
+    section#servicios.mb-5
+      .container
+        .text-center.mb-5
+          h2.section-title.text-center Nuestros Servicios
+          p.text-muted.mt-3 Soluciones integrales de seguridad para tu tranquilidad
+        .row.g-4
+          .col-md-4
+            .service-card.shadow-sm.hover-lift
+              .service-icon.bg-primary-subtle.text-primary.mx-auto
+                i.fas.fa-tools
+              h5.fw-bold Instalación Profesional
+              p.text-muted.mb-0 Instalamos sistemas de seguridad en hogares y negocios con técnicos certificados.
+          .col-md-4
+            .service-card.shadow-sm.hover-lift
+              .service-icon.bg-success-subtle.text-success.mx-auto
+                i.fas.fa-sync-alt
+              h5.fw-bold Mantenimiento Preventivo
+              p.text-muted.mb-0 Asegura el correcto funcionamiento de tus equipos con revisiones periódicas.
+          .col-md-4
+            .service-card.shadow-sm.hover-lift
+              .service-icon.bg-warning-subtle.text-warning.mx-auto
+                i.fas.fa-headset
+              h5.fw-bold Asesoría Personalizada
+              p.text-muted.mb-0 Te ayudamos a elegir la mejor solución de seguridad para tus necesidades.
+
+    //- ============================================
+    //- NOSOTROS PREVIEW
+    //- ============================================
+    section#nosotros.mb-5
+      .container
+        .about-preview
+          .row.align-items-center.position-relative(style="z-index: 2;")
+            .col-lg-7
+              .about-preview-badge
+                i.fas.fa-building.me-2
+                | Sobre Nosotros
+              h2.fw-bold.mb-3(style="font-size: 2rem; letter-spacing: -0.5px;")
+                | Más que una empresa, tu aliado en seguridad
+              p.mb-4(style="opacity: 0.85; line-height: 1.7;")
+                | Somos especialistas en soluciones integrales de seguridad electrónica.
+                | Combinamos tecnología de punta, técnicos certificados y un servicio
+                | personalizado para proteger lo que más te importa.
+              .d-flex.flex-wrap.gap-3
+                a.btn.btn-light.rounded-pill.px-4(href="/about")
+                  i.fas.fa-info-circle.me-2
+                  | Conoce más sobre nosotros
+                if setting && setting.social && setting.social.whatsapp
+                  a.btn.btn-outline-light.rounded-pill.px-4(
+                    href=`https://wa.me/${setting.social.whatsapp}`
+                    target="_blank"
+                  )
+                    i.fab.fa-whatsapp.me-2
+                    | Contáctanos
+
+            .col-lg-5
+              .about-preview-stats
+                .about-preview-stat
+                  .about-preview-stat-number 5+
+                  .about-preview-stat-label Años de experiencia
+                .about-preview-stat
+                  .about-preview-stat-number 500+
+                  .about-preview-stat-label Clientes
+                .about-preview-stat
+                  .about-preview-stat-number 800+
+                  .about-preview-stat-label Proyectos
+                .about-preview-stat
+                  .about-preview-stat-number 24/7
+                  .about-preview-stat-label Soporte
+
+    //- ============================================
+    //- TESTIMONIOS
+    //- ============================================
+    section#testimonios.mb-5
+      .container
+        .text-center.mb-5
+          h2.section-title.text-center Lo que dicen nuestros clientes
+          p.text-muted.mt-3 Miles de clientes satisfechos confían en nosotros
+        .row.g-4
+          .col-md-4
+            .testimonial-card.shadow-sm
+              .d-flex.align-items-center.mb-3
+                img.rounded-circle.me-3(src="https://ui-avatars.com/api/?name=Carlos+Mendoza&size=50&background=0D6EFD&color=fff" alt="Carlos Mendoza")
+                div
+                  h6.mb-0.fw-bold Carlos Mendoza
+                  small.text-muted Cliente desde 2023
+              .text-warning.mb-3
+                i.fas.fa-star
+                i.fas.fa-star
+                i.fas.fa-star
+                i.fas.fa-star
+                i.fas.fa-star
+              p.card-text.mb-0 "Excelente servicio, instalaron cámaras en mi negocio y la calidad es increíble."
+          .col-md-4
+            .testimonial-card.shadow-sm
+              .d-flex.align-items-center.mb-3
+                img.rounded-circle.me-3(src="https://ui-avatars.com/api/?name=Maria+Gonzalez&size=50&background=198754&color=fff" alt="Maria Gonzalez")
+                div
+                  h6.mb-0.fw-bold Maria Gonzalez
+                  small.text-muted Cliente desde 2024
+              .text-warning.mb-3
+                i.fas.fa-star
+                i.fas.fa-star
+                i.fas.fa-star
+                i.fas.fa-star
+                i.fas.fa-star
+              p.card-text.mb-0 "Recomiendo 100% a JP Security, su atención y productos son de primera."
+          .col-md-4
+            .testimonial-card.shadow-sm
+              .d-flex.align-items-center.mb-3
+                img.rounded-circle.me-3(src="https://ui-avatars.com/api/?name=Juan+Perez&size=50&background=FFC107&color=000" alt="Juan Perez")
+                div
+                  h6.mb-0.fw-bold Juan Perez
+                  small.text-muted Cliente desde 2022
+              .text-warning.mb-3
+                i.fas.fa-star
+                i.fas.fa-star
+                i.fas.fa-star
+                i.fas.fa-star
+                i.fas.fa-star-half-alt
+              p.card-text.mb-0 "La alarma que compré funciona perfectamente, muy fácil de usar."
+
+    //- ============================================
+    //- SEGUIMIENTO DE PEDIDO
+    //- ============================================
+    section#seguimiento.mb-5
+      .container
+        .p-5.rounded-4.position-relative.overflow-hidden(
+          style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white;"
+        )
+          .position-absolute.rounded-circle(
+            style="top: -50%; right: -10%; width: 400px; height: 400px; background: rgba(255,255,255,0.05);"
+          )
+          .position-absolute.rounded-circle(
+            style="bottom: -40%; left: -5%; width: 300px; height: 300px; background: rgba(255,255,255,0.03);"
+          )
+
+          .row.align-items-center.position-relative(style="z-index: 2;")
+            .col-lg-5.mb-4.mb-lg-0
+              .d-flex.align-items-center.gap-3.mb-3
+                .rounded-circle.bg-primary.d-flex.align-items-center.justify-content-center(
+                  style="width: 56px; height: 56px;"
+                )
+                  i.fas.fa-search-location.fa-lg
+                div
+                  h3.fw-bold.mb-0.text-white Sigue tu pedido
+                  small.text-muted En tiempo real
+              p.text-white-50.mb-4
+                | Ingresa tu número de pedido y consulta el estado actual de tu entrega.
+                | Te mostraremos el progreso paso a paso.
+              .d-flex.gap-2.flex-wrap
+                .badge.bg-white.text-dark.rounded-pill.px-3.py-2
+                  i.fas.fa-clock.me-1
+                  | Pendiente
+                .badge.bg-white.text-dark.rounded-pill.px-3.py-2
+                  i.fas.fa-check-circle.me-1
+                  | Confirmado
+                .badge.bg-white.text-dark.rounded-pill.px-3.py-2
+                  i.fas.fa-truck.me-1
+                  | Enviado
+                .badge.bg-white.text-dark.rounded-pill.px-3.py-2
+                  i.fas.fa-box-open.me-1
+                  | Entregado
+
+            .col-lg-7
+              .card.border-0.shadow-lg.rounded-3
+                .card-body.p-4
+                  form(method="POST" action="/checkout/track")
+                    label.form-label.fw-semibold.text-dark Número de pedido
+                    .input-group.input-group-lg
+                      span.input-group-text.bg-transparent
+                        i.fas.fa-receipt.text-muted
+                      input.form-control(
+                        type="text"
+                        name="orderNumber"
+                        placeholder="Ej: PED-20260913-0001"
+                        required
+                      )
+                      button.btn.btn-primary(type="submit")
+                        i.fas.fa-search.me-1
+                        span.d-none.d-sm-inline Buscar
+
+                    small.text-muted.d-block.mt-3
+                      i.fas.fa-info-circle.me-1
+                      | El número de pedido lo recibiste al confirmar tu compra.
+
+                    .text-center.mt-3
+                      a.text-decoration-none.small.fw-semibold(
+                        href="/checkout/track"
+                        style="color: var(--brand);"
+                      )
+                        | Ver página de seguimiento completa
+                        i.fas.fa-arrow-right.ms-1
+
+    //- ============================================
+    //- CTA FINAL
+    //- ============================================
+    section#contacto.mb-5
+      .container
+        .p-5.rounded-4.text-white.position-relative.overflow-hidden(
+          style=`background: linear-gradient(135deg, ${setting && setting.colors ? setting.colors.primary : '#0d6efd'}, ${setting && setting.colors ? setting.colors.secondary : '#0a58ca'});`
+        )
+          .row.align-items-center.position-relative(style="z-index:2;")
+            .col-lg-8
+              h2.fw-bold.mb-2 ¿Listo para proteger tu negocio?
+              p.lead.mb-0 Contáctanos hoy y obtén una cotización sin compromiso.
+            .col-lg-4.text-lg-end.mt-3.mt-lg-0
+              if setting && setting.social && setting.social.whatsapp
+                a.btn.btn-light.btn-lg.rounded-pill.px-4(
+                  href=`https://wa.me/${setting.social.whatsapp}`
+                  target="_blank"
+                )
+                  i.fab.fa-whatsapp.me-2.text-success
+                  | WhatsApp
+              else if setting && setting.company && setting.company.phone
+                a.btn.btn-light.btn-lg.rounded-pill.px-4(href=`tel:${setting.company.phone}`)
+                  i.fas.fa-phone.me-2.text-success
+                  | Llamar
+
+    //- ============================================
+    //- FOOTER
+    //- ============================================
+    footer.pt-5.pb-3
+      .container
+        .row.g-4
+          .col-md-4
+            h5
+              if setting && setting.icon
+                i.fas(class=setting.icon).me-2
+              else
+                i.fas.fa-shield-halved.me-2              = setting && setting.siteName ? setting.siteName : 'JP Security'
+            p= setting && setting.siteTagline ? setting.siteTagline : 'Soluciones integrales en seguridad electrónica.'
+            .footer-social.mt-3
+              if setting && setting.social && setting.social.facebook
+                a(href=setting.social.facebook target="_blank" title="Facebook")
+                  i.fab.fa-facebook-f
+              if setting && setting.social && setting.social.instagram
+                a(href=setting.social.instagram target="_blank" title="Instagram")
+                  i.fab.fa-instagram
+              if setting && setting.social && setting.social.youtube
+                a(href=setting.social.youtube target="_blank" title="YouTube")
+                  i.fab.fa-youtube
+              if setting && setting.social && setting.social.tiktok
+                a(href=setting.social.tiktok target="_blank" title="TikTok")
+                  i.fab.fa-tiktok
+              if setting && setting.social && setting.social.linkedin
+                a(href=setting.social.linkedin target="_blank" title="LinkedIn")
+                  i.fab.fa-linkedin-in
+              if setting && setting.social && setting.social.whatsapp
+                a(href=`https://wa.me/${setting.social.whatsapp}` target="_blank" title="WhatsApp")
+                  i.fab.fa-whatsapp
+
+          .col-md-2.col-6
+            h5 Enlaces
+            ul.list-unstyled
+              li.mb-2: a(href="/") Inicio
+              li.mb-2: a(href="/products") Productos
+              li.mb-2: a(href="/about")
+                i.fas.fa-building.me-1
+                | Nosotros
+              li.mb-2: a(href="#servicios") Servicios
+              li.mb-2: a(href="#contacto") Contacto
+              li.mb-2: a(href="/checkout/track")
+                i.fas.fa-search-location.me-1
+                | Seguir pedido
+
+          .col-md-2.col-6
+            h5 Cuenta
+            ul.list-unstyled
+              li.mb-2: a(href="/login") Ingresar
+              li.mb-2: a(href="/register") Registrarse
+              li.mb-2: a(href="/orders") Mis Pedidos
+              li.mb-2: a(href="/support") Soporte
+              li.mb-2: a(href="/checkout/track")
+                i.fas.fa-search-location.me-1
+                | Seguir pedido
+
+          .col-md-4
+            h5 Contacto
+            ul.list-unstyled
+              if setting && setting.company && setting.company.phone
+                li.mb-2
+                  i.fas.fa-phone.me-2
+                  = setting.company.phone
+              if setting && setting.company && setting.company.email
+                li.mb-2
+                  i.fas.fa-envelope.me-2
+                  = setting.company.email
+              if setting && setting.company && setting.company.address
+                li.mb-2
+                  i.fas.fa-map-marker-alt.me-2
+                  = setting.company.address
+                  if setting.company.city
+                    = ', ' + setting.company.city
+              if setting && setting.schedule
+                if setting.schedule.weekdays
+                  li.mb-2
+                    i.fas.fa-clock.me-2
+                    | Lun - Vie: #{setting.schedule.weekdays}
+                if setting.schedule.saturday
+                  li.mb-2.ps-4
+                    | Sáb: #{setting.schedule.saturday}
+                if setting.schedule.sunday
+                  li.mb-2.ps-4
+                    | Dom: #{setting.schedule.sunday}
+
+        .border-top.border-secondary.mt-4.pt-3
+          .d-flex.flex-wrap.justify-content-between.align-items-center.gap-2
+            small
+              | © #{new Date().getFullYear()} #{setting && setting.siteName ? setting.siteName : 'JP Security'}
+              if setting && setting.company && setting.company.legalName
+                |  - #{setting.company.legalName}
+            if setting && setting.company && setting.company.ruc
+              small
+                | RUC: #{setting.company.ruc}
+
+    //- ============================================
+    //- CARRITO LATERAL
+    //- ============================================
+    .cart-overlay#cartOverlay
+    aside.cart-sidebar#cartSidebar
+      .cart-header
+        h5.mb-0
+          i.fas.fa-shopping-cart.me-2
+          | Mi Carrito
+        button.icon-btn(type="button" id="cartClose")
+          i.fas.fa-times
+      .cart-body#cartBody
+        .text-center.py-5#cartEmpty
+          i.fas.fa-shopping-cart.fa-3x.text-muted.mb-3
+          p.text-muted Tu carrito está vacío
+      .cart-footer
+        .d-flex.justify-content-between.mb-2
+          span.text-muted Subtotal
+          strong#cartSubtotal S/. 0.00
+        .d-flex.justify-content-between.mb-3
+          span.text-muted Envío
+          span.text-success Gratis
+        .d-flex.justify-content-between.mb-3.fs-5
+          span.fw-bold Total
+          strong.text-primary#cartTotal S/. 0.00
+        a.btn.btn-primary.w-100.rounded-pill.py-2(href="/checkout")
+          i.fas.fa-credit-card.me-2
+          | Pago Contra entrega
+
+    //- ============================================
+    //- BOTONES FLOTANTES
+    //- ============================================
+    - const waNumber = (setting && setting.social && setting.social.whatsapp) ? setting.social.whatsapp : '51935909756'
+    - const waMessage = encodeURIComponent('Hola, estoy interesado en sus productos de seguridad.')
+    a.whatsapp-float(
+      href=`https://wa.me/${waNumber}?text=${waMessage}`
+      target="_blank"
+      rel="noopener"
+      title="Escríbenos por WhatsApp"
+    )
+      i.fab.fa-whatsapp
+    button.scroll-top#scrollTop(type="button" title="Ir arriba")
+      i.fas.fa-arrow-up
+
+    //- ============================================
+    //- SCRIPTS
+    //- ============================================
+    script(src="/bootstrap/js/bootstrap.bundle.min.js")
+
+    script.
+      /* DROPDOWN HOVER */
+      if (window.innerWidth >= 992) {
+        document.querySelectorAll('.dropdown').forEach(function(dropdown) {
+          dropdown.addEventListener('mouseenter', function() {
+            const toggle = this.querySelector('.dropdown-toggle');
+            if (toggle) bootstrap.Dropdown.getOrCreateInstance(toggle).show();
+          });
+          dropdown.addEventListener('mouseleave', function() {
+            const toggle = this.querySelector('.dropdown-toggle');
+            if (toggle) bootstrap.Dropdown.getOrCreateInstance(toggle).hide();
+          });
+        });
+      }
+
+      /* BUSCADOR EN VIVO */
+      (function initLiveSearch() {
+        const liveSearch = document.getElementById('liveSearch');
+        const searchResults = document.getElementById('searchResults');
+        const searchList = document.getElementById('searchList');
+        const searchLoading = document.querySelector('.search-loading');
+        const searchEmpty = document.querySelector('.search-empty');
+        let searchTimeout = null;
+
+        if (!liveSearch || !searchResults) return;
+
+        liveSearch.addEventListener('input', function() {
+          const q = this.value.trim();
+          clearTimeout(searchTimeout);
+
+          if (q.length < 2) {
+            searchResults.classList.remove('show');
+            return;
+          }
+
+          searchResults.classList.add('show');
+          searchLoading.classList.remove('d-none');
+          searchEmpty.classList.add('d-none');
+          searchList.innerHTML = '';
+
+          searchTimeout = setTimeout(() => {
+            fetch('/api/products/search?q=' + encodeURIComponent(q))
+              .then(r => r.json())
+              .then(data => {
+                searchLoading.classList.add('d-none');
+
+                if (!data.products || data.products.length === 0) {
+                  searchEmpty.classList.remove('d-none');
+                  return;
+                }
+
+                searchList.innerHTML = data.products.slice(0, 8).map(p => `
+                  <a href="/products/${p._id}" class="search-result-item">
+                    <div class="search-result-img">
+                      ${p.image
+                        ? `<img src="${p.image}" alt="${p.name}">`
+                        : `<i class="fas fa-image text-muted"></i>`}
+                    </div>
+                    <div class="search-result-info">
+                      <div class="search-result-title">${p.name}</div>
+                      <div class="search-result-meta">
+                        ${p.category ? p.category.name : ''}
+                        ${p.model ? ' · ' + p.model : ''}
+                      </div>
+                    </div>
+                    <div class="search-result-price">
+                      S/. ${p.finalPrice || p.customerPrice}
+                    </div>
+                  </a>
+                `).join('') + `
+                  <div class="search-footer">
+                    <a href="/products?q=${encodeURIComponent(q)}">
+                      Ver todos los resultados →
+                    </a>
+                  </div>
+                `;
+              })
+              .catch(err => {
+                console.error('Error buscando:', err);
+                searchLoading.classList.add('d-none');
+                searchEmpty.classList.remove('d-none');
+              });
+          }, 300);
+        });
+
+        document.addEventListener('click', function(e) {
+          if (!e.target.closest('.search-wrapper')) {
+            searchResults.classList.remove('show');
+          }
+        });
+
+        liveSearch.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape') {
+            searchResults.classList.remove('show');
+            this.blur();
+          }
+        });
+      })();
+
+      /* CARRITO */
+      const CART_KEY = 'jp_cart';
+
+      function getCart() {
+        try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; }
+        catch(e) { return []; }
+      }
+
+      function saveCart(cart) {
+        localStorage.setItem(CART_KEY, JSON.stringify(cart));
+        updateCartUI();
+      }
+
+      function addToCart(product) {
+        const cart = getCart();
+        const id = String(product.id);
+        const existing = cart.find(i => i.id === id);
+        if (existing) {
+          existing.qty += 1;
+        } else {
+          cart.push({
+            id: id,
+            name: product.name,
+            price: Number(product.price),
+            image: product.image || '',
+            qty: 1
+          });
+        }
+        saveCart(cart);
+        openCart();
+      }
+
+      function removeFromCart(id) {
+        const cleanId = String(id);
+        const cart = getCart().filter(i => String(i.id) !== cleanId);
+        saveCart(cart);
+      }
+
+      function updateQty(id, delta) {
+        const cleanId = String(id);
+        const cart = getCart();
+        const item = cart.find(i => String(i.id) === cleanId);
+        if (!item) return;
+        item.qty += delta;
+        if (item.qty <= 0) {
+          removeFromCart(cleanId);
+          return;
+        }
+        saveCart(cart);
+      }
+
+      function updateCartUI() {
+        const cart = getCart();
+        const count = cart.reduce((s, i) => s + i.qty, 0);
+        const subtotal = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+
+        const cartCount = document.getElementById('cartCount');
+        const cartSubtotal = document.getElementById('cartSubtotal');
+        const cartTotal = document.getElementById('cartTotal');
+
+        if (cartCount) cartCount.textContent = count;
+        if (cartSubtotal) cartSubtotal.textContent = 'S/. ' + subtotal.toFixed(2);
+        if (cartTotal) cartTotal.textContent = 'S/. ' + subtotal.toFixed(2);
+
+        const body = document.getElementById('cartBody');
+        const empty = document.getElementById('cartEmpty');
+        if (!body) return;
+
+        body.querySelectorAll('.cart-item').forEach(el => el.remove());
+
+        if (cart.length === 0) {
+          if (empty) empty.style.display = '';
+          return;
+        }
+        if (empty) empty.style.display = 'none';
+
+        cart.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'cart-item';
+          div.innerHTML = `
+            <img src="${item.image || 'https://via.placeholder.com/60'}" alt="${item.name}">
+            <div class="flex-grow-1 min-w-0">
+              <div class="fw-semibold small text-truncate">${item.name}</div>
+              <div class="text-primary fw-bold small">S/. ${Number(item.price).toFixed(2)}</div>
+              <div class="d-flex align-items-center gap-2 mt-1">
+                <button type="button" class="btn btn-sm btn-outline-secondary rounded-circle p-0 cart-qty-btn" style="width:24px;height:24px;" data-action="decrease" data-id="${item.id}">−</button>
+                <span class="small fw-bold">${item.qty}</span>
+                <button type="button" class="btn btn-sm btn-outline-secondary rounded-circle p-0 cart-qty-btn" style="width:24px;height:24px;" data-action="increase" data-id="${item.id}">+</button>
+                <button type="button" class="btn btn-sm btn-link text-danger ms-auto p-0 cart-remove-btn" data-id="${item.id}" title="Eliminar">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          `;
+          body.appendChild(div);
+        });
+      }
+
+      function openCart() {
+        const s = document.getElementById('cartSidebar');
+        const o = document.getElementById('cartOverlay');
+        if (s) s.classList.add('open');
+        if (o) o.classList.add('open');
+      }
+
+      function closeCart() {
+        const s = document.getElementById('cartSidebar');
+        const o = document.getElementById('cartOverlay');
+        if (s) s.classList.remove('open');
+        if (o) o.classList.remove('open');
+      }
+
+      document.addEventListener('click', function(e) {
+        const qtyBtn = e.target.closest('.cart-qty-btn');
+        if (qtyBtn) {
+          e.preventDefault();
+          const id = qtyBtn.dataset.id;
+          const action = qtyBtn.dataset.action;
+          updateQty(id, action === 'increase' ? 1 : -1);
+          return;
+        }
+        const removeBtn = e.target.closest('.cart-remove-btn');
+        if (removeBtn) {
+          e.preventDefault();
+          removeFromCart(removeBtn.dataset.id);
+          return;
+        }
+      });
+
+      document.addEventListener('DOMContentLoaded', function() {
+        updateCartUI();
+
+        const cartBtn = document.getElementById('cartBtn');
+        if (cartBtn) cartBtn.addEventListener('click', openCart);
+
+        const cartClose = document.getElementById('cartClose');
+        if (cartClose) cartClose.addEventListener('click', closeCart);
+
+        const cartOverlay = document.getElementById('cartOverlay');
+        if (cartOverlay) cartOverlay.addEventListener('click', closeCart);
+
+        document.querySelectorAll('.btn-add-cart').forEach(btn => {
+          btn.addEventListener('click', function() {
+            addToCart({
+              id: this.dataset.id,
+              name: this.dataset.name,
+              price: parseFloat(this.dataset.price),
+              image: this.dataset.image
+            });
+          });
+        });
+      });
+
+      /* SCROLL TOP */
+      (function initScrollTop() {
+        const scrollTop = document.getElementById('scrollTop');
+        if (!scrollTop) return;
+
+        window.addEventListener('scroll', () => {
+          scrollTop.classList.toggle('visible', window.scrollY > 300);
+        });
+        scrollTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+      })();
+
+      /* CARRUSEL DE CATEGORÍAS */
+      (function initCategoryCarousel() {
+        const carousel = document.getElementById('categoryCarousel');
+        const btnPrev = document.getElementById('catPrev');
+        const btnNext = document.getElementById('catNext');
+
+        if (!carousel) return;
+
+        const getScrollAmount = () => {
+          const card = carousel.querySelector('.category-slide-card');
+          if (!card) return 300;
+          const gap = 16;
+          return card.offsetWidth + gap;
+        };
+
+        function updateNavButtons() {
+          if (!btnPrev || !btnNext) return;
+          const { scrollLeft, scrollWidth, clientWidth } = carousel;
+          const atStart = scrollLeft <= 5;
+          const atEnd = scrollLeft + clientWidth >= scrollWidth - 5;
+          btnPrev.disabled = atStart;
+          btnNext.disabled = atEnd;
+        }
+
+        if (btnPrev) {
+          btnPrev.addEventListener('click', () => {
+            carousel.scrollBy({ left: -getScrollAmount() * 2, behavior: 'smooth' });
+          });
+        }
+        if (btnNext) {
+          btnNext.addEventListener('click', () => {
+            carousel.scrollBy({ left: getScrollAmount() * 2, behavior: 'smooth' });
+          });
+        }
+
+        carousel.addEventListener('scroll', updateNavButtons, { passive: true });
+        window.addEventListener('resize', updateNavButtons);
+        updateNavButtons();
+
+        let autoScrollTimer = null;
+        let isUserInteracting = false;
+
+        function startAutoScroll() {
+          if (autoScrollTimer) return;
+          autoScrollTimer = setInterval(() => {
+            if (isUserInteracting) return;
+            const { scrollLeft, scrollWidth, clientWidth } = carousel;
+            const atEnd = scrollLeft + clientWidth >= scrollWidth - 5;
+            if (atEnd) {
+              carousel.scrollTo({ left: 0, behavior: 'smooth' });
+            } else {
+              carousel.scrollBy({ left: getScrollAmount(), behavior: 'smooth' });
+            }
+          }, 5000);
+        }
+
+        function stopAutoScroll() {
+          if (autoScrollTimer) {
+            clearInterval(autoScrollTimer);
+            autoScrollTimer = null;
+          }
+        }
+
+        ['mouseenter', 'touchstart', 'focusin'].forEach(evt => {
+          carousel.addEventListener(evt, () => {
+            isUserInteracting = true;
+            stopAutoScroll();
+          }, { passive: true });
+        });
+
+        ['mouseleave', 'touchend', 'focusout'].forEach(evt => {
+          carousel.addEventListener(evt, () => {
+            isUserInteracting = false;
+            startAutoScroll();
+          }, { passive: true });
+        });
+
+        const totalCards = carousel.querySelectorAll('.category-slide-card').length;
+        if (totalCards > 4) {
+          startAutoScroll();
+        }
+      })();

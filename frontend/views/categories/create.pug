@@ -1,0 +1,41 @@
+extends ../layouts/layout
+
+block content
+  .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pb-2.mb-3.border-bottom
+    h1.h2
+      if isSubcategory
+        i.fas.fa-plus-circle.me-2
+        | Nueva Subcategoría para "#{parentCategory ? parentCategory.name : ''}"
+      else
+        i.fas.fa-plus-circle.me-2
+        | Nueva Categoría
+    a.btn.btn-outline-secondary(href="/categories")
+      i.fas.fa-arrow-left.me-1
+      | Volver
+
+  .card.border-0.shadow-sm
+    .card-body
+      form(method="POST", action="/categories")
+        if isSubcategory && parentCategory
+          input(type="hidden", name="parent", value=parentCategory._id)
+        .mb-3
+          label.form-label Nombre *
+          input.form-control(type="text", name="name", required)
+        .mb-3
+          label.form-label Descripción
+          textarea.form-control(name="description", rows="2")
+        if !isSubcategory
+          .mb-3
+            label.form-label Imagen (URL)
+            input.form-control(type="text", name="image", placeholder="https://ejemplo.com/imagen.jpg")
+            small.text-muted Ingresa la URL de la imagen para la categoría.
+        else
+          input(type="hidden", name="image", value="")
+        if !isSubcategory
+          .form-check.mb-3
+            input#isActive.form-check-input(type="checkbox", name="isActive", checked)
+            label.form-check-label(for="isActive") Activo
+        button.btn.btn-primary(type="submit")
+          i.fas.fa-save.me-1
+          | Guardar
+        a.btn.btn-outline-secondary.ms-2(href="/categories") Cancelar

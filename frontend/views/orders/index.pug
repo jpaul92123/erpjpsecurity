@@ -1,0 +1,289 @@
+extends ../layouts/layout
+
+block content
+
+  //- ============================================
+  //- HEADER
+  //- ============================================
+  .d-flex.flex-wrap.justify-content-between.align-items-center.gap-3.mb-4
+    div
+      nav(aria-label="breadcrumb")
+        ol.breadcrumb.mb-1
+          li.breadcrumb-item
+            a.text-decoration-none(href="/") Dashboard
+          li.breadcrumb-item.active Pedidos
+      h1.h3.fw-bold.mb-1
+        i.fas.fa-shopping-bag.me-2.text-primary
+        | Pedidos
+      p.text-muted.mb-0 Gestiona los pedidos recibidos desde la tienda pública
+
+  //- ============================================
+  //- ESTADÍSTICAS
+  //- ============================================
+  .row.g-3.mb-4
+    .col-6.col-md-3.col-lg-2
+      .card.border-0.shadow-sm.h-100
+        .card-body.p-3
+          .d-flex.align-items-center.gap-2.mb-2
+            .rounded-circle.bg-primary-subtle.text-primary.d-flex.align-items-center.justify-content-center(
+              style="width: 38px; height: 38px;"
+            )
+              i.fas.fa-shopping-bag
+            div
+              small.text-muted.d-block Total
+              h5.fw-bold.mb-0= stats.total
+    .col-6.col-md-3.col-lg-2
+      .card.border-0.shadow-sm.h-100
+        .card-body.p-3
+          .d-flex.align-items-center.gap-2.mb-2
+            .rounded-circle.bg-warning-subtle.text-warning.d-flex.align-items-center.justify-content-center(
+              style="width: 38px; height: 38px;"
+            )
+              i.fas.fa-clock
+            div
+              small.text-muted.d-block Pendientes
+              h5.fw-bold.mb-0= stats.pendientes
+    .col-6.col-md-3.col-lg-2
+      .card.border-0.shadow-sm.h-100
+        .card-body.p-3
+          .d-flex.align-items-center.gap-2.mb-2
+            .rounded-circle.bg-info-subtle.text-info.d-flex.align-items-center.justify-content-center(
+              style="width: 38px; height: 38px;"
+            )
+              i.fas.fa-check-circle
+            div
+              small.text-muted.d-block Confirmados
+              h5.fw-bold.mb-0= stats.confirmados
+    .col-6.col-md-3.col-lg-2
+      .card.border-0.shadow-sm.h-100
+        .card-body.p-3
+          .d-flex.align-items-center.gap-2.mb-2
+            .rounded-circle.bg-primary-subtle.text-primary.d-flex.align-items-center.justify-content-center(
+              style="width: 38px; height: 38px;"
+            )
+              i.fas.fa-truck
+            div
+              small.text-muted.d-block Enviados
+              h5.fw-bold.mb-0= stats.enviados
+    .col-6.col-md-3.col-lg-2
+      .card.border-0.shadow-sm.h-100
+        .card-body.p-3
+          .d-flex.align-items-center.gap-2.mb-2
+            .rounded-circle.bg-success-subtle.text-success.d-flex.align-items-center.justify-content-center(
+              style="width: 38px; height: 38px;"
+            )
+              i.fas.fa-box-open
+            div
+              small.text-muted.d-block Entregados
+              h5.fw-bold.mb-0= stats.entregados
+    .col-6.col-md-3.col-lg-2
+      .card.border-0.shadow-sm.h-100.bg-gradient
+        .card-body.p-3
+          .d-flex.align-items-center.gap-2.mb-2
+            .rounded-circle.bg-success.text-white.d-flex.align-items-center.justify-content-center(
+              style="width: 38px; height: 38px;"
+            )
+              i.fas.fa-dollar-sign
+            div
+              small.text-muted.d-block Ventas
+              h5.fw-bold.mb-0.text-success S/. #{stats.ventasTotales.toFixed(2)}
+
+  //- ============================================
+  //- FILTROS
+  //- ============================================
+  .card.border-0.shadow-sm.rounded-3.mb-4
+    .card-body.p-3
+      form(method="GET" action="/orders")
+        .row.g-2.align-items-center
+          .col-lg-4.col-md-6
+            .input-group
+              span.input-group-text.bg-transparent.border-end-0
+                i.fas.fa-search.text-muted
+              input.form-control.border-start-0(
+                type="text"
+                name="q"
+                placeholder="Buscar por # pedido, nombre o teléfono..."
+                value=filters.search
+              )
+
+          .col-lg-2.col-md-3
+            select.form-select(name="status")
+              option(value="" selected=(!filters.status)) Todos los estados
+              option(value="pendiente" selected=(filters.status === 'pendiente')) Pendientes
+              option(value="confirmado" selected=(filters.status === 'confirmado')) Confirmados
+              option(value="enviado" selected=(filters.status === 'enviado')) Enviados
+              option(value="entregado" selected=(filters.status === 'entregado')) Entregados
+              option(value="cancelado" selected=(filters.status === 'cancelado')) Cancelados
+
+          .col-lg-2.col-md-3
+            input.form-control(
+              type="date"
+              name="from"
+              value=filters.dateFrom
+              placeholder="Desde"
+            )
+
+          .col-lg-2.col-md-3
+            input.form-control(
+              type="date"
+              name="to"
+              value=filters.dateTo
+              placeholder="Hasta"
+            )
+
+          .col-lg-2.col-md-3
+            .d-flex.gap-2
+              button.btn.btn-primary.flex-grow-1(type="submit")
+                i.fas.fa-filter.me-1
+                | Filtrar
+              a.btn.btn-outline-secondary(href="/orders")
+                i.fas.fa-times
+
+  //- ============================================
+  //- LISTADO DE PEDIDOS
+  //- ============================================
+  if orders && orders.length
+
+    .card.border-0.shadow-sm.rounded-3
+      .table-responsive
+        table.table.table-hover.align-middle.mb-0
+          thead.bg-light
+            tr
+              th.px-3 #
+              th Cliente
+              th.d-none.d-md-table-cell Fecha
+              th.d-none.d-lg-table-cell Pago
+              th.text-end Total
+              th.text-center Estado
+              th.text-end Acciones
+          tbody
+            each order in orders
+              tr
+                td.px-3
+                  a.fw-bold.text-primary.text-decoration-none(
+                    href=`/orders/${order._id}`
+                  )= order.orderNumber
+
+                td
+                  .d-flex.align-items-center.gap-2
+                    .rounded-circle.bg-primary-subtle.text-primary.d-flex.align-items-center.justify-content-center(
+                      style="width: 36px; height: 36px; font-weight: 700;"
+                    )= order.customer.name.charAt(0).toUpperCase()
+                    div
+                      div.fw-semibold= order.customer.name
+                      small.text-muted= order.customer.phone
+
+                td.d-none.d-md-table-cell
+                  div= new Date(order.createdAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
+                  small.text-muted= new Date(order.createdAt).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+
+                td.d-none.d-lg-table-cell
+                  case order.paymentMethod
+                    when 'yape'
+                      span.badge.bg-purple-subtle.text-purple
+                        i.fas.fa-mobile-alt.me-1
+                        | Yape
+                    when 'plin'
+                      span.badge.bg-teal-subtle.text-teal
+                        i.fas.fa-mobile-alt.me-1
+                        | Plin
+                    when 'transferencia'
+                      span.badge.bg-primary-subtle.text-primary
+                        i.fas.fa-university.me-1
+                        | Transf.
+                    when 'efectivo'
+                      span.badge.bg-success-subtle.text-success
+                        i.fas.fa-money-bill-wave.me-1
+                        | Efectivo
+
+                td.text-end.fw-bold.text-primary S/. #{order.total.toFixed(2)}
+
+                td.text-center
+                  case order.status
+                    when 'pendiente'
+                      span.badge.bg-warning-subtle.text-warning.rounded-pill.px-3.py-2
+                        i.fas.fa-clock.me-1
+                        | Pendiente
+                    when 'confirmado'
+                      span.badge.bg-info-subtle.text-info.rounded-pill.px-3.py-2
+                        i.fas.fa-check-circle.me-1
+                        | Confirmado
+                    when 'enviado'
+                      span.badge.bg-primary-subtle.text-primary.rounded-pill.px-3.py-2
+                        i.fas.fa-truck.me-1
+                        | Enviado
+                    when 'entregado'
+                      span.badge.bg-success-subtle.text-success.rounded-pill.px-3.py-2
+                        i.fas.fa-box-open.me-1
+                        | Entregado
+                    when 'cancelado'
+                      span.badge.bg-danger-subtle.text-danger.rounded-pill.px-3.py-2
+                        i.fas.fa-times-circle.me-1
+                        | Cancelado
+
+                td.text-end
+                  .d-flex.gap-1.justify-content-end
+                    a.btn.btn-sm.btn-outline-primary.rounded-pill(
+                      href=`/orders/${order._id}`
+                      title="Ver detalle"
+                    )
+                      i.fas.fa-eye
+                    form.d-inline(
+                      method="POST"
+                      action=`/orders/${order._id}?_method=DELETE`
+                      onsubmit="return confirm('¿Eliminar este pedido?')"
+                    )
+                      button.btn.btn-sm.btn-outline-danger.rounded-pill(
+                        type="submit"
+                        title="Eliminar"
+                      )
+                        i.fas.fa-trash
+
+  else
+    //- ============================================
+    //- EMPTY STATE
+    //- ============================================
+    .card.border-0.shadow-sm.rounded-3
+      .card-body.text-center.py-5
+        i.fas.fa-shopping-bag.fa-4x.text-muted.mb-3.opacity-50
+        h5.text-muted.mb-2
+          if filters.search || filters.status
+            | No se encontraron pedidos
+          else
+            | Aún no hay pedidos
+        if filters.search || filters.status
+          p.text-muted.small.mb-4
+            | Intenta con otros filtros o
+            a.text-primary.ms-1(href="/orders") ver todos los pedidos
+        else
+          p.text-muted.small Los pedidos de la tienda pública aparecerán aquí
+
+  //- ============================================
+  //- ESTILOS
+  //- ============================================
+  style.
+    /* Badges con variantes -subtle */
+    .badge.bg-primary-subtle   { background: rgba(13,110,253,0.12)  !important; }
+    .badge.bg-success-subtle   { background: rgba(25,135,84,0.12)   !important; }
+    .badge.bg-warning-subtle   { background: rgba(217,119,6,0.12)   !important; }
+    .badge.bg-info-subtle      { background: rgba(8,145,178,0.12)   !important; }
+    .badge.bg-danger-subtle    { background: rgba(220,53,69,0.12)   !important; }
+    .badge.bg-purple-subtle    { background: rgba(147,51,234,0.12)  !important; }
+    .badge.bg-teal-subtle      { background: rgba(13,148,136,0.12)  !important; }
+
+    .text-purple { color: #9333ea !important; }
+    .text-teal   { color: #0d9488 !important; }
+
+    /* Tabla */
+    .table thead th {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #64748b;
+      font-weight: 700;
+      border-bottom: 2px solid #e5e7eb;
+    }
+    .table tbody td {
+      padding: 12px 8px;
+      vertical-align: middle;
+    }

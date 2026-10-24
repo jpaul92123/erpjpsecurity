@@ -1,0 +1,26 @@
+extends ../layouts/layout
+
+block content
+  .container.py-5
+    .row.justify-content-center
+      .col-md-6.text-center
+        .bg-danger.bg-opacity-10.rounded-circle.d-inline-flex.align-items-center.justify-content-center.mb-4(
+          style="width: 120px; height: 120px;"
+        )
+          i.fas.fa-exclamation-triangle.text-danger.fa-4x
+
+        h1.display-4.fw-bold.text-danger 500
+        h3.fw-bold.mb-3 Error del servidor
+        p.text-muted.mb-4
+          | Ha ocurrido un error inesperado. Por favor, intenta nuevamente o contacta al administrador.
+
+        .d-flex.justify-content-center.gap-2
+          a.btn.btn-primary.rounded-pill.px-4(href="/")
+            i.fas.fa-home.me-1
+            | Ir al Dashboard
+          button.btn.btn-outline-secondary.rounded-pill.px-4(
+            type="button"
+            onclick="history.back()"
+          )
+            i.fas.fa-arrow-left.me-1
+            | Volver

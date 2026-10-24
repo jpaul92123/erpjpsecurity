@@ -1,0 +1,48 @@
+extends ../layouts/layout
+
+block content
+  .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pb-2.mb-3.border-bottom
+    h1.h2
+      i.fas.fa-project-diagram.me-2
+      | Proyectos
+    a.btn.btn-primary(href="/projects/create")
+      i.fas.fa-plus-circle.me-1
+      | Nuevo Proyecto
+
+  .card.border-0.shadow-sm
+    .card-body
+      .table-responsive
+        table.table.table-hover.align-middle
+          thead
+            tr
+              th Nombre
+              th Cliente
+              th Fecha Inicio
+              th Avance
+              th Estado
+              th Acciones
+          tbody
+            each project in projects || []
+              tr
+                td #{project.name}
+                td #{project.client ? project.client.businessName : '-'}
+                td #{new Date(project.startDate).toLocaleDateString()}
+                td
+                  .progress(style="width: 100px;")
+                    .progress-bar(role="progressbar", style=`width: ${project.progress || 0}%`, aria-valuenow=project.progress || 0, aria-valuemin="0", aria-valuemax="100") #{project.progress || 0}%
+                td
+                  span.badge(class=project.status === 'Completado' ? 'bg-success' : project.status === 'Cancelado' ? 'bg-danger' : 'bg-warning') #{project.status}
+                td
+                  .btn-group.btn-group-sm
+                    a.btn.btn-outline-info(href=`/projects/${project._id}`)
+                      i.fas.fa-eye
+                    a.btn.btn-outline-warning(href=`/projects/${project._id}/edit`)
+                      i.fas.fa-edit
+                    form.d-inline(method="POST", action=`/projects/${project._id}?_method=DELETE`, onsubmit="return confirm('¿Eliminar este proyecto?')")
+                      button.btn.btn-outline-danger(type="submit")
+                        i.fas.fa-trash
+            else
+              tr
+                td(colspan="6").text-center.py-4
+                  p.text-muted No hay proyectos registrados.
+                  a.btn.btn-sm.btn-primary(href="/projects/create") Crear primer proyecto

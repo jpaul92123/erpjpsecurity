@@ -1,0 +1,206 @@
+doctype html
+html(lang="es")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title #{title} | JP Security
+    link(rel="stylesheet", href="/bootstrap/css/bootstrap.min.css")
+    link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css")
+    link(rel="stylesheet", href="/css/styles.css")
+  body
+    //- ============================================================
+    //- NAVBAR CON CATEGORÍAS DESPLEGABLES
+    //- ============================================================
+    nav.navbar.navbar-expand-lg.navbar-dark.bg-dark.shadow-sm.sticky-top
+      .container
+        a.navbar-brand(href="/")
+          i.fas.fa-shield-alt.me-2
+          strong JP Security
+        button.navbar-toggler(type="button", data-bs-toggle="collapse", data-bs-target="#navbarMain")
+          span.navbar-toggler-icon
+        .collapse.navbar-collapse#navbarMain
+          ul.navbar-nav.me-auto.mb-2.mb-lg-0
+            //- Menú desplegable de categorías
+            li.nav-item.dropdown
+              a.nav-link.dropdown-toggle(href="#", role="button", data-bs-toggle="dropdown")
+                i.fas.fa-list.me-1
+                | Categorías
+              ul.dropdown-menu.dropdown-menu-end
+                each cat in categories
+                  li
+                    a.dropdown-item(href=`/products?category=${cat._id}`)
+                      i.fas.fa-folder-open.me-2
+                      | #{cat.name}
+                  if cat.subcategories && cat.subcategories.length
+                    li
+                      hr.dropdown-divider
+                    each sub in cat.subcategories
+                      li
+                        a.dropdown-item.ps-4(href=`/products?category=${sub._id}`)
+                          i.fas.fa-tag.me-2
+                          | #{sub.name}
+                    li
+                      hr.dropdown-divider
+          ul.navbar-nav
+            if user
+              li.nav-item
+                a.nav-link(href="/")
+                  i.fas.fa-tachometer-alt.me-1
+                  | Dashboard
+              li.nav-item
+                a.nav-link(href="/logout")
+                  i.fas.fa-sign-out-alt.me-1
+                  | Cerrar Sesión
+            else
+              li.nav-item
+                a.nav-link(href="/login")
+                  i.fas.fa-sign-in-alt.me-1
+                  | Iniciar Sesión
+              li.nav-item
+                a.nav-link(href="/register")
+                  i.fas.fa-user-plus.me-1
+                  | Registrarse
+
+    //- ============================================================
+    //- HERO CON CARRUSEL
+    //- ============================================================
+    section.hero.py-5.bg-gradient-primary
+      .container
+        .row.align-items-center
+          .col-lg-6
+            h1.display-4.fw-bold.text-white
+              | Seguridad Electrónica 
+              span.text-warning de Alto Nivel
+            p.lead.text-white-50.mt-3
+              | Soluciones integrales en sistemas de seguridad electrónica para empresas y hogares.
+            .mt-4
+              if !user
+                a.btn.btn-light.btn-lg.me-2(href="/login")
+                  i.fas.fa-sign-in-alt.me-2
+                  | Iniciar Sesión
+                a.btn.btn-outline-light.btn-lg(href="/register")
+                  i.fas.fa-user-plus.me-2
+                  | Registrarse
+              else
+                a.btn.btn-light.btn-lg(href="/")
+                  i.fas.fa-tachometer-alt.me-2
+                  | Ir al Dashboard
+          .col-lg-6.d-none.d-lg-block
+            .text-center
+              i.fas.fa-shield-halved.fa-8x.text-white.opacity-75
+
+    //- ============================================================
+    //- ÚLTIMOS PRODUCTOS
+    //- ============================================================
+    section.py-5
+      .container
+        .d-flex.justify-content-between.align-items-center.mb-4
+          h2
+            i.fas.fa-box-open.me-2.text-primary
+            | Últimos Productos
+          a.btn.btn-outline-primary(href="/products")
+            Ver todos
+            i.fas.fa-arrow-right.ms-1
+        if latestProducts && latestProducts.length
+          .row.row-cols-1.row-cols-sm-2.row-cols-md-3.row-cols-lg-4.g-4
+            each product in latestProducts
+              .col
+                .card.h-100.shadow-sm.hover-lift.border-0.rounded-3
+                  .card-img-top.text-center.bg-light.p-3(style="height: 180px; overflow: hidden; position: relative;")
+                    if product.image
+                      img(src=product.image, alt=product.name, style="height: 100%; width: 100%; object-fit: contain;")
+                    else
+                      i.fas.fa-image.fa-4x.text-muted(style="line-height: 160px;")
+                    if product.discount && product.discount > 0
+                      span.badge.bg-danger.position-absolute.top-0.end-0.m-2
+                        -#{product.discount}%
+                  .card-body.d-flex.flex-column
+                    h6.card-title.text-truncate(title=product.name) #{product.name}
+                    if product.model
+                      p.card-text.text-muted.small
+                        i.fas.fa-tag.me-1
+                        | #{product.model}
+                    .mt-auto
+                      .d-flex.justify-content-between.align-items-center
+                        div
+                          if product.discount && product.discount > 0
+                            small.text-muted.text-decoration-line-through.me-2 S/. #{ (product.customerPrice || 0).toFixed(2) }
+                            span.text-danger.fw-bold S/. #{ ((product.customerPrice || 0) * (1 - (product.discount || 0)/100)).toFixed(2) }
+                          else
+                            span.text-primary.fw-bold S/. #{ (product.customerPrice || 0).toFixed(2) }
+                        small.text-muted
+                          i.fas.fa-arrow-up.text-success.me-1
+                          | +#{ ((product.customerPrice || 0) - (product.supplierPrice || 0)).toFixed(2) }
+                  .card-footer.bg-transparent.border-0
+                    a.btn.btn-sm.btn-outline-primary.w-100(href=`/products/${product._id}`)
+                      i.fas.fa-eye.me-1
+                      | Ver Detalle
+        else
+          .text-center.py-5
+            i.fas.fa-box-open.fa-4x.text-muted.mb-3
+            p.text-muted No hay productos disponibles.
+
+    //- ============================================================
+    //- SERVICIOS DESTACADOS
+    //- ============================================================
+    section.py-5.bg-light
+      .container
+        h2.text-center.mb-5
+          i.fas.fa-cogs.me-2.text-primary
+          | Nuestros Servicios
+        .row.g-4
+          .col-md-4
+            .card.h-100.border-0.shadow-sm.text-center.hover-lift
+              .card-body.p-4
+                .icon-circle.bg-primary.text-white.mx-auto.mb-3
+                  i.fas.fa-video.fa-2x
+                h5.card-title Circuito Cerrado
+                p.card-text.text-muted Sistemas de videovigilancia profesional con tecnología IP.
+          .col-md-4
+            .card.h-100.border-0.shadow-sm.text-center.hover-lift
+              .card-body.p-4
+                .icon-circle.bg-danger.text-white.mx-auto.mb-3
+                  i.fas.fa-bell.fa-2x
+                h5.card-title Alarmas
+                p.card-text.text-muted Sistemas de alarma contra intrusos y monitoreo 24/7.
+          .col-md-4
+            .card.h-100.border-0.shadow-sm.text-center.hover-lift
+              .card-body.p-4
+                .icon-circle.bg-success.text-white.mx-auto.mb-3
+                  i.fas.fa-lock.fa-2x
+                h5.card-title Control de Acceso
+                p.card-text.text-muted Cerraduras inteligentes y sistemas biométricos.
+
+    //- ============================================================
+    //- FOOTER
+    //- ============================================================
+    footer.bg-dark.text-white.py-4.mt-5
+      .container
+        .row
+          .col-md-6
+            p.mb-0 &copy; 2026 JP Security - Todos los derechos reservados2
+          .col-md-6.text-md-end
+            a.text-white-50.me-3(href="#")
+              i.fab.fa-facebook-f
+            a.text-white-50.me-3(href="#")
+              i.fab.fa-instagram
+            a.text-white-50(href="#")
+              i.fab.fa-youtube
+
+    //- ============================================================
+    //- SCRIPTS
+    //- ============================================================
+    script(src="/bootstrap/js/bootstrap.bundle.min.js")
+    script.
+      // Activar el dropdown al pasar el mouse (mejora UX)
+      document.querySelectorAll('.dropdown').forEach(dropdown => {
+        dropdown.addEventListener('mouseenter', function() {
+          this.querySelector('.dropdown-toggle')?.click();
+        });
+        dropdown.addEventListener('mouseleave', function() {
+          const menu = this.querySelector('.dropdown-menu');
+          if (menu && menu.classList.contains('show')) {
+            this.querySelector('.dropdown-toggle')?.click();
+          }
+        });
+      });

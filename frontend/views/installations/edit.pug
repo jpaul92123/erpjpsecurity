@@ -1,0 +1,62 @@
+extends ../layouts/layout
+
+block content
+  .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pb-2.mb-3.border-bottom
+    h1.h2
+      i.fas.fa-edit.me-2
+      | Editar Instalación
+    a.btn.btn-outline-secondary(href="/installations")
+      i.fas.fa-arrow-left.me-1
+      | Volver
+
+  .card.border-0.shadow-sm
+    .card-body
+      form(method="POST", action=`/installations/${installation._id}?_method=PUT`)
+        .row
+          .col-md-6
+            .mb-3
+              label.form-label Cliente *
+              select.form-control(name="client", required)
+                each client in clients || []
+                  option(value=client._id, selected=client._id.toString() === installation.client.toString()) #{client.businessName}
+          .col-md-6
+            .mb-3
+              label.form-label Proyecto (opcional)
+              select.form-control(name="project")
+                option(value="") Ninguno
+                each project in projects || []
+                  option(value=project._id, selected=project._id.toString() === installation.project?.toString()) #{project.name}
+        .row
+          .col-md-6
+            .mb-3
+              label.form-label Equipo *
+              input.form-control(type="text", name="equipment", value=installation.equipment, required)
+          .col-md-6
+            .mb-3
+              label.form-label N° Serie
+              input.form-control(type="text", name="serialNumber", value=installation.serialNumber)
+        .row
+          .col-md-6
+            .mb-3
+              label.form-label Fecha de Instalación *
+              input.form-control(type="date", name="installationDate", value=installation.installationDate.toISOString().split('T')[0], required)
+          .col-md-6
+            .mb-3
+              label.form-label Técnico *
+              input.form-control(type="text", name="technician", value=installation.technician, required)
+        .row
+          .col-md-6
+            .mb-3
+              label.form-label Estado
+              select.form-control(name="status")
+                option(value="Programado", selected=installation.status==='Programado') Programado
+                option(value="En Progreso", selected=installation.status==='En Progreso') En Progreso
+                option(value="Completado", selected=installation.status==='Completado') Completado
+                option(value="Cancelado", selected=installation.status==='Cancelado') Cancelado
+        .mb-3
+          label.form-label Notas
+          textarea.form-control(name="notes", rows="2") #{installation.notes}
+        button.btn.btn-primary(type="submit")
+          i.fas.fa-save.me-1
+          | Actualizar
+        a.btn.btn-outline-secondary.ms-2(href="/installations") Cancelar

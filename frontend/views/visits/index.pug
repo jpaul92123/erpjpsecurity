@@ -1,0 +1,46 @@
+extends ../layouts/layout
+
+block content
+  .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pb-2.mb-3.border-bottom
+    h1.h2
+      i.fas.fa-clipboard-check.me-2
+      | Visitas Técnicas
+    a.btn.btn-primary(href="/visits/create")
+      i.fas.fa-plus-circle.me-1
+      | Nueva Visita
+
+  .card.border-0.shadow-sm
+    .card-body
+      .table-responsive
+        table.table.table-hover.align-middle
+          thead
+            tr
+              th Cliente
+              th Técnico
+              th Fecha
+              th Propósito
+              th Estado
+              th Acciones
+          tbody
+            each visit in visits || []
+              tr
+                td #{visit.client ? visit.client.businessName : '-'}
+                td #{visit.technician}
+                td #{new Date(visit.date).toLocaleDateString()}
+                td #{visit.purpose}
+                td
+                  span.badge(class=visit.status === 'Realizada' ? 'bg-success' : visit.status === 'Cancelada' ? 'bg-danger' : 'bg-warning') #{visit.status}
+                td
+                  .btn-group.btn-group-sm
+                    a.btn.btn-outline-info(href=`/visits/${visit._id}`)
+                      i.fas.fa-eye
+                    a.btn.btn-outline-warning(href=`/visits/${visit._id}/edit`)
+                      i.fas.fa-edit
+                    form.d-inline(method="POST", action=`/visits/${visit._id}?_method=DELETE`, onsubmit="return confirm('¿Eliminar esta visita?')")
+                      button.btn.btn-outline-danger(type="submit")
+                        i.fas.fa-trash
+            else
+              tr
+                td(colspan="6").text-center.py-4
+                  p.text-muted No hay visitas registradas.
+                  a.btn.btn-sm.btn-primary(href="/visits/create") Registrar primera visita

@@ -1,0 +1,972 @@
+extends ../layouts/layout-public
+
+block content
+
+  //- ============================================
+  //- HERO
+  //- ============================================
+  section.about-hero
+    //- Fondo con imagen
+    if about.companyInfo && about.companyInfo.hero && about.companyInfo.hero.background
+      .about-hero-bg(style=`background-image: url('${about.companyInfo.hero.background}');`)
+    else
+      .about-hero-bg.about-hero-bg-default
+
+    //- Overlay
+    .about-hero-overlay
+
+    //- Círculos decorativos
+    .about-hero-shape.about-hero-shape-1
+    .about-hero-shape.about-hero-shape-2
+
+    .container.position-relative(style="z-index: 3;")
+      .row.align-items-center.min-vh-50
+        .col-lg-9
+          nav(aria-label="breadcrumb").mb-3
+            ol.breadcrumb.about-breadcrumb.mb-0
+              li.breadcrumb-item
+                a.text-decoration-none(href="/")
+                  i.fas.fa-home.me-1
+                  | Inicio
+              li.breadcrumb-item.active Nosotros
+
+          h1.about-hero-title
+            = (about.companyInfo && about.companyInfo.hero && about.companyInfo.hero.title) || 'Nosotros'
+
+          p.about-hero-subtitle
+            = (about.companyInfo && about.companyInfo.hero && about.companyInfo.hero.subtitle) || 'Conoce más sobre nuestra empresa'
+
+          if setting && setting.siteName
+            .about-hero-badge
+              i.fas.fa-shield-halved.me-2
+              = setting.siteName
+
+  //- ============================================
+  //- SOBRE NOSOTROS
+  //- ============================================
+  section.about-section.py-5
+    .container
+      .row.align-items-center.g-5
+
+        //- Texto
+        .col-lg-7
+          .about-section-badge
+            i.fas.fa-building.me-2
+            | Sobre Nosotros
+
+          h2.about-section-title
+            | Comprometidos con tu seguridad
+
+          if about.companyInfo && about.companyInfo.description
+            p.about-section-text= about.companyInfo.description
+          else
+            p.about-section-text
+              | Somos una empresa peruana especializada en soluciones integrales de seguridad electrónica.
+              | Contamos con un equipo técnico certificado y trabajamos con las mejores marcas del sector.
+
+          if about.companyInfo && about.companyInfo.history
+            p.about-section-text= about.companyInfo.history
+
+          //- Botón CTA
+          .d-flex.flex-wrap.gap-3.mt-4
+            if setting && setting.social && setting.social.whatsapp
+              a.btn.btn-primary.rounded-pill.px-4(
+                href=`https://wa.me/${setting.social.whatsapp}`
+                target="_blank"
+              )
+                i.fab.fa-whatsapp.me-2
+                | Contáctanos
+            a.btn.btn-outline-primary.rounded-pill.px-4(href="/products")
+              i.fas.fa-cubes.me-2
+              | Ver Productos
+
+        //- Estadísticas
+        .col-lg-5
+          .about-stats-grid
+            .about-stat-card
+              .about-stat-icon.bg-primary-subtle.text-primary
+                i.fas.fa-award
+              .about-stat-content
+                h3.about-stat-number= (about.companyInfo && about.companyInfo.yearsExperience) || 5
+                p.about-stat-label Años de experiencia
+
+            .about-stat-card
+              .about-stat-icon.bg-success-subtle.text-success
+                i.fas.fa-users
+              .about-stat-content
+                h3.about-stat-number= (about.companyInfo && about.companyInfo.clientsCount) || 500
+                p.about-stat-label Clientes satisfechos
+
+            .about-stat-card
+              .about-stat-icon.bg-warning-subtle.text-warning
+                i.fas.fa-hard-hat
+              .about-stat-content
+                h3.about-stat-number= (about.companyInfo && about.companyInfo.projectsCount) || 800
+                p.about-stat-label Proyectos completados
+
+            .about-stat-card
+              .about-stat-icon.bg-info-subtle.text-info
+                i.fas.fa-shield-alt
+              .about-stat-content
+                h3.about-stat-number 24/7
+                p.about-stat-label Soporte técnico
+
+  //- ============================================
+  //- MISIÓN Y VISIÓN
+  //- ============================================
+  if (about.companyInfo && about.companyInfo.mission) || (about.companyInfo && about.companyInfo.vision)
+    section.about-section.py-5.bg-light-section
+      .container
+        .text-center.mb-5
+          .about-section-badge.mx-auto
+            i.fas.fa-bullseye.me-2
+            | Nuestro Propósito
+          h2.about-section-title
+            | Misión y Visión
+
+        .row.g-4
+          if about.companyInfo && about.companyInfo.mission
+            .col-md-6
+              .about-purpose-card.about-purpose-mission
+                .about-purpose-icon
+                  i.fas.fa-bullseye
+                h4.about-purpose-title Misión
+                p.about-purpose-text= about.companyInfo.mission
+
+          if about.companyInfo && about.companyInfo.vision
+            .col-md-6
+              .about-purpose-card.about-purpose-vision
+                .about-purpose-icon
+                  i.fas.fa-eye
+                h4.about-purpose-title Visión
+                p.about-purpose-text= about.companyInfo.vision
+
+  //- ============================================
+  //- VALORES
+  //- ============================================
+  if about.companyInfo && about.companyInfo.values && about.companyInfo.values.length
+    section.about-section.py-5
+      .container
+        .text-center.mb-5
+          .about-section-badge.mx-auto
+            i.fas.fa-heart.me-2
+            | Lo que nos define
+          h2.about-section-title
+            | Nuestros Valores
+
+        .row.g-4
+          each value in about.companyInfo.values
+            .col-6.col-md-4.col-lg-3
+              .about-value-card
+                .about-value-icon
+                  i.fas(class=value.icon || 'fa-star')
+                h5.about-value-title= value.title
+                if value.description
+                  p.about-value-text= value.description
+
+  //- ============================================
+  //- SERVICIOS
+  //- ============================================
+  if services && services.length
+    section.about-section.py-5.bg-light-section
+      .container
+        .text-center.mb-5
+          .about-section-badge.mx-auto
+            i.fas.fa-tools.me-2
+            | Lo que hacemos
+          h2.about-section-title
+            | Nuestros Servicios
+          p.about-section-subtitle
+            | Soluciones integrales de seguridad adaptadas a tus necesidades
+
+        .row.g-4
+          each service in services
+            .col-md-6.col-lg-4
+              .about-service-card
+                //- Imagen
+                if service.image
+                  .about-service-image(style=`background-image: url('${service.image}');`)
+                else
+                  .about-service-image.about-service-image-default
+                    i.fas(class=service.icon || 'fa-tools')
+
+                .about-service-body
+                  .about-service-icon
+                    i.fas(class=service.icon || 'fa-tools')
+                  h5.about-service-title= service.title
+
+                  if service.description
+                    p.about-service-text= service.description
+
+                  if service.features && service.features.length
+                    ul.about-service-features
+                      each feat in service.features
+                        li
+                          i.fas.fa-check
+                          span= feat
+
+                  if setting && setting.social && setting.social.whatsapp
+                    a.about-service-cta(
+                      href=`https://wa.me/${setting.social.whatsapp}?text=${encodeURIComponent('Hola, me interesa el servicio: ' + service.title)}`
+                      target="_blank"
+                    )
+                      | Consultar
+                      i.fas.fa-arrow-right.ms-2
+
+  //- ============================================
+  //- PROYECTOS REALIZADOS
+  //- ============================================
+  if projects && projects.length
+    section.about-section.py-5
+      .container
+        .text-center.mb-5
+          .about-section-badge.mx-auto
+            i.fas.fa-hard-hat.me-2
+            | Casos de éxito
+          h2.about-section-title
+            | Proyectos Realizados
+          p.about-section-subtitle
+            | Algunos de los trabajos que hemos completado con éxito
+
+        .row.g-4
+          each project, index in projects
+            .col-md-6.col-lg-4
+              .about-project-card
+                //- Imagen principal
+                if project.images && project.images.length
+                  .about-project-image(
+                    style=`background-image: url('${project.images[0]}');`
+                    data-bs-toggle="modal"
+                    data-bs-target=`#projectModal${index}`
+                  )
+                    .about-project-image-overlay
+                      i.fas.fa-search-plus
+                    if project.images.length > 1
+                      .about-project-photos-badge
+                        i.fas.fa-images.me-1
+                        = project.images.length
+                else
+                  .about-project-image.about-project-image-default
+                    i.fas.fa-image
+
+                .about-project-body
+                  .about-project-header
+                    h5.about-project-client= project.client
+                    if project.serviceType
+                      span.about-project-type= project.serviceType
+
+                  p.about-project-address
+                    i.fas.fa-map-marker-alt.me-1
+                    = project.address
+                    if project.city
+                      = ', ' + project.city
+
+                  if project.serviceDate
+                    p.about-project-date
+                      i.fas.fa-calendar.me-1
+                      = new Date(project.serviceDate).toLocaleDateString('es-PE', { month: 'long', year: 'numeric' })
+
+                  if project.description
+                    p.about-project-description= project.description
+
+                //- Modal con galería
+                if project.images && project.images.length
+                  .modal.fade(id=`projectModal${index}` tabindex="-1")
+                    .modal-dialog.modal-lg.modal-dialog-centered
+                      .modal-content.rounded-4.border-0
+                        .modal-header.border-0
+                          div
+                            h5.modal-title.fw-bold.mb-0= project.client
+                            small.text-muted
+                              i.fas.fa-map-marker-alt.me-1
+                              = project.address
+                          button.btn-close(type="button" data-bs-dismiss="modal")
+
+                        .modal-body
+                          //- Carrusel de fotos
+                          #projectCarousel.project-carousel.carousel.slide(
+                            data-bs-ride="carousel"
+                          )
+                            if project.images.length > 1
+                              .carousel-indicators
+                                each img, i in project.images
+                                  button(
+                                    type="button"
+                                    data-bs-target=`#projectCarousel`
+                                    data-bs-slide-to=i
+                                    class=(i === 0 ? 'active' : '')
+                                  )
+                            .carousel-inner.rounded-3
+                              each img, i in project.images
+                                .carousel-item(class=(i === 0 ? 'active' : ''))
+                                  img.about-project-modal-img(
+                                    src=img
+                                    alt=`${project.client} - ${i+1}`
+                                  )
+                            if project.images.length > 1
+                              button.carousel-control-prev(
+                                type="button"
+                                data-bs-target=`#projectCarousel`
+                                data-bs-slide="prev"
+                              )
+                                span.carousel-control-prev-icon
+                              button.carousel-control-next(
+                                type="button"
+                                data-bs-target=`#projectCarousel`
+                                data-bs-slide="next"
+                              )
+                                span.carousel-control-next-icon
+
+                          if project.description
+                            .mt-3
+                              h6.fw-bold Descripción
+                              p.text-muted.mb-0= project.description
+
+  //- ============================================
+  //- CTA FINAL
+  //- ============================================
+  section.about-cta-section
+    .container
+      .about-cta-card
+        .about-cta-shape.about-cta-shape-1
+        .about-cta-shape.about-cta-shape-2
+
+        .row.align-items-center.position-relative(style="z-index: 2;")
+          .col-lg-8
+            h2.about-cta-title
+              | ¿Listo para proteger lo que más valoras?
+            p.about-cta-text
+              | Contáctanos hoy y obtén una cotización sin compromiso.
+              | Nuestro equipo te asesorará para elegir la mejor solución.
+
+          .col-lg-4.text-lg-end
+            .d-flex.flex-column.gap-2
+              if setting && setting.social && setting.social.whatsapp
+                a.btn.btn-light.btn-lg.rounded-pill.px-4(
+                  href=`https://wa.me/${setting.social.whatsapp}`
+                  target="_blank"
+                )
+                  i.fab.fa-whatsapp.me-2.text-success
+                  | WhatsApp
+              if setting && setting.company && setting.company.phone
+                a.btn.btn-outline-light.btn-lg.rounded-pill.px-4(
+                  href=`tel:${setting.company.phone}`
+                )
+                  i.fas.fa-phone.me-2
+                  | Llamar
+
+  //- ============================================
+  //- ESTILOS
+  //- ============================================
+  style.
+    /* ================================================
+       HERO
+       ================================================ */
+    .about-hero {
+      position: relative;
+      min-height: 500px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .about-hero-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      z-index: 0;
+    }
+
+    .about-hero-bg-default {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    }
+
+    .about-hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg,
+        rgba(15, 23, 42, 0.9) 0%,
+        rgba(15, 23, 42, 0.75) 50%,
+        rgba(15, 23, 42, 0.6) 100%);
+      z-index: 1;
+    }
+
+    .about-hero-shape {
+      position: absolute;
+      border-radius: 50%;
+      z-index: 2;
+    }
+    .about-hero-shape-1 {
+      top: -10%;
+      right: -5%;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(13,110,253,0.25), transparent 70%);
+      filter: blur(60px);
+    }
+    .about-hero-shape-2 {
+      bottom: -20%;
+      left: 10%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(255,193,7,0.15), transparent 70%);
+      filter: blur(60px);
+    }
+
+    .about-breadcrumb .breadcrumb-item a {
+      color: rgba(255,255,255,0.6);
+    }
+    .about-breadcrumb .breadcrumb-item a:hover {
+      color: white;
+    }
+    .about-breadcrumb .breadcrumb-item.active {
+      color: rgba(255,255,255,0.9);
+    }
+    .about-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+      color: rgba(255,255,255,0.3);
+    }
+
+    .about-hero-title {
+      font-size: 3rem;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 0.75rem;
+      letter-spacing: -1px;
+      line-height: 1.1;
+    }
+
+    .about-hero-subtitle {
+      font-size: 1.15rem;
+      color: rgba(255,255,255,0.85);
+      margin-bottom: 1.5rem;
+      max-width: 600px;
+    }
+
+    .about-hero-badge {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: white;
+      padding: 0.5rem 1.25rem;
+      border-radius: 50rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+      .about-hero { min-height: 400px; }
+      .about-hero-title { font-size: 2rem; }
+      .about-hero-subtitle { font-size: 1rem; }
+    }
+
+    /* ================================================
+       SECCIONES
+       ================================================ */
+    .about-section {
+      padding: 4rem 0;
+    }
+    .bg-light-section {
+      background: #f8fafc;
+    }
+
+    .about-section-badge {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(13, 110, 253, 0.1);
+      color: var(--brand);
+      padding: 0.5rem 1.25rem;
+      border-radius: 50rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 1rem;
+    }
+
+    .about-section-title {
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 1rem;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+    }
+
+    .about-section-subtitle {
+      color: #64748b;
+      font-size: 1.05rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .about-section-text {
+      color: #475569;
+      font-size: 1rem;
+      line-height: 1.75;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .about-section { padding: 3rem 0; }
+      .about-section-title { font-size: 1.75rem; }
+    }
+
+    /* ================================================
+       ESTADÍSTICAS
+       ================================================ */
+    .about-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    .about-stat-card {
+      background: white;
+      border-radius: 1rem;
+      padding: 1.25rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      border: 1px solid #f1f5f9;
+      transition: all 0.3s;
+    }
+    .about-stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+
+    .about-stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .about-stat-number {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 0.25rem;
+      letter-spacing: -1px;
+    }
+
+    .about-stat-label {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-bottom: 0;
+    }
+
+    /* ================================================
+       MISIÓN Y VISIÓN
+       ================================================ */
+    .about-purpose-card {
+      position: relative;
+      background: white;
+      border-radius: 1.25rem;
+      padding: 2.5rem 2rem;
+      height: 100%;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+      border: 1px solid #f1f5f9;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+    .about-purpose-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.1);
+    }
+    .about-purpose-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+    }
+    .about-purpose-mission::before {
+      background: linear-gradient(90deg, #0d6efd, #0a58ca);
+    }
+    .about-purpose-vision::before {
+      background: linear-gradient(90deg, #f59e0b, #d97706);
+    }
+
+    .about-purpose-icon {
+      width: 70px;
+      height: 70px;
+      border-radius: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
+      margin-bottom: 1.25rem;
+      color: white;
+    }
+    .about-purpose-mission .about-purpose-icon {
+      background: linear-gradient(135deg, #0d6efd, #0a58ca);
+      box-shadow: 0 8px 24px rgba(13, 110, 253, 0.3);
+    }
+    .about-purpose-vision .about-purpose-icon {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      box-shadow: 0 8px 24px rgba(245, 158, 11, 0.3);
+    }
+
+    .about-purpose-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 1rem;
+    }
+
+    .about-purpose-text {
+      color: #475569;
+      line-height: 1.75;
+      margin-bottom: 0;
+    }
+
+    /* ================================================
+       VALORES
+       ================================================ */
+    .about-value-card {
+      background: white;
+      border-radius: 1rem;
+      padding: 2rem 1.5rem;
+      text-align: center;
+      height: 100%;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      border: 1px solid #f1f5f9;
+      transition: all 0.3s;
+    }
+    .about-value-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.1);
+      border-color: var(--brand);
+    }
+
+    .about-value-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(13,110,253,0.1), rgba(10,88,202,0.15));
+      color: var(--brand);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      transition: all 0.3s;
+    }
+    .about-value-card:hover .about-value-icon {
+      background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+      color: white;
+      transform: rotate(-8deg) scale(1.05);
+    }
+
+    .about-value-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 0.5rem;
+    }
+
+    .about-value-text {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-bottom: 0;
+      line-height: 1.5;
+    }
+
+    /* ================================================
+       SERVICIOS
+       ================================================ */
+    .about-service-card {
+      background: white;
+      border-radius: 1.25rem;
+      overflow: hidden;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+      border: 1px solid #f1f5f9;
+      transition: all 0.3s;
+    }
+    .about-service-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+    }
+
+    .about-service-image {
+      height: 200px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+    .about-service-image-default {
+      background: linear-gradient(135deg, #0d6efd, #0a58ca);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 3rem;
+      opacity: 0.9;
+    }
+
+    .about-service-body {
+      padding: 1.5rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .about-service-icon {
+      position: absolute;
+      top: -32px;
+      right: 1.5rem;
+      width: 64px;
+      height: 64px;
+      border-radius: 1rem;
+      background: white;
+      color: var(--brand);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+
+    .about-service-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 0.75rem;
+      padding-right: 60px;
+    }
+
+    .about-service-text {
+      color: #64748b;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .about-service-features {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .about-service-features li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: #475569;
+    }
+    .about-service-features li i {
+      color: #10b981;
+      font-size: 0.75rem;
+      margin-top: 4px;
+      flex-shrink: 0;
+    }
+
+    .about-service-cta {
+      display: inline-flex;
+      align-items: center;
+      color: var(--brand);
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-decoration: none;
+      margin-top: auto;
+      transition: all 0.2s;
+    }
+    .about-service-cta:hover {
+      color: var(--brand-dark);
+      transform: translateX(4px);
+    }
+
+    /* ================================================
+       PROYECTOS
+       ================================================ */
+    .about-project-card {
+      background: white;
+      border-radius: 1.25rem;
+      overflow: hidden;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+      border: 1px solid #f1f5f9;
+      transition: all 0.3s;
+    }
+    .about-project-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+    }
+
+    .about-project-image {
+      height: 220px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .about-project-image-default {
+      background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      font-size: 3rem;
+    }
+
+    .about-project-image-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.75rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .about-project-image:hover .about-project-image-overlay {
+      opacity: 1;
+    }
+
+    .about-project-photos-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(10px);
+      color: white;
+      padding: 0.35rem 0.75rem;
+      border-radius: 50rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .about-project-body {
+      padding: 1.5rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .about-project-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .about-project-client {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 0;
+    }
+
+    .about-project-type {
+      background: rgba(13, 110, 253, 0.1);
+      color: var(--brand);
+      padding: 0.25rem 0.6rem;
+      border-radius: 50rem;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    .about-project-address,
+    .about-project-date {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-bottom: 0.5rem;
+    }
+
+    .about-project-description {
+      font-size: 0.85rem;
+      color: #475569;
+      line-height: 1.6;
+      margin-bottom: 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .about-project-modal-img {
+      width: 100%;
+      max-height: 500px;
+      object-fit: contain;
+      background: #f8fafc;
+      border-radius: 0.75rem;
+    }
+
+    /* ================================================
+       CTA FINAL
+       ================================================ */
+    .about-cta-section {
+      padding: 4rem 0 5rem;
+    }
+
+    .about-cta-card {
+      background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 60%, #084298 100%);
+      border-radius: 1.5rem;
+      padding: 3rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(13, 110, 253, 0.25);
+    }
+
+    .about-cta-shape {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+    }
+    .about-cta-shape-1 {
+      top: -50%;
+      right: -10%;
+      width: 400px;
+      height: 400px;
+    }
+    .about-cta-shape-2 {
+      bottom: -60%;
+      left: 15%;
+      width: 300px;
+      height: 300px;
+    }
+
+    .about-cta-title {
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.5px;
+    }
+
+    .about-cta-text {
+      color: rgba(255,255,255,0.9);
+      font-size: 1rem;
+      margin-bottom: 0;
+    }
+
+    @media (max-width: 768px) {
+      .about-cta-card { padding: 2rem 1.5rem; }
+      .about-cta-title { font-size: 1.4rem; }
+    }

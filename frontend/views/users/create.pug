@@ -1,0 +1,21 @@
+extends ../layouts/layout
+
+block content
+  h1 Crear Usuario
+  form(action="/users", method="POST")
+    .mb-3
+      label.form-label Nombre
+      input.form-control(type="text", name="name", required)
+    .mb-3
+      label.form-label Email
+      input.form-control(type="email", name="email", required)
+    .mb-3
+      label.form-label Contraseña
+      input.form-control(type="password", name="password", required)
+    .mb-3
+      label.form-label Rol
+      select.form-control(name="role")
+        each role in roles
+          option(value=role.id)= role.name
+    button.btn.btn-primary(type="submit") Guardar
+    a.btn.btn-secondary(href="/users") Cancelar

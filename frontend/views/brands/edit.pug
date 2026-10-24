@@ -1,0 +1,432 @@
+extends ../layouts/layout
+
+block content
+
+  //- ============================================
+  //- HEADER
+  //- ============================================
+  .d-flex.flex-wrap.flex-md-nowrap.align-items-center.justify-content-between.pb-3.mb-4.border-bottom
+    .d-flex.align-items-center
+      .bg-warning.bg-opacity-10.rounded-3.p-3.me-3
+        i.fas.fa-pen.text-warning.fa-2x
+      div
+        nav(aria-label="breadcrumb")
+          ol.breadcrumb.mb-1
+            li.breadcrumb-item
+              a.text-decoration-none(href="/brands") Marcas
+            li.breadcrumb-item
+              a.text-decoration-none(href=`/brands/${brand._id}`)= brand.name
+            li.breadcrumb-item.active Editar
+        h1.h2.mb-0.fw-bold Editar Marca
+        p.text-muted.mb-0
+          i.fas.fa-info-circle.me-1
+          | Modifica los datos de la marca
+    div.d-flex.gap-2
+      a.btn.btn-outline-secondary.rounded-pill.px-4(href=`/brands/${brand._id}`)
+        i.fas.fa-arrow-left.me-1
+        | Volver
+
+  //- ============================================
+  //- FORMULARIO
+  //- ============================================
+  .row
+    .col-lg-8.mx-auto
+      form(
+        action=`/brands/${brand._id}?_method=PUT`
+        method="POST"
+        enctype="multipart/form-data"
+        id="formEditBrand"
+        novalidate
+      )
+
+        .row.g-4
+
+          //- ========== COLUMNA IZQUIERDA: LOGO ==========
+          .col-md-4
+            .card.border-0.shadow-sm.rounded-3.h-100
+              .card-header.bg-white.border-bottom.py-3
+                h6.mb-0.fw-bold
+                  i.fas.fa-image.me-2.text-warning
+                  | Logo de la Marca
+              .card-body.p-4.text-center
+
+                //- Preview del logo
+                .logo-preview-wrapper.mb-3
+                  .logo-preview(
+                    id="logoPreview"
+                    style="width: 140px; height: 140px; margin: 0 auto; border-radius: 16px; background: #f8fafc; border: 2px solid #0d6efd; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; transition: all 0.3s ease; cursor: pointer;"
+                  )
+                    img(
+                      id="logoPreviewImg"
+                      src=brand.logo || '/img/brand-default.png'
+                      alt="Preview"
+                      style="max-width: 100%; max-height: 100%; object-fit: contain;"
+                      onerror="this.style.display='none'; document.getElementById('logoPlaceholder').style.display='block';"
+                    )
+                    .logo-placeholder(
+                      id="logoPlaceholder"
+                      style="display: none;"
+                    )
+                      i.fas.fa-image.text-muted(
+                        style="font-size: 40px; opacity: 0.5;"
+                      )
+                      p.text-muted.small.mb-0.mt-2 Sin logo
+
+                //- Input file (oculto)
+                input(
+                  type="file"
+                  name="logo"
+                  id="logoInput"
+                  accept="image/*"
+                  style="display: none;"
+                )
+
+                //- Botón para cambiar
+                button.btn.btn-outline-primary.rounded-pill.w-100(
+                  type="button"
+                  id="btnSelectLogo"
+                )
+                  i.fas.fa-cloud-upload-alt.me-2
+                  | Cambiar Logo
+
+                //- Botón para quitar (aparece si hay logo personalizado)
+                if brand.logo && !brand.logo.includes('default')
+                  button.btn.btn-outline-danger.rounded-pill.w-100.mt-2(
+                    type="button"
+                    id="btnRemoveLogo"
+                  )
+                    i.fas.fa-trash.me-2
+                    | Quitar Logo
+                else
+                  button.btn.btn-outline-danger.rounded-pill.w-100.mt-2(
+                    type="button"
+                    id="btnRemoveLogo"
+                    style="display: none;"
+                  )
+                    i.fas.fa-trash.me-2
+                    | Quitar Logo
+
+                //- Checkbox oculto para indicar eliminación (se activa si se quita el logo)
+                input(
+                  type="checkbox"
+                  name="removeLogo"
+                  id="removeLogoInput"
+                  style="display: none;"
+                )
+
+                //- Info
+                .mt-3
+                  small.text-muted.d-block
+                    i.fas.fa-info-circle.me-1
+                    | JPG, PNG, WEBP o SVG
+                  small.text-muted Máximo 2MB
+
+          //- ========== COLUMNA DERECHA: DATOS ==========
+          .col-md-8
+            .card.border-0.shadow-sm.rounded-3.mb-3
+              .card-header.bg-white.border-bottom.py-3
+                h6.mb-0.fw-bold
+                  i.fas.fa-tag.me-2.text-warning
+                  | Datos de la Marca
+              .card-body.p-4
+
+                .row.g-3
+                  .col-md-12
+                    label.form-label.fw-semibold
+                      | Nombre de la Marca
+                      span.text-danger.ms-1 *
+                    .input-group
+                      span.input-group-text.bg-white
+                        i.fas.fa-trademark.text-muted
+                      input.form-control(
+                        type="text"
+                        name="name"
+                        id="name"
+                        value=brand.name
+                        placeholder="Ej: Hikvision, Dahua, TP-Link..."
+                        required
+                        maxlength="100"
+                        autofocus
+                      )
+                    small.text-muted Máximo 100 caracteres
+                    .invalid-feedback Ingresa el nombre de la marca
+
+                  .col-md-12
+                    label.form-label.fw-semibold Descripción
+                    .input-group
+                      span.input-group-text.bg-white
+                        i.fas.fa-align-left.text-muted
+                      textarea.form-control(
+                        name="description"
+                        id="description"
+                        rows="5"
+                        placeholder="Describe brevemente la marca (opcional)..."
+                        maxlength="500"
+                      )= brand.description || ''
+                    .d-flex.justify-content-between.mt-1
+                      small.text-muted Máximo 500 caracteres
+                      small.text-muted
+                        span#charCount #{brand.description ? brand.description.length : 0}
+                        | /500
+
+        //- ============================================
+        //- ESTADO
+        //- ============================================
+        .card.border-0.shadow-sm.rounded-3.mt-3
+          .card-header.bg-white.border-bottom.py-3
+            h6.mb-0.fw-bold
+              i.fas.fa-toggle-on.me-2.text-warning
+              | Estado de la Marca
+          .card-body.p-4
+
+            .form-check.form-switch
+              input.form-check-input(
+                type="checkbox"
+                name="isActive"
+                id="isActive"
+                checked=brand.isActive
+              )
+              label.form-check-label.fw-semibold(for="isActive")
+                | Marca Activa
+                small.text-muted.d-block.ms-0
+                  | Si está desactivada, no aparecerá en las listas de selección
+
+        //- ============================================
+        //- BOTONES
+        //- ============================================
+        .card.border-0.shadow-sm.rounded-3.mt-3
+          .card-body.p-3
+            .d-flex.flex-wrap.justify-content-between.align-items-center.gap-2
+
+              if brand.createdAt
+                small.text-muted
+                  i.fas.fa-clock.me-1
+                  | Creada el #{new Date(brand.createdAt).toLocaleDateString('es-PE', { day: '2-digit', month: 'long', year: 'numeric' })}
+
+              div.d-flex.gap-2
+                a.btn.btn-outline-secondary.rounded-pill.px-4(href=`/brands/${brand._id}`)
+                  i.fas.fa-times.me-1
+                  | Cancelar
+                button.btn.btn-warning.rounded-pill.px-4(
+                  type="submit"
+                  id="btnSubmit"
+                )
+                  i.fas.fa-save.me-1
+                  | Guardar Cambios
+
+  //- ============================================
+  //- ESTILOS
+  //- ============================================
+  style.
+    .form-control, .form-select {
+      border-color: #e2e8f0;
+      padding: 0.65rem 0.9rem;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #ffc107;
+      box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.15);
+    }
+    .input-group-text {
+      border-color: #e2e8f0;
+    }
+    .input-group:focus-within .input-group-text {
+      border-color: #ffc107;
+    }
+    .form-label {
+      font-size: 0.9rem;
+      margin-bottom: 0.4rem;
+      color: #334155;
+    }
+
+    .logo-preview-wrapper {
+      position: relative;
+    }
+    .logo-preview:hover {
+      border-color: #ffc107 !important;
+      background: #fffbf0 !important;
+    }
+    .logo-preview.dragover {
+      border-color: #ffc107 !important;
+      background: #fffbf0 !important;
+      transform: scale(1.05);
+    }
+
+    .form-check-input:checked {
+      background-color: #ffc107;
+      border-color: #ffc107;
+    }
+    .form-check-input:focus {
+      border-color: #ffc107;
+      box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.15);
+    }
+
+  //- ============================================
+  //- SCRIPT
+  //- ============================================
+  script.
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('formEditBrand');
+      const btnSubmit = document.getElementById('btnSubmit');
+      const nameInput = document.getElementById('name');
+      const descriptionInput = document.getElementById('description');
+      const charCount = document.getElementById('charCount');
+
+      // ============================================
+      // CONTADOR DE CARACTERES
+      // ============================================
+      if (descriptionInput && charCount) {
+        function updateCharCount() {
+          const len = descriptionInput.value.length;
+          charCount.textContent = len;
+          charCount.classList.toggle('text-warning', len > 450);
+        }
+        descriptionInput.addEventListener('input', updateCharCount);
+      }
+
+      // ============================================
+      // SUBIR / CAMBIAR LOGO
+      // ============================================
+      const logoInput = document.getElementById('logoInput');
+      const btnSelectLogo = document.getElementById('btnSelectLogo');
+      const btnRemoveLogo = document.getElementById('btnRemoveLogo');
+      const logoPreview = document.getElementById('logoPreview');
+      const logoPreviewImg = document.getElementById('logoPreviewImg');
+      const logoPlaceholder = document.getElementById('logoPlaceholder');
+      const removeLogoInput = document.getElementById('removeLogoInput');
+
+      function showLogoPreview(src) {
+        logoPreviewImg.src = src;
+        logoPreviewImg.style.display = 'block';
+        logoPlaceholder.style.display = 'none';
+        btnRemoveLogo.style.display = 'block';
+        logoPreview.style.borderStyle = 'solid';
+        logoPreview.style.borderColor = '#ffc107';
+        logoPreview.style.background = '#fffbf0';
+      }
+
+      function hideLogoPreview() {
+        logoPreviewImg.src = '';
+        logoPreviewImg.style.display = 'none';
+        logoPlaceholder.style.display = 'block';
+        btnRemoveLogo.style.display = 'none';
+        logoPreview.style.borderStyle = 'solid';
+        logoPreview.style.borderColor = '#ffc107';
+        logoPreview.style.background = '#fffbf0';
+      }
+
+      btnSelectLogo.addEventListener('click', function() {
+        logoInput.click();
+      });
+
+      logoPreview.addEventListener('click', function() {
+        logoInput.click();
+      });
+
+      logoInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (file.size > 2 * 1024 * 1024) {
+          alert('La imagen no puede superar los 2MB');
+          logoInput.value = '';
+          return;
+        }
+
+        if (!file.type.startsWith('image/')) {
+          alert('Solo se permiten imágenes');
+          logoInput.value = '';
+          return;
+        }
+
+        // Si sube nueva imagen, cancelar la eliminación
+        removeLogoInput.checked = false;
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          showLogoPreview(event.target.result);
+        };
+        reader.readAsDataURL(file);
+      });
+
+      btnRemoveLogo.addEventListener('click', function() {
+        if (!confirm('¿Estás seguro de quitar el logo de esta marca?')) return;
+
+        logoInput.value = '';
+        removeLogoInput.checked = true;
+        hideLogoPreview();
+      });
+
+      // Drag & Drop
+      logoPreview.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('dragover');
+      });
+      logoPreview.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        this.classList.remove('dragover');
+      });
+      logoPreview.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('dragover');
+
+        const file = e.dataTransfer.files[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+          alert('Solo se permiten imágenes');
+          return;
+        }
+
+        if (file.size > 2 * 1024 * 1024) {
+          alert('La imagen no puede superar los 2MB');
+          return;
+        }
+
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        logoInput.files = dataTransfer.files;
+        removeLogoInput.checked = false;
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          showLogoPreview(event.target.result);
+        };
+        reader.readAsDataURL(file);
+      });
+
+      // ============================================
+      // VALIDACIÓN Y ENVÍO
+      // ============================================
+      if (form) {
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+
+          let hasError = false;
+
+          if (!nameInput.value.trim()) {
+            nameInput.classList.add('is-invalid');
+            hasError = true;
+          } else {
+            nameInput.classList.remove('is-invalid');
+          }
+
+          if (hasError) {
+            const firstError = form.querySelector('.is-invalid');
+            if (firstError) {
+              firstError.focus();
+              firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            return false;
+          }
+
+          btnSubmit.disabled = true;
+          btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
+          form.submit();
+        });
+
+        nameInput.addEventListener('input', function() {
+          this.classList.remove('is-invalid');
+        });
+      }
+    });

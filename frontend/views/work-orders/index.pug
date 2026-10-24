@@ -1,0 +1,50 @@
+extends ../layouts/layout
+
+block content
+  .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pb-2.mb-3.border-bottom
+    h1.h2
+      i.fas.fa-tasks.me-2
+      | Órdenes de Trabajo
+    a.btn.btn-primary(href="/work-orders/create")
+      i.fas.fa-plus-circle.me-1
+      | Nueva Orden
+
+  .card.border-0.shadow-sm
+    .card-body
+      .table-responsive
+        table.table.table-hover.align-middle
+          thead
+            tr
+              th N° Orden
+              th Cliente
+              th Descripción
+              th Prioridad
+              th Fecha Inicio
+              th Estado
+              th Acciones
+          tbody
+            each order in workOrders || []
+              tr
+                td 
+                  code #{order.number}
+                td #{order.client ? order.client.businessName : '-'}
+                td #{order.description.substring(0, 40)}...
+                td 
+                  span.badge(class=order.priority === 'Alta' ? 'bg-danger' : order.priority === 'Urgente' ? 'bg-danger' : 'bg-warning') #{order.priority}
+                td #{new Date(order.startDate).toLocaleDateString()}
+                td
+                  span.badge(class=order.status === 'Completada' ? 'bg-success' : order.status === 'Cancelada' ? 'bg-danger' : 'bg-warning') #{order.status}
+                td
+                  .btn-group.btn-group-sm
+                    a.btn.btn-outline-info(href=`/work-orders/${order._id}`)
+                      i.fas.fa-eye
+                    a.btn.btn-outline-warning(href=`/work-orders/${order._id}/edit`)
+                      i.fas.fa-edit
+                    form.d-inline(method="POST", action=`/work-orders/${order._id}?_method=DELETE`, onsubmit="return confirm('¿Eliminar esta orden?')")
+                      button.btn.btn-outline-danger(type="submit")
+                        i.fas.fa-trash
+            else
+              tr
+                td(colspan="7").text-center.py-4
+                  p.text-muted No hay órdenes de trabajo registradas.
+                  a.btn.btn-sm.btn-primary(href="/work-orders/create") Crear primera orden

@@ -1,0 +1,506 @@
+extends ../layouts/layout
+
+block content
+
+  //- ============================================
+  //- HEADER
+  //- ============================================
+  .quotation-header.mb-4
+    .d-flex.flex-wrap.justify-content-between.align-items-center.gap-3
+      div
+        nav(aria-label="breadcrumb")
+          ol.breadcrumb.mb-1
+            li.breadcrumb-item
+              a.text-decoration-none(href="/") Dashboard
+            li.breadcrumb-item
+              a.text-decoration-none(href="/quotations") Cotizaciones
+            li.breadcrumb-item.active= quotation.number
+        h1.h3.fw-bold.mb-1
+          i.fas.fa-file-invoice.me-2.text-primary
+          | Cotización #{quotation.number}
+          if quotation.convertedToSale
+            span.badge.bg-success.ms-2 CONVERTIDA
+        p.text-muted.mb-0
+          i.fas.fa-calendar.me-1
+          = new Date(quotation.createdAt).toLocaleString('es-PE', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+
+      .d-flex.gap-2.flex-wrap
+        a.btn.btn-outline-secondary.rounded-pill.px-3(href="/quotations")
+          i.fas.fa-arrow-left.me-1
+          | Volver
+
+        button.btn.btn-primary.rounded-pill.px-4(
+          type="button"
+          onclick="printQuotation(quotationData)"
+        )
+          i.fas.fa-print.me-1
+          | Imprimir / PDF
+
+        if !quotation.convertedToSale
+          button.btn.btn-success.rounded-pill.px-3(
+            type="button"
+            data-bs-toggle="modal"
+            data-bs-target="#modalCrearVenta"
+          )
+            i.fas.fa-shopping-cart.me-1
+            | Crear Venta
+        else
+          button.btn.btn-secondary.rounded-pill.px-3(type="button" disabled)
+            i.fas.fa-check.me-1
+            | Venta ya creada
+          if quotation.saleId
+            a.btn.btn-info.rounded-pill.px-3(href=`/sales/${quotation.saleId.toString()}`)
+              i.fas.fa-eye.me-1
+              | Ver Venta
+
+  //- ============================================
+  //- CONTENIDO PRINCIPAL
+  //- ============================================
+  .card.border-0.shadow-sm.rounded-3
+    .card-body.p-4
+
+      .text-center.mb-4
+        h3.fw-bold.mb-1 PROFORMA
+        small.text-muted Documento de cotización
+
+      //- INFO CLIENTE + ORDEN
+      .row.g-4.mb-4
+        .col-md-6
+          .info-box
+            h6.info-box-title
+              i.fas.fa-user.me-2
+              | Datos del Cliente
+            .info-box-content
+              p.mb-1
+                strong Cliente:
+                span.ms-2= quotation.client ? quotation.client.businessName : 'Cliente Anónimo'
+              p.mb-1
+                strong RUC/DNI:
+                span.ms-2= quotation.rucDni || 'No especificado'
+              p.mb-0
+                strong Celular:
+                span.ms-2= quotation.celular || 'No especificado'
+
+        .col-md-6
+          .info-box
+            h6.info-box-title
+              i.fas.fa-file-invoice.me-2
+              | Detalles de la Cotización
+            .info-box-content
+              p.mb-1
+                strong Fecha:
+                span.ms-2= new Date(quotation.createdAt).toLocaleDateString('es-PE')
+              p.mb-1
+                strong Válido hasta:
+                span.ms-2= new Date(quotation.validUntil).toLocaleDateString('es-PE')
+              p.mb-1
+                strong Pago:
+                span.ms-2= quotation.modalidadPago
+              p.mb-0
+                strong Garantía:
+                span.ms-2= quotation.garantiaMeses > 0 ? quotation.garantiaMeses + ' meses' : 'No especificada'
+
+      //- TABLA DE PRODUCTOS
+      .table-responsive.mb-4
+        table.table.table-bordered.align-middle.mb-0
+          thead.table-dark
+            tr
+              th.text-center(style="width: 80px;") Imagen
+              th Descripción
+              th.text-center(style="width: 80px;") Cant.
+              th.text-end(style="width: 120px;") P. Unitario
+              th.text-end(style="width: 120px;") Total
+          tbody
+            each item in quotation.items
+              tr
+                td.text-center
+                  if item.image
+                    img(
+                      src=item.image
+                      alt=item.description
+                      style="width: 50px; height: 50px; object-fit: contain; border-radius: 6px; background: #f8fafc; padding: 4px;"
+                    )
+                  else
+                    i.fas.fa-image.text-muted
+                td
+                  div.fw-semibold= item.description
+                  if item.product && item.product.model
+                    small.text-muted
+                      i.fas.fa-barcode.me-1
+                      = item.product.model
+                td.text-center= item.quantity
+                td.text-end S/. #{item.unitPrice.toFixed(2)}
+                td.text-end.fw-bold S/. #{item.total.toFixed(2)}
+
+      //- TOTALES
+      .row.mb-4
+        .col-md-7
+          if quotation.notas
+            .alert.alert-light.border.rounded-3.mb-0
+              h6.fw-bold.mb-2
+                i.fas.fa-sticky-note.me-1
+                | Notas
+              p.mb-0.small= quotation.notas
+
+        .col-md-5
+          .totals-box
+            .d-flex.justify-content-between.mb-2
+              span.text-muted Subtotal
+              strong S/. #{quotation.subtotal.toFixed(2)}
+            if quotation.igv > 0
+              .d-flex.justify-content-between.mb-2
+                span.text-muted IGV (18%)
+                strong S/. #{quotation.igv.toFixed(2)}
+            if quotation.discount > 0
+              .d-flex.justify-content-between.mb-2.text-danger
+                span Descuento
+                strong - S/. #{quotation.discount.toFixed(2)}
+            .d-flex.justify-content-between.pt-2(style="border-top: 2px solid var(--brand);")
+              span.fw-bold.fs-5 TOTAL
+              span.fw-bold.fs-4.text-primary S/. #{quotation.total.toFixed(2)}
+
+      //- Footer
+      .text-center.text-muted.small.pt-3(style="border-top: 1px dashed #e2e8f0;")
+        i.fas.fa-user-circle.me-1
+        | Creado por: 
+        strong= quotation.createdBy ? quotation.createdBy.name : '-'
+
+  //- ============================================
+  //- MODAL CREAR VENTA
+  //- ============================================
+  if !quotation.convertedToSale
+    .modal.fade#modalCrearVenta(tabindex="-1")
+      .modal-dialog.modal-lg.modal-dialog-centered
+        .modal-content.rounded-4.border-0.shadow-lg
+
+          .modal-header.bg-success.text-white.rounded-top-4
+            h5.modal-title
+              i.fas.fa-shopping-cart.me-2
+              | Crear Venta desde Cotización
+            button.btn-close.btn-close-white(type="button" data-bs-dismiss="modal")
+
+          //- ⬇️ EL FORMULARIO ENVUELVE BODY + FOOTER
+          form#formCrearVenta(method="POST", action=`/quotations/${quotation._id}/sale` novalidate)
+
+            .modal-body.p-4
+
+              .alert.alert-info.rounded-3.mb-4
+                .row.g-2
+                  .col-md-6
+                    small.text-muted.d-block Cliente
+                    strong= quotation.client ? quotation.client.businessName : 'Cliente Anónimo'
+                  .col-md-3
+                    small.text-muted.d-block Total
+                    strong.text-success S/. #{quotation.total.toFixed(2)}
+                  .col-md-3
+                    small.text-muted.d-block Items
+                    strong #{quotation.items.length} productos
+
+              .mb-4
+                label.form-label.fw-semibold
+                  i.fas.fa-user.me-1
+                  | Cliente para la venta
+                .d-flex.gap-2
+                  select.form-select#clientId(name="clientId")
+                    option(value="") -- Usar cliente de la cotización --
+                    if quotation.client
+                      option(value=quotation.client._id)= quotation.client.businessName + ' (de la cotización)'
+                    each client in clients
+                      if quotation.client && client._id.toString() !== quotation.client._id.toString()
+                        option(value=client._id)= client.businessName + ' - ' + client.ruc
+                    option(value="new") + Crear nuevo cliente
+                  button.btn.btn-success(type="button" id="btnNuevoClienteVenta" title="Nuevo cliente")
+                    i.fas.fa-user-plus
+
+              #nuevoClienteFields(style="display:none;")
+                .card.bg-light.border-0.rounded-3.mb-4
+                  .card-body.p-3
+                    h6.fw-bold.mb-3
+                      i.fas.fa-user-plus.me-1
+                      | Nuevo Cliente
+                    .row.g-3
+                      .col-md-6
+                        label.form-label.small.fw-semibold
+                          | Nombre / Razón Social
+                          span.text-danger *
+                        input.form-control(
+                          type="text"
+                          name="businessName"
+                          placeholder="Ej: Juan Pérez"
+                        )
+                      .col-md-6
+                        label.form-label.small.fw-semibold RUC
+                        input.form-control(
+                          type="text"
+                          name="ruc"
+                          placeholder="20123456789"
+                          maxlength="11"
+                        )
+                      .col-md-6
+                        label.form-label.small.fw-semibold Email
+                        input.form-control(
+                          type="email"
+                          name="email"
+                          placeholder="cliente@email.com"
+                        )
+                      .col-md-6
+                        label.form-label.small.fw-semibold Teléfono
+                        input.form-control(
+                          type="text"
+                          name="phone"
+                          placeholder="987654321"
+                        )
+
+              .row.g-3.mb-4
+                .col-md-6
+                  label.form-label.fw-semibold
+                    i.fas.fa-credit-card.me-1
+                    | Método de Pago
+                  select.form-select(name="paymentMethod")
+                    option(value="Efectivo") 💵 Efectivo
+                    option(value="Tarjeta") 💳 Tarjeta
+                    option(value="Transferencia") 🏦 Transferencia
+                    option(value="Yape") 📱 Yape
+                    option(value="Plin") 📱 Plin
+                    option(value="Otro") Otro
+                .col-md-6
+                  label.form-label.fw-semibold
+                    i.fas.fa-calendar.me-1
+                    | Fecha de Venta
+                  input.form-control(
+                    type="date"
+                    name="saleDate"
+                    value=new Date().toISOString().split('T')[0]
+                  )
+
+              .mb-3
+                label.form-label.fw-semibold
+                  i.fas.fa-sticky-note.me-1
+                  | Notas adicionales
+                textarea.form-control(
+                  name="notes"
+                  rows="2"
+                  placeholder="Notas para la venta (opcional)"
+                )
+
+              .alert.alert-danger.d-none#formError
+                i.fas.fa-exclamation-circle.me-1
+                span#formErrorMessage
+
+            .modal-footer.border-top-0.p-3
+              button.btn.btn-outline-secondary.rounded-pill.px-4(
+                type="button"
+                data-bs-dismiss="modal"
+              )
+                i.fas.fa-times.me-1
+                | Cancelar
+              button.btn.btn-success.rounded-pill.px-4(
+                type="submit"
+                id="btnSubmitVenta"
+              )
+                i.fas.fa-check.me-1
+                | Confirmar Venta
+
+  //- ============================================
+  //- INCLUIR SETTING GLOBAL
+  //- ============================================
+  include ../partials/setting-globals
+
+  //- ============================================
+  //- SCRIPTS
+  //- ============================================
+  script.
+    const quotationData = !{JSON.stringify(quotation).replace(/</g, '\\u003c')};
+
+  script(src="/js/quotation-print.js")
+
+  script.
+    document.addEventListener('DOMContentLoaded', function() {
+
+      const form = document.getElementById('formCrearVenta');
+      const clientSelect = document.getElementById('clientId');
+      const newClientFields = document.getElementById('nuevoClienteFields');
+      const btnNew = document.getElementById('btnNuevoClienteVenta');
+      const btnSubmit = document.getElementById('btnSubmitVenta');
+      const formError = document.getElementById('formError');
+      const formErrorMessage = document.getElementById('formErrorMessage');
+
+      function showError(msg) {
+        if (formError && formErrorMessage) {
+          formError.classList.remove('d-none');
+          formErrorMessage.textContent = msg;
+        }
+      }
+
+      function hideError() {
+        if (formError) {
+          formError.classList.add('d-none');
+        }
+      }
+
+      function setLoading(loading) {
+        if (btnSubmit) {
+          if (loading) {
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creando venta...';
+          } else {
+            btnSubmit.disabled = false;
+            btnSubmit.innerHTML = '<i class="fas fa-check me-1"></i> Confirmar Venta';
+          }
+        }
+      }
+
+      if (clientSelect) {
+        clientSelect.addEventListener('change', function() {
+          if (this.value === 'new') {
+            newClientFields.style.display = 'block';
+            newClientFields.querySelectorAll('input').forEach(function(inp) {
+              inp.required = true;
+            });
+            hideError();
+          } else {
+            newClientFields.style.display = 'none';
+            newClientFields.querySelectorAll('input').forEach(function(inp) {
+              inp.required = false;
+            });
+            hideError();
+          }
+        });
+      }
+
+      if (btnNew && clientSelect) {
+        btnNew.addEventListener('click', function() {
+          clientSelect.value = 'new';
+          clientSelect.dispatchEvent(new Event('change'));
+          clientSelect.focus();
+        });
+      }
+
+      if (form) {
+        form.addEventListener('submit', function(e) {
+          hideError();
+
+          const clientId = clientSelect.value;
+
+          // ⬇️ Solo validar si es cliente NUEVO
+          if (clientId === 'new') {
+            const businessName = form.querySelector('input[name="businessName"]');
+            if (!businessName || !businessName.value.trim()) {
+              e.preventDefault();
+              showError('Por favor ingresa el nombre del nuevo cliente');
+              if (businessName) businessName.focus();
+              return false;
+            }
+          }
+
+          const formData = new FormData(form);
+          const data = {};
+          formData.forEach((value, key) => {
+            data[key] = value;
+          });
+
+          console.log('📤 Enviando formulario de venta:', data);
+          console.log('🔗 URL destino:', form.action);
+
+          setLoading(true);
+        });
+      }
+
+      const modal = document.getElementById('modalCrearVenta');
+      if (modal) {
+        modal.addEventListener('hidden.bs.modal', function() {
+          hideError();
+          setLoading(false);
+        });
+      }
+    });
+
+  //- ============================================
+  //- ESTILOS
+  //- ============================================
+  style.
+    .info-box {
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 16px;
+      border-left: 4px solid var(--brand);
+      height: 100%;
+    }
+    .info-box-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--brand);
+      margin-bottom: 12px;
+    }
+    .info-box-content p {
+      font-size: 0.9rem;
+      color: #334155;
+    }
+    .info-box-content strong {
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    .totals-box {
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .table thead.table-dark th {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+    .table tbody td {
+      vertical-align: middle;
+    }
+
+    #modalCrearVenta .modal-content {
+      overflow: hidden;
+    }
+    #modalCrearVenta .modal-header {
+      border-bottom: none;
+      padding: 1.25rem 1.5rem;
+    }
+    #modalCrearVenta .modal-body {
+      max-height: calc(100vh - 220px);
+      overflow-y: auto;
+    }
+    #modalCrearVenta .form-label {
+      font-size: 0.9rem;
+      margin-bottom: 0.4rem;
+    }
+    #modalCrearVenta .form-control,
+    #modalCrearVenta .form-select {
+      border-color: #e2e8f0;
+      padding: 0.6rem 0.9rem;
+    }
+    #modalCrearVenta .form-control:focus,
+    #modalCrearVenta .form-select:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+    }
+
+    @media print {
+      .btn, .btn-group, .no-print, nav[aria-label="breadcrumb"] {
+        display: none !important;
+      }
+      .card {
+        border: none !important;
+        box-shadow: none !important;
+      }
+      .container {
+        max-width: 100% !important;
+      }
+      body {
+        padding: 20px;
+      }
+      .quotation-header {
+        text-align: center;
+      }
+    }

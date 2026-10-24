@@ -1,0 +1,340 @@
+extends ../layouts/layout
+
+block content
+
+  //- ============================================
+  //- HEADER
+  //- ============================================
+  .d-flex.flex-wrap.flex-md-nowrap.align-items-center.justify-content-between.pb-3.mb-4.border-bottom
+    .d-flex.align-items-center
+      .bg-primary.bg-opacity-10.rounded-3.p-3.me-3
+        i.bi.fs-3.text-primary(
+          class=client.type === 'Jurídico' ? 'bi-building' : 'bi-person'
+        )
+      div
+        nav(aria-label="breadcrumb")
+          ol.breadcrumb.mb-1
+            li.breadcrumb-item
+              a.text-decoration-none(href="/clients") Clientes
+            li.breadcrumb-item.active= client.businessName
+        h1.h2.mb-0.fw-bold= client.businessName
+        p.text-muted.mb-0
+          if client.type === 'Jurídico'
+            span.badge.bg-info-subtle.text-info.px-3.py-2.rounded-pill.border.border-info-subtle.me-2
+              i.bi.bi-building.me-1
+              | Jurídico
+          else
+            span.badge.bg-secondary-subtle.text-secondary.px-3.py-2.rounded-pill.border.border-secondary-subtle.me-2
+              i.bi.bi-person.me-1
+              | Natural
+
+          if client.isActive
+            span.badge.bg-success-subtle.text-success.px-3.py-2.rounded-pill.border.border-success-subtle
+              i.bi.bi-check-circle.me-1
+              | Activo
+          else
+            span.badge.bg-danger-subtle.text-danger.px-3.py-2.rounded-pill.border.border-danger-subtle
+              i.bi.bi-x-circle.me-1
+              | Inactivo
+    div.d-flex.gap-2
+      a.btn.btn-outline-secondary.rounded-pill.px-3(href="/clients")
+        i.bi.bi-arrow-left.me-1
+        | Volver
+      a.btn.btn-warning.rounded-pill.px-4(href=`/clients/${client._id}/edit`)
+        i.bi.bi-pencil.me-1
+        | Editar
+
+  //- ============================================
+  //- TARJETAS DE ESTADÍSTICAS RÁPIDAS
+  //- ============================================
+  .row.g-3.mb-4
+    .col-sm-6.col-lg-3
+      .card.border-0.shadow-sm.rounded-3.stat-card.h-100
+        .card-body.d-flex.justify-content-between.align-items-center
+          div
+            h6.card-title.mb-1.small.text-uppercase.text-muted.fw-semibold RUC / DNI
+            h6.card-text.mb-0.fw-bold.text-dark #{client.ruc || '—'}
+          .stat-icon.bg-primary.bg-opacity-10.text-primary.rounded-3
+            i.bi.bi-hash.fs-4
+
+    .col-sm-6.col-lg-3
+      .card.border-0.shadow-sm.rounded-3.stat-card.h-100
+        .card-body.d-flex.justify-content-between.align-items-center
+          div
+            h6.card-title.mb-1.small.text-uppercase.text-muted.fw-semibold Teléfono
+            h6.card-text.mb-0.fw-bold.text-dark #{client.phone || '—'}
+          .stat-icon.bg-success.bg-opacity-10.text-success.rounded-3
+            i.bi.bi-telephone.fs-4
+
+    .col-sm-6.col-lg-3
+      .card.border-0.shadow-sm.rounded-3.stat-card.h-100
+        .card-body.d-flex.justify-content-between.align-items-center
+          div
+            h6.card-title.mb-1.small.text-uppercase.text-muted.fw-semibold Contactos
+            h6.card-text.mb-0.fw-bold.text-dark #{client.contacts ? client.contacts.length : 0}
+          .stat-icon.bg-info.bg-opacity-10.text-info.rounded-3
+            i.bi.bi-people.fs-4
+
+    .col-sm-6.col-lg-3
+      .card.border-0.shadow-sm.rounded-3.stat-card.h-100
+        .card-body.d-flex.justify-content-between.align-items-center
+          div
+            h6.card-title.mb-1.small.text-uppercase.text-muted.fw-semibold Direcciones
+            h6.card-text.mb-0.fw-bold.text-dark #{client.addresses ? client.addresses.length : 0}
+          .stat-icon.bg-warning.bg-opacity-10.text-warning.rounded-3
+            i.bi.bi-geo-alt.fs-4
+
+  //- ============================================
+  //- CONTENIDO PRINCIPAL
+  //- ============================================
+  .row.g-4
+
+    //- ========== COLUMNA IZQUIERDA ==========
+    .col-lg-6
+
+      //- INFORMACIÓN GENERAL
+      .card.border-0.shadow-sm.rounded-3.mb-4
+        .card-header.bg-white.border-bottom.py-3
+          h6.mb-0.fw-bold
+            i.bi.bi-info-circle.me-2.text-primary
+            | Información General
+        .card-body.p-4
+
+          .info-list
+            .info-item
+              .info-icon.bg-primary.bg-opacity-10.text-primary
+                i.bi.bi-hash
+              div
+                small.text-muted.d-block RUC / DNI
+                strong= client.ruc || '—'
+
+            .info-item
+              .info-icon.bg-info.bg-opacity-10.text-info
+                i.bi.bi-envelope
+              div
+                small.text-muted.d-block Email
+                strong= client.email || '—'
+
+            .info-item
+              .info-icon.bg-success.bg-opacity-10.text-success
+                i.bi.bi-telephone
+              div
+                small.text-muted.d-block Teléfono
+                strong= client.phone || '—'
+
+            .info-item
+              .info-icon.bg-warning.bg-opacity-10.text-warning
+                i.bi.bi-geo-alt
+              div
+                small.text-muted.d-block Dirección
+                strong= client.address || '—'
+
+            .info-item
+              .info-icon.bg-secondary.bg-opacity-10.text-secondary
+                i.bi.bi-tag
+              div
+                small.text-muted.d-block Tipo de Cliente
+                if client.type === 'Jurídico'
+                  span.badge.bg-info-subtle.text-info.px-3.py-1.rounded-pill.border.border-info-subtle
+                    i.bi.bi-building.me-1
+                    | Jurídico
+                else
+                  span.badge.bg-secondary-subtle.text-secondary.px-3.py-1.rounded-pill.border.border-secondary-subtle
+                    i.bi.bi-person.me-1
+                    | Natural
+
+            .info-item
+              .info-icon.bg-primary.bg-opacity-10.text-primary
+                i.bi.bi-calendar
+              div
+                small.text-muted.d-block Registrado
+                strong= new Date(client.createdAt).toLocaleDateString('es-PE', { day: '2-digit', month: 'long', year: 'numeric' })
+
+      //- CONTACTOS
+      .card.border-0.shadow-sm.rounded-3.mb-4
+        .card-header.bg-white.border-bottom.py-3
+          .d-flex.justify-content-between.align-items-center
+            h6.mb-0.fw-bold
+              i.bi.bi-people.me-2.text-primary
+              | Contactos
+              span.badge.bg-primary.ms-2 #{client.contacts ? client.contacts.length : 0}
+        .card-body.p-4
+
+          if client.contacts && client.contacts.length > 0
+            each contact in client.contacts
+              .contact-item.mb-3.pb-3.border-bottom
+                .d-flex.justify-content-between.align-items-start.mb-2
+                  .d-flex.align-items-center.gap-2
+                    .bg-primary.bg-opacity-10.rounded-circle(
+                      style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"
+                    )
+                      i.bi.bi-person.text-primary.fs-5
+                    div
+                      div.fw-semibold= contact.name
+                      if contact.position
+                        small.text-muted= contact.position
+                  if contact.isMain
+                    span.badge.bg-primary-subtle.text-primary.px-3.py-1.rounded-pill.border.border-primary-subtle
+                      i.bi.bi-star-fill.me-1
+                      | Principal
+
+                .row.g-2.ms-5.ps-2
+                  if contact.email
+                    .col-md-6
+                      small.text-muted.d-block
+                        i.bi.bi-envelope.me-1
+                        | Email
+                      strong.small= contact.email
+                  if contact.phone
+                    .col-md-6
+                      small.text-muted.d-block
+                        i.bi.bi-telephone.me-1
+                        | Teléfono
+                      strong.small= contact.phone
+          else
+            .text-center.py-4
+              i.bi.bi-people.fs-1.text-muted.opacity-25.d-block.mb-2
+              p.text-muted.mb-0 Sin contactos registrados
+
+    //- ========== COLUMNA DERECHA ==========
+    .col-lg-6
+
+      //- DIRECCIONES
+      .card.border-0.shadow-sm.rounded-3.mb-4
+        .card-header.bg-white.border-bottom.py-3
+          .d-flex.justify-content-between.align-items-center
+            h6.mb-0.fw-bold
+              i.bi.bi-geo-alt.me-2.text-primary
+              | Direcciones
+              span.badge.bg-primary.ms-2 #{client.addresses ? client.addresses.length : 0}
+        .card-body.p-4
+
+          if client.addresses && client.addresses.length > 0
+            each address in client.addresses
+              .address-item.mb-3.pb-3.border-bottom
+                .d-flex.justify-content-between.align-items-start.mb-2
+                  .d-flex.align-items-center.gap-2
+                    .bg-warning.bg-opacity-10.rounded-circle(
+                      style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"
+                    )
+                      i.bi.bi-geo-alt.text-warning.fs-5
+                    div
+                      div.fw-semibold= address.street || 'Sin dirección'
+                      if address.city
+                        small.text-muted #{address.city}#{address.state ? ', ' + address.state : ''}
+                  if address.isMain
+                    span.badge.bg-warning-subtle.text-warning.px-3.py-1.rounded-pill.border.border-warning-subtle
+                      i.bi.bi-star-fill.me-1
+                      | Principal
+
+                .ms-5.ps-2
+                  if address.zipCode
+                    small.text-muted.d-block
+                      i.bi.bi-mailbox.me-1
+                      | Código Postal: #{address.zipCode}
+                  if address.country
+                    small.text-muted.d-block
+                      i.bi.bi-globe.me-1
+                      | #{address.country}
+                  if address.reference
+                    small.text-muted.d-block.mt-1
+                      i.bi.bi-info-circle.me-1
+                      | Referencia: #{address.reference}
+          else
+            .text-center.py-4
+              i.bi.bi-geo-alt.fs-1.text-muted.opacity-25.d-block.mb-2
+              p.text-muted.mb-0 Sin direcciones registradas
+
+      //- HISTORIAL (opcional - si tienes ventas/cotizaciones)
+      .card.border-0.shadow-sm.rounded-3
+        .card-header.bg-white.border-bottom.py-3
+          h6.mb-0.fw-bold
+            i.bi.bi-clock-history.me-2.text-primary
+            | Actividad Reciente
+        .card-body.p-4
+
+          .row.g-3
+            .col-6
+              .d-flex.align-items-center.gap-3.p-3.bg-light.rounded-3
+                .bg-success.bg-opacity-10.rounded-3.p-2
+                  i.bi.bi-cart-check.text-success.fs-5
+                div
+                  small.text-muted.d-block Ventas
+                  h5.mb-0.fw-bold= client.salesCount || 0
+            .col-6
+              .d-flex.align-items-center.gap-3.p-3.bg-light.rounded-3
+                .bg-primary.bg-opacity-10.rounded-3.p-2
+                  i.bi.bi-file-invoice.text-primary.fs-5
+                div
+                  small.text-muted.d-block Cotizaciones
+                  h5.mb-0.fw-bold= client.quotationsCount || 0
+
+  //- ============================================
+  //- ESTILOS
+  //- ============================================
+  style.
+    .stat-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.08) !important;
+    }
+    .stat-icon {
+      width: 52px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .info-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .info-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .info-item strong {
+      color: #1e293b;
+      font-size: 0.95rem;
+    }
+
+    .contact-item:last-child,
+    .address-item:last-child {
+      border-bottom: none !important;
+      margin-bottom: 0 !important;
+      padding-bottom: 0 !important;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+
+    @media (max-width: 768px) {
+      .info-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+      }
+      .stat-icon {
+        width: 44px;
+        height: 44px;
+      }
+    }

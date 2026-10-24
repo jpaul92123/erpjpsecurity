@@ -1,0 +1,15 @@
+extends ../layouts/layout
+
+block content
+  .row.justify-content-center.mt-5
+    .col-md-6.text-center
+      .card.border-0.shadow-sm
+        .card-body.py-5
+          .display-1.text-muted
+            i.fas.fa-exclamation-triangle
+          h1.display-3.text-muted 404
+          h2.mb-4 Página no encontrada
+          p.text-muted La página que buscas no existe o fue movida.
+          a.btn.btn-primary(href="/")
+            i.fas.fa-home.me-2
+            | Volver al inicio

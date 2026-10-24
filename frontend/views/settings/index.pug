@@ -1,0 +1,926 @@
+extends ../layouts/layout
+
+block content
+  //- ============================================
+  //- HEADER
+  //- ============================================
+  .d-flex.flex-wrap.justify-content-between.align-items-center.mb-4.gap-3
+    div
+      nav(aria-label="breadcrumb")
+        ol.breadcrumb.mb-1
+          li.breadcrumb-item
+            a.text-decoration-none(href="/") Dashboard
+          li.breadcrumb-item.active(aria-current="page") Configuración
+      h1.h3.fw-bold.mb-1
+        i.fas.fa-cog.me-2.text-primary
+        | Configuración del Sitio
+      p.text-muted.mb-0 Administra la identidad, datos de empresa, horarios, redes sociales y los slides del hero
+    div.d-flex.gap-2
+      a.btn.btn-outline-secondary.rounded-pill.px-3(href="/" target="_blank" title="Ver landing")
+        i.fas.fa-external-link-alt.me-1
+        | Ver Sitio
+      button.btn.btn-primary.rounded-pill.px-4(type="submit" form="settingsForm")
+        i.fas.fa-save.me-2
+        | Guardar Cambios
+
+  //- ============================================
+  //- MENSAJES FLASH
+  //- ============================================
+  if success && success.length
+    .alert.alert-success.alert-dismissible.fade.show.rounded-3
+      i.fas.fa-check-circle.me-2
+      = success
+      button.btn-close(type="button" data-bs-dismiss="alert")
+
+  if error && error.length
+    .alert.alert-danger.alert-dismissible.fade.show.rounded-3
+      i.fas.fa-exclamation-circle.me-2
+      = error
+      button.btn-close(type="button" data-bs-dismiss="alert")
+
+  //- ============================================
+  //- FORMULARIO PRINCIPAL (CON enctype para archivos)
+  //- ============================================
+  form#settingsForm(method="POST" action="/settings" enctype="multipart/form-data" novalidate)
+    //- ========== TABS DE NAVEGACIÓN ==========
+    ul.nav.nav-pills.mb-4.gap-2.settings-tabs(role="tablist")
+      li.nav-item(role="presentation")
+        button.nav-link.active(data-bs-toggle="pill" data-bs-target="#tab-identidad" type="button")
+          i.fas.fa-tag.me-1
+          | Identidad
+      li.nav-item(role="presentation")
+        button.nav-link(data-bs-toggle="pill" data-bs-target="#tab-empresa" type="button")
+          i.fas.fa-building.me-1
+          | Empresa
+      li.nav-item(role="presentation")
+        button.nav-link(data-bs-toggle="pill" data-bs-target="#tab-horarios" type="button")
+          i.fas.fa-clock.me-1
+          | Horarios
+      li.nav-item(role="presentation")
+        button.nav-link(data-bs-toggle="pill" data-bs-target="#tab-redes" type="button")
+          i.fas.fa-share-alt.me-1
+          | Redes Sociales
+      li.nav-item(role="presentation")
+        button.nav-link(data-bs-toggle="pill" data-bs-target="#tab-slides" type="button")
+          i.fas.fa-images.me-1
+          | Slides del Hero
+          span.badge.bg-primary.rounded-pill.ms-2#slideCountBadge= (setting.heroSlides ? setting.heroSlides.length : 0)
+
+    .tab-content
+
+      //- ============================================
+      //- TAB 1: IDENTIDAD
+      //- ============================================
+      .tab-pane.fade.show.active#tab-identidad
+        .card.border-0.shadow-sm.rounded-3
+          .card-header.bg-white.border-bottom.py-3
+            h5.mb-0
+              i.fas.fa-tag.me-2.text-primary
+              | Identidad del Sitio
+              small.text-muted.ms-2 Nombre, logo, colores y SEO
+          .card-body.p-4
+            .row.g-4
+
+              //- ---------- Nombre y eslogan ----------
+              .col-12
+                h6.text-uppercase.text-muted.small.fw-bold.mb-3
+                  i.fas.fa-heading.me-1
+                  | Nombre y Eslogan
+                .row.g-3
+                  .col-md-6
+                    label.form-label.fw-semibold(for="siteName")
+                      | Nombre del sitio
+                      span.text-danger *
+                    input.form-control#siteName(
+                      name="siteName"
+                      value=setting.siteName
+                      required
+                      placeholder="Ej: JP Security"
+                    )
+                    .form-text El nombre que aparecerá en el navbar y título
+                  .col-md-6
+                    label.form-label.fw-semibold(for="siteTagline") Eslogan
+                    input.form-control#siteTagline(
+                      name="siteTagline"
+                      value=setting.siteTagline
+                      placeholder="Ej: Protegemos lo que más quieres"
+                    )
+                    .form-text Se muestra debajo del nombre
+
+              //- ---------- Logo y favicon (SUBIR ARCHIVO) ----------
+              .col-12
+                hr.my-2
+                h6.text-uppercase.text-muted.small.fw-bold.mb-3
+                  i.fas.fa-image.me-1
+                  | Logo e Icono
+                .row.g-3
+
+                  //- LOGO
+                  .col-md-6
+                    label.form-label.fw-semibold Subir Logo
+                    input.form-control(
+                      type="file"
+                      name="logo"
+                      accept="image/*"
+                    )
+                    .form-text JPG, PNG, SVG, WEBP (máx 2MB)
+                    if setting.logo
+                      .mt-2.p-2.bg-light.rounded-2.d-flex.align-items-center.gap-2
+                        img(src=setting.logo alt="Logo actual" style="height:32px; object-fit:contain;")
+                        small.text-muted Logo actual
+                        button.btn.btn-sm.btn-link.text-danger.ms-auto.p-0(
+                          type="button"
+                          onclick="if(confirm('¿Eliminar el logo?')) document.getElementById('removeLogo').value = '1';"
+                          title="Eliminar logo"
+                        )
+                          i.fas.fa-times
+                    input(type="hidden" name="removeLogo" id="removeLogo" value="")
+
+                  //- FAVICON
+                  .col-md-6
+                    label.form-label.fw-semibold Subir Favicon
+                    input.form-control(
+                      type="file"
+                      name="favicon"
+                      accept="image/*"
+                    )
+                    .form-text Icono de la pestaña (máx 1MB)
+                    if setting.favicon
+                      .mt-2.p-2.bg-light.rounded-2.d-flex.align-items-center.gap-2
+                        img(src=setting.favicon alt="Favicon" style="height:24px;")
+                        small.text-muted Favicon actual
+
+              //- ---------- Icono FA ----------
+              .col-md-6
+                label.form-label.fw-semibold(for="icon") Icono principal (FontAwesome)
+                .input-group
+                  span.input-group-text
+                    i.fas.fa-icons
+                  input.form-control#icon(
+                    name="icon"
+                    value=setting.icon
+                    placeholder="fa-shield-halved"
+                  )
+                .form-text Ej: fa-shield-halved, fa-lock, fa-camera
+                .mt-2.d-flex.gap-2.flex-wrap
+                  each ic in ['fa-shield-halved', 'fa-lock', 'fa-camera', 'fa-bell', 'fa-house-chimney', 'fa-user-shield']
+                    button.btn.btn-sm.btn-outline-secondary.rounded-pill.icon-suggestion(
+                      type="button"
+                      data-icon=ic
+                    )
+                      i.fas(class=ic).me-1
+                      = ic.replace('fa-', '')
+
+              //- ---------- Colores ----------
+              .col-12
+                hr.my-2
+                h6.text-uppercase.text-muted.small.fw-bold.mb-3
+                  i.fas.fa-palette.me-1
+                  | Colores de Marca
+                .row.g-3
+                  .col-md-4
+                    label.form-label.fw-semibold(for="colorPrimary") Color principal
+                    .input-group
+                      input.form-control.form-control-color#colorPrimary(
+                        name="colorPrimary"
+                        type="color"
+                        value=setting.colors.primary
+                      )
+                      input.form-control(type="text" value=setting.colors.primary readonly data-color-preview="colorPrimary")
+                    .form-text Color de botones principales
+                  .col-md-4
+                    label.form-label.fw-semibold(for="colorSecondary") Color secundario
+                    .input-group
+                      input.form-control.form-control-color#colorSecondary(
+                        name="colorSecondary"
+                        type="color"
+                        value=setting.colors.secondary
+                      )
+                      input.form-control(type="text" value=setting.colors.secondary readonly data-color-preview="colorSecondary")
+                    .form-text Hover de botones
+                  .col-md-4
+                    label.form-label.fw-semibold(for="colorAccent") Color de acento
+                    .input-group
+                      input.form-control.form-control-color#colorAccent(
+                        name="colorAccent"
+                        type="color"
+                        value=setting.colors.accent
+                      )
+                      input.form-control(type="text" value=setting.colors.accent readonly data-color-preview="colorAccent")
+                    .form-text Badges y destacados
+
+              //- ---------- SEO ----------
+              .col-12
+                hr.my-2
+                h6.text-uppercase.text-muted.small.fw-bold.mb-3
+                  i.fas.fa-search.me-1
+                  | SEO (Buscadores)
+                .row.g-3
+                  .col-md-12
+                    label.form-label.fw-semibold(for="metaDescription") Meta descripción
+                    textarea.form-control#metaDescription(
+                      name="metaDescription"
+                      rows="2"
+                      maxlength="160"
+                      placeholder="Descripción breve para Google (máx 160 caracteres)"
+                    )= setting.metaDescription
+                    .form-text.d-flex.justify-content-between
+                      span Aparece en resultados de búsqueda
+                      span#metaDescCount 0 / 160
+                  .col-md-12
+                    label.form-label.fw-semibold(for="metaKeywords") Meta keywords
+                    input.form-control#metaKeywords(
+                      name="metaKeywords"
+                      value=setting.metaKeywords
+                      placeholder="seguridad, cámaras, alarmas, Lima, Perú"
+                    )
+                    .form-text Separadas por comas
+
+      //- ============================================
+      //- TAB 2: EMPRESA
+      //- ============================================
+      .tab-pane.fade#tab-empresa
+        .card.border-0.shadow-sm.rounded-3
+          .card-header.bg-white.border-bottom.py-3
+            h5.mb-0
+              i.fas.fa-building.me-2.text-primary
+              | Datos de la Empresa
+              small.text-muted.ms-2 Información fiscal y de contacto
+          .card-body.p-4
+            .row.g-3
+              .col-md-8
+                label.form-label.fw-semibold(for="companyLegalName") Razón social
+                input.form-control#companyLegalName(
+                  name="companyLegalName"
+                  value=setting.company.legalName
+                  placeholder="JP SECURITY S.A.C."
+                )
+                .form-text Nombre legal completo
+              .col-md-4
+                label.form-label.fw-semibold(for="companyRuc") RUC
+                input.form-control#companyRuc(
+                  name="companyRuc"
+                  value=setting.company.ruc
+                  placeholder="20123456789"
+                  maxlength="11"
+                  pattern="[0-9]*"
+                )
+                .form-text 11 dígitos
+              .col-md-6
+                label.form-label.fw-semibold(for="companyPhone")
+                  i.fas.fa-phone.me-1.text-muted
+                  | Teléfono
+                input.form-control#companyPhone(
+                  name="companyPhone"
+                  value=setting.company.phone
+                  placeholder="(01) 555-1234"
+                )
+              .col-md-6
+                label.form-label.fw-semibold(for="companyEmail")
+                  i.fas.fa-envelope.me-1.text-muted
+                  | Correo
+                input.form-control#companyEmail(
+                  name="companyEmail"
+                  type="email"
+                  value=setting.company.email
+                  placeholder="ventas@jpsecurity.com"
+                )
+              .col-md-8
+                label.form-label.fw-semibold(for="companyAddress")
+                  i.fas.fa-map-marker-alt.me-1.text-muted
+                  | Dirección
+                input.form-control#companyAddress(
+                  name="companyAddress"
+                  value=setting.company.address
+                  placeholder="Av. Principal 123, Of. 501"
+                )
+              .col-md-2
+                label.form-label.fw-semibold(for="companyCity") Ciudad
+                input.form-control#companyCity(
+                  name="companyCity"
+                  value=setting.company.city
+                )
+              .col-md-2
+                label.form-label.fw-semibold(for="companyCountry") País
+                input.form-control#companyCountry(
+                  name="companyCountry"
+                  value=setting.company.country
+                )
+
+            //- ---------- Vista previa ----------
+            .col-12.mt-4
+              .alert.alert-light.border.rounded-3
+                h6.fw-bold.mb-3
+                  i.fas.fa-eye.me-2.text-primary
+                  | Vista previa en el footer
+                .d-flex.flex-wrap.gap-4.small
+                  div
+                    i.fas.fa-phone.me-2.text-primary
+                    span#previewPhone= setting.company.phone || '(01) 555-1234'
+                  div
+                    i.fas.fa-envelope.me-2.text-primary
+                    span#previewEmail= setting.company.email || 'ventas@jpsecurity.com'
+                  div
+                    i.fas.fa-map-marker-alt.me-2.text-primary
+                    span#previewAddress= setting.company.address || 'Av. Principal 123, Lima'
+
+      //- ============================================
+      //- TAB 3: HORARIOS
+      //- ============================================
+      .tab-pane.fade#tab-horarios
+        .card.border-0.shadow-sm.rounded-3
+          .card-header.bg-white.border-bottom.py-3
+            h5.mb-0
+              i.fas.fa-clock.me-2.text-primary
+              | Horarios de Atención
+              small.text-muted.ms-2 Cuándo atiende la empresa
+          .card-body.p-4
+            .row.g-3
+              .col-md-6
+                label.form-label.fw-semibold(for="scheduleWeekdays")
+                  i.fas.fa-calendar-day.me-1.text-muted
+                  | Lunes a Viernes
+                input.form-control#scheduleWeekdays(
+                  name="scheduleWeekdays"
+                  value=setting.schedule.weekdays
+                  placeholder="9:00 - 19:00"
+                )
+              .col-md-6
+                label.form-label.fw-semibold(for="scheduleSaturday")
+                  i.fas.fa-calendar-day.me-1.text-muted
+                  | Sábado
+                input.form-control#scheduleSaturday(
+                  name="scheduleSaturday"
+                  value=setting.schedule.saturday
+                  placeholder="9:00 - 14:00"
+                )
+              .col-md-6
+                label.form-label.fw-semibold(for="scheduleSunday")
+                  i.fas.fa-calendar-day.me-1.text-muted
+                  | Domingo
+                input.form-control#scheduleSunday(
+                  name="scheduleSunday"
+                  value=setting.schedule.sunday
+                  placeholder="Cerrado"
+                )
+              .col-md-6
+                label.form-label.fw-semibold(for="scheduleHolidays")
+                  i.fas.fa-calendar-day.me-1.text-muted
+                  | Feriados
+                input.form-control#scheduleHolidays(
+                  name="scheduleHolidays"
+                  value=setting.schedule.holidays
+                  placeholder="No laborable"
+                )
+
+            //- ---------- Vista previa ----------
+            .col-12.mt-4
+              .alert.alert-light.border.rounded-3
+                h6.fw-bold.mb-3
+                  i.fas.fa-eye.me-2.text-primary
+                  | Vista previa
+                ul.list-unstyled.mb-0.small
+                  li.mb-1
+                    strong Lun - Vie:
+                    span.ms-2#previewWeekdays= setting.schedule.weekdays || '9:00 - 19:00'
+                  li.mb-1
+                    strong Sábado:
+                    span.ms-2#previewSaturday= setting.schedule.saturday || '9:00 - 14:00'
+                  li.mb-1
+                    strong Domingo:
+                    span.ms-2#previewSunday= setting.schedule.sunday || 'Cerrado'
+                  if setting.schedule.holidays
+                    li
+                      strong Feriados:
+                      span.ms-2#previewHolidays= setting.schedule.holidays
+
+      //- ============================================
+      //- TAB 4: REDES SOCIALES
+      //- ============================================
+      .tab-pane.fade#tab-redes
+        .card.border-0.shadow-sm.rounded-3
+          .card-header.bg-white.border-bottom.py-3
+            h5.mb-0
+              i.fas.fa-share-alt.me-2.text-primary
+              | Redes Sociales
+              small.text-muted.ms-2 Enlaces a tus perfiles
+          .card-body.p-4
+            .row.g-3
+              .col-md-6
+                label.form-label.fw-semibold(for="socialFacebook")
+                  i.fab.fa-facebook.text-primary.me-2
+                  | Facebook
+                .input-group
+                  span.input-group-text
+                    i.fab.fa-facebook.text-primary
+                  input.form-control#socialFacebook(
+                    name="socialFacebook"
+                    value=setting.social.facebook
+                    placeholder="https://facebook.com/jpsecurity"
+                  )
+              .col-md-6
+                label.form-label.fw-semibold(for="socialInstagram")
+                  i.fab.fa-instagram.text-danger.me-2
+                  | Instagram
+                .input-group
+                  span.input-group-text
+                    i.fab.fa-instagram.text-danger
+                  input.form-control#socialInstagram(
+                    name="socialInstagram"
+                    value=setting.social.instagram
+                    placeholder="https://instagram.com/jpsecurity"
+                  )
+              .col-md-6
+                label.form-label.fw-semibold(for="socialWhatsapp")
+                  i.fab.fa-whatsapp.text-success.me-2
+                  | WhatsApp (solo número)
+                .input-group
+                  span.input-group-text
+                    i.fab.fa-whatsapp.text-success
+                  input.form-control#socialWhatsapp(
+                    name="socialWhatsapp"
+                    value=setting.social.whatsapp
+                    placeholder="51935909756"
+                  )
+                .form-text Incluye código de país, sin + ni espacios
+              .col-md-6
+                label.form-label.fw-semibold(for="socialYoutube")
+                  i.fab.fa-youtube.text-danger.me-2
+                  | YouTube
+                .input-group
+                  span.input-group-text
+                    i.fab.fa-youtube.text-danger
+                  input.form-control#socialYoutube(
+                    name="socialYoutube"
+                    value=setting.social.youtube
+                    placeholder="https://youtube.com/@jpsecurity"
+                  )
+              .col-md-6
+                label.form-label.fw-semibold(for="socialTiktok")
+                  i.fab.fa-tiktok.me-2
+                  | TikTok
+                .input-group
+                  span.input-group-text
+                    i.fab.fa-tiktok
+                  input.form-control#socialTiktok(
+                    name="socialTiktok"
+                    value=setting.social.tiktok
+                    placeholder="https://tiktok.com/@jpsecurity"
+                  )
+              .col-md-6
+                label.form-label.fw-semibold(for="socialLinkedin")
+                  i.fab.fa-linkedin.text-primary.me-2
+                  | LinkedIn
+                .input-group
+                  span.input-group-text
+                    i.fab.fa-linkedin.text-primary
+                  input.form-control#socialLinkedin(
+                    name="socialLinkedin"
+                    value=setting.social.linkedin
+                    placeholder="https://linkedin.com/company/jpsecurity"
+                  )
+              .col-md-6
+                label.form-label.fw-semibold(for="socialTwitter")
+                  i.fab.fa-twitter.text-info.me-2
+                  | Twitter / X
+                .input-group
+                  span.input-group-text
+                    i.fab.fa-twitter.text-info
+                  input.form-control#socialTwitter(
+                    name="socialTwitter"
+                    value=setting.social.twitter
+                    placeholder="https://twitter.com/jpsecurity"
+                  )
+
+      //- ============================================
+      //- TAB 5: SLIDES DEL HERO (CON SUBIDA DE IMÁGENES)
+      //- ============================================
+      .tab-pane.fade#tab-slides
+        .card.border-0.shadow-sm.rounded-3
+          .card-header.bg-white.border-bottom.py-3.d-flex.justify-content-between.align-items-center
+            h5.mb-0
+              i.fas.fa-images.me-2.text-primary
+              | Slides del Hero
+              small.text-muted.ms-2 (máximo 3)
+            span.badge.bg-info-subtle.text-info
+              i.fas.fa-info-circle.me-1
+              | Cada slide puede vincularse a una categoría
+          .card-body.p-4
+
+            - const slides = setting.heroSlides && setting.heroSlides.length ? setting.heroSlides : []
+
+            each i in [0, 1, 2]
+              - const s = slides[i] || {}
+              .slide-editor.card.border.mb-4.rounded-3(
+                data-slide-index=i
+                style="border-left: 4px solid #0d6efd !important;"
+              )
+                .card-header.bg-light.d-flex.justify-content-between.align-items-center.py-2
+                  h6.mb-0
+                    i.fas.fa-square.me-2.text-primary
+                    | Slide #{i + 1}
+                  .d-flex.align-items-center.gap-3
+                    .form-check.form-switch.mb-0
+                      input.form-check-input.slide-active-toggle(
+                        type="checkbox"
+                        name="slideActive"
+                        id=`slideActive${i}`
+                        value=i
+                        checked=(s.isActive !== false)
+                        data-slide-index=i
+                      )
+                      label.form-check-label.small.fw-semibold(for=`slideActive${i}`) Activo
+                    button.btn.btn-sm.btn-outline-danger.rounded-pill.slide-clear(
+                      type="button"
+                      data-slide-index=i
+                      title="Limpiar slide"
+                    )
+                      i.fas.fa-trash
+
+                .card-body
+                  .row.g-3
+                    //- ---------- Título y subtítulo ----------
+                    .col-md-6
+                      label.form-label.small.fw-semibold(for=`slideTitle${i}`) Título
+                      input.form-control.form-control-sm(
+                        type="text"
+                        name="slideTitle"
+                        id=`slideTitle${i}`
+                        value=s.title
+                        placeholder="Ej: Protege lo que más quieres"
+                      )
+                    .col-md-6
+                      label.form-label.small.fw-semibold(for=`slideSubtitle${i}`) Subtítulo
+                      input.form-control.form-control-sm(
+                        type="text"
+                        name="slideSubtitle"
+                        id=`slideSubtitle${i}`
+                        value=s.subtitle
+                        placeholder="Descripción breve del slide"
+                      )
+
+                    //- ---------- Botón ----------
+                    .col-md-6
+                      label.form-label.small.fw-semibold(for=`slideButtonText${i}`) Texto del botón
+                      input.form-control.form-control-sm(
+                        type="text"
+                        name="slideButtonText"
+                        id=`slideButtonText${i}`
+                        value=s.buttonText
+                        placeholder="Ver productos"
+                      )
+                    .col-md-6
+                      label.form-label.small.fw-semibold(for=`slideButtonLink${i}`) Enlace del botón
+                      input.form-control.form-control-sm(
+                        type="text"
+                        name="slideButtonLink"
+                        id=`slideButtonLink${i}`
+                        value=s.buttonLink
+                        placeholder="/products?category=..."
+                      )
+
+                    //- ---------- Imagen: subir desde PC o URL ----------
+                    .col-md-12
+                      label.form-label.small.fw-semibold Imagen del slide
+                      ul.nav.nav-tabs.nav-tabs-sm.mb-2(role="tablist")
+                        li.nav-item(role="presentation")
+                          button.nav-link.active(
+                            type="button"
+                            data-bs-toggle="tab"
+                            data-bs-target=`#slideImgPc${i}`
+                          )
+                            i.fas.fa-upload.me-1
+                            | Subir desde PC
+                        li.nav-item(role="presentation")
+                          button.nav-link(
+                            type="button"
+                            data-bs-toggle="tab"
+                            data-bs-target=`#slideImgUrl${i}`
+                          )
+                            i.fas.fa-link.me-1
+                            | URL externa
+
+                      .tab-content
+                        .tab-pane.fade.show.active(id=`slideImgPc${i}`)
+                          input.form-control.form-control-sm(
+                            type="file"
+                            name=`slideImage${i}`
+                            accept="image/*"
+                          )
+                          .form-text JPG, PNG, WEBP (máx 5MB)
+                        .tab-pane.fade(id=`slideImgUrl${i}`)
+                          input.form-control.form-control-sm(
+                            type="text"
+                            name="slideImage"
+                            id=`slideImage${i}`
+                            value=s.image
+                            placeholder="/images/slide1.jpg o https://..."
+                          )
+                          .form-text Ruta o URL de la imagen
+
+                      //- Preview de imagen actual
+                      if s.image
+                        .mt-2.p-2.bg-light.rounded-2.d-flex.align-items-center.gap-2
+                          img(
+                            src=s.image
+                            alt=`Slide ${i + 1}`
+                            style="height:50px; object-fit:cover; border-radius:6px;"
+                          )
+                          small.text-muted Imagen actual
+
+                    //- ---------- Categoría vinculada ----------
+                    .col-md-6
+                      label.form-label.small.fw-semibold(for=`slideCategory${i}`) Categoría vinculada
+                      select.form-select.form-select-sm(
+                        name="slideCategory"
+                        id=`slideCategory${i}`
+                      )
+                        option(value="") — Sin categoría —
+                        each cat in categories
+                          - const isSelected = s.category && (s.category._id ? String(s.category._id) === String(cat._id) : String(s.category) === String(cat._id))
+                          option(value=cat._id selected=isSelected)= cat.name
+
+                    //- ---------- Colores ----------
+                    .col-md-3
+                      label.form-label.small.fw-semibold(for=`slideBgColor${i}`) Color de fondo
+                      input.form-control.form-control-sm.form-control-color(
+                        type="color"
+                        name="slideBgColor"
+                        id=`slideBgColor${i}`
+                        value=(s.bgColor || '#0d6efd')
+                      )
+                    .col-md-3
+                      label.form-label.small.fw-semibold(for=`slideTextColor${i}`) Color de texto
+                      input.form-control.form-control-sm.form-control-color(
+                        type="color"
+                        name="slideTextColor"
+                        id=`slideTextColor${i}`
+                        value=(s.textColor || '#ffffff')
+                      )
+
+                    //- ---------- Vista previa ----------
+                    .col-md-6
+                      label.form-label.small.fw-semibold.d-block Vista previa
+                      .slide-preview.rounded-3.p-3(
+                        data-slide-preview=i
+                        style=`background: ${s.bgColor || '#0d6efd'}; color: ${s.textColor || '#ffffff'};`
+                      )
+                        .fw-bold.small.slide-preview-title= s.title || 'Título del slide'
+                        .small.opacity-75.slide-preview-subtitle= s.subtitle || 'Subtítulo descriptivo'
+                        if s.buttonText
+                          span.badge.bg-light.text-dark.mt-2.slide-preview-btn= s.buttonText
+
+            //- Nota final
+            .alert.alert-light.border.rounded-3.mb-0
+              i.fas.fa-info-circle.me-2.text-primary
+              | Si un slide está vacío (sin título, subtítulo ni imagen) no se mostrará en la landing.
+
+  //- ============================================
+  //- BOTÓN FLOTANTE DE GUARDAR
+  //- ============================================
+  .position-fixed.bottom-0.start-50.translate-middle-x.mb-4(style="z-index: 1030;")
+    .card.shadow-lg.border-0.rounded-pill.px-3.py-2.d-flex.flex-row.align-items-center.gap-3
+      span.text-muted.small.d-none.d-md-inline
+        i.fas.fa-info-circle.me-1
+        | Los cambios se aplican globalmente
+      button.btn.btn-primary.rounded-pill.px-4(type="submit")
+        i.fas.fa-save.me-2
+        | Guardar Cambios
+
+  //- ============================================
+  //- ESTILOS
+  //- ============================================
+  style.
+    .settings-tabs .nav-link {
+      border-radius: 50rem;
+      padding: 0.5rem 1.25rem;
+      color: #475569;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .settings-tabs .nav-link:hover {
+      background: #f1f5f9;
+    }
+    .settings-tabs .nav-link.active {
+      background: #0d6efd;
+      color: white;
+      box-shadow: 0 4px 12px rgba(13,110,253,0.3);
+    }
+    .form-control-color {
+      max-width: 60px;
+    }
+    .icon-suggestion {
+      font-size: 0.75rem;
+    }
+    .slide-editor {
+      transition: all 0.2s;
+    }
+    .slide-editor:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .slide-preview {
+      min-height: 80px;
+      transition: all 0.3s;
+    }
+    .position-fixed.bottom-0.start-50 {
+      transform: translateX(-50%);
+    }
+    .nav-tabs-sm .nav-link {
+      padding: 0.35rem 0.75rem;
+      font-size: 0.8rem;
+    }
+    @media (max-width: 768px) {
+      .settings-tabs {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 0.5rem;
+      }
+      .settings-tabs .nav-link {
+        white-space: nowrap;
+        font-size: 0.85rem;
+        padding: 0.4rem 1rem;
+      }
+    }
+
+  //- ============================================
+  //- SCRIPTS
+  //- ============================================
+  script.
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // ============ CONTADOR META DESCRIPTION ============
+      const metaDesc = document.getElementById('metaDescription');
+      const metaCount = document.getElementById('metaDescCount');
+      if (metaDesc && metaCount) {
+        const update = () => {
+          const len = metaDesc.value.length;
+          metaCount.textContent = len + ' / 160';
+          metaCount.classList.toggle('text-danger', len > 160);
+        };
+        metaDesc.addEventListener('input', update);
+        update();
+      }
+
+      // ============ SUGERENCIAS DE ICONOS ============
+      document.querySelectorAll('.icon-suggestion').forEach(btn => {
+        btn.addEventListener('click', function () {
+          document.getElementById('icon').value = this.dataset.icon;
+        });
+      });
+
+      // ============ SINCRONIZAR PREVIEW DE COLORES ============
+      ['colorPrimary', 'colorSecondary', 'colorAccent'].forEach(id => {
+        const input = document.getElementById(id);
+        const preview = document.querySelector(`[data-color-preview="${id}"]`);
+        if (input && preview) {
+          input.addEventListener('input', () => preview.value = input.value);
+        }
+      });
+
+      // ============ PREVIEW EMPRESA ============
+      const mapEmpresa = {
+        companyPhone: 'previewPhone',
+        companyEmail: 'previewEmail',
+        companyAddress: 'previewAddress'
+      };
+      Object.entries(mapEmpresa).forEach(([inputId, previewId]) => {
+        const inp = document.getElementById(inputId);
+        const prev = document.getElementById(previewId);
+        if (inp && prev) {
+          inp.addEventListener('input', () => {
+            prev.textContent = inp.value || prev.textContent;
+          });
+        }
+      });
+
+      // ============ PREVIEW HORARIOS ============
+      const mapHorarios = {
+        scheduleWeekdays: 'previewWeekdays',
+        scheduleSaturday: 'previewSaturday',
+        scheduleSunday: 'previewSunday',
+        scheduleHolidays: 'previewHolidays'
+      };
+      Object.entries(mapHorarios).forEach(([inputId, previewId]) => {
+        const inp = document.getElementById(inputId);
+        const prev = document.getElementById(previewId);
+        if (inp && prev) {
+          inp.addEventListener('input', () => prev.textContent = inp.value);
+        }
+      });
+
+      // ============ PREVIEW EN VIVO DE SLIDES ============
+      document.querySelectorAll('.slide-editor').forEach(editor => {
+        const i = editor.dataset.slideIndex;
+        const title = editor.querySelector(`#slideTitle${i}`);
+        const subtitle = editor.querySelector(`#slideSubtitle${i}`);
+        const buttonText = editor.querySelector(`#slideButtonText${i}`);
+        const bgColor = editor.querySelector(`#slideBgColor${i}`);
+        const textColor = editor.querySelector(`#slideTextColor${i}`);
+        const preview = editor.querySelector(`[data-slide-preview="${i}"]`);
+        const pTitle = preview.querySelector('.slide-preview-title');
+        const pSub = preview.querySelector('.slide-preview-subtitle');
+
+        function updatePreview() {
+          pTitle.textContent = title.value || 'Título del slide';
+          pSub.textContent = subtitle.value || 'Subtítulo descriptivo';
+          preview.style.background = bgColor.value;
+          preview.style.color = textColor.value;
+
+          // Botón
+          let btn = preview.querySelector('.slide-preview-btn');
+          if (buttonText.value) {
+            if (!btn) {
+              btn = document.createElement('span');
+              btn.className = 'badge bg-light text-dark mt-2 slide-preview-btn';
+              preview.appendChild(btn);
+            }
+            btn.textContent = buttonText.value;
+          } else if (btn) {
+            btn.remove();
+          }
+        }
+
+        [title, subtitle, buttonText].forEach(el => el && el.addEventListener('input', updatePreview));
+        [bgColor, textColor].forEach(el => el && el.addEventListener('input', updatePreview));
+      });
+
+      // ============ PREVIEW DE IMAGEN AL SUBIR ============
+      document.querySelectorAll('input[type="file"][name^="slideImage"]').forEach(input => {
+        input.addEventListener('change', function() {
+          const file = this.files[0];
+          if (!file) return;
+
+          if (!file.type.startsWith('image/')) {
+            alert('Solo se permiten imágenes');
+            this.value = '';
+            return;
+          }
+
+          if (file.size > 5 * 1024 * 1024) {
+            alert('La imagen no puede superar los 5MB');
+            this.value = '';
+            return;
+          }
+
+          // Preview
+          const slideIndex = this.name.replace('slideImage', '');
+          const editor = document.querySelector(`.slide-editor[data-slide-index="${slideIndex}"]`);
+          if (!editor) return;
+
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            // Buscar o crear contenedor de preview
+            let previewBox = editor.querySelector('.slide-img-preview-box');
+            if (!previewBox) {
+              previewBox = document.createElement('div');
+              previewBox.className = 'mt-2 p-2 bg-light rounded-2 d-flex align-items-center gap-2 slide-img-preview-box';
+              previewBox.innerHTML = `
+                <img src="" alt="Preview" style="height:60px; object-fit:cover; border-radius:6px;">
+                <small class="text-success">
+                  <i class="fas fa-check-circle me-1"></i>
+                  Nueva imagen lista para guardar
+                </small>
+              `;
+              editor.querySelector('.tab-content').after(previewBox);
+            }
+            previewBox.querySelector('img').src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+      });
+
+      // ============ CONTADOR DE SLIDES ACTIVOS ============
+      const badge = document.getElementById('slideCountBadge');
+      const toggles = document.querySelectorAll('.slide-active-toggle');
+      function updateSlideCount() {
+        const active = Array.from(toggles).filter(t => t.checked).length;
+        if (badge) badge.textContent = active;
+      }
+      toggles.forEach(t => t.addEventListener('change', updateSlideCount));
+      updateSlideCount();
+
+      // ============ LIMPIAR SLIDE ============
+      document.querySelectorAll('.slide-clear').forEach(btn => {
+        btn.addEventListener('click', function () {
+          const i = this.dataset.slideIndex;
+          if (!confirm('¿Limpiar todos los campos de este slide?')) return;
+          const editor = document.querySelector(`.slide-editor[data-slide-index="${i}"]`);
+          editor.querySelectorAll('input[type="text"], textarea').forEach(el => el.value = '');
+          editor.querySelectorAll('select').forEach(el => el.value = '');
+          editor.querySelector(`#slideBgColor${i}`).value = '#0d6efd';
+          editor.querySelector(`#slideTextColor${i}`).value = '#ffffff';
+          // Actualizar preview
+          const preview = editor.querySelector(`[data-slide-preview="${i}"]`);
+          preview.style.background = '#0d6efd';
+          preview.style.color = '#ffffff';
+          preview.querySelector('.slide-preview-title').textContent = 'Título del slide';
+          preview.querySelector('.slide-preview-subtitle').textContent = 'Subtítulo descriptivo';
+          const btn = preview.querySelector('.slide-preview-btn');
+          if (btn) btn.remove();
+          // Remover preview de imagen
+          const imgPreview = editor.querySelector('.slide-img-preview-box');
+          if (imgPreview) imgPreview.remove();
+        });
+      });
+
+    });

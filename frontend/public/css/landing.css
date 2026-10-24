@@ -1,0 +1,163 @@
+/* Gradientes y fondos */
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+}
+
+/* Hero slide */
+.hero-slide {
+  min-height: 350px;
+  display: flex;
+  align-items: center;
+}
+
+/* Tarjetas de categorías */
+.category-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: white;
+  border-radius: 12px;
+}
+.category-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15) !important;
+}
+
+/* Iconos circulares */
+.icon-circle {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+
+/* Efecto hover en tarjetas */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15) !important;
+}
+
+/* Dropdown items */
+.dropdown-menu {
+  min-width: 220px;
+}
+.dropdown-item.ps-4 {
+  padding-left: 2.5rem !important;
+  font-size: 0.9rem;
+}
+
+/* Productos */
+.product-card img {
+  height: 160px;
+  object-fit: contain;
+}
+
+/* Testimonios */
+.testimonial-card {
+  transition: transform 0.2s ease;
+}
+.testimonial-card:hover {
+  transform: translateY(-3px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero-slide {
+    min-height: 250px;
+    padding: 2rem 1rem;
+  }
+  .hero-slide h1 {
+    font-size: 2rem;
+  }
+}/* Gradiente para hero */
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+}
+
+/* Iconos circulares para servicios */
+.icon-circle {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+
+/* Efecto hover en tarjetas */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Tarjetas de categorías */
+.category-card {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: white;
+}
+.category-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Productos */
+.product-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+.product-card .card-img-top {
+  background: #f8f9fa;
+}
+
+/* Dropdown items en navbar */
+.dropdown-menu {
+  min-width: 220px;
+}
+.dropdown-item.ps-4 {
+  padding-left: 2.5rem !important;
+  font-size: 0.9rem;
+}
+
+/* Hero slider */
+.hero-slide {
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+}
+.hero-slide .row {
+  width: 100%;
+}
+
+/* Testimonios */
+.testimonial-card {
+  transition: transform 0.2s ease;
+}
+.testimonial-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero-slide {
+    min-height: 300px;
+    padding: 2rem 1rem;
+  }
+  .hero-slide h1 {
+    font-size: 2rem;
+  }
+  .category-card {
+    padding: 1rem;
+  }
+}

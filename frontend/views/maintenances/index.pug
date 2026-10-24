@@ -1,0 +1,49 @@
+extends ../layouts/layout
+
+block content
+  .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pb-2.mb-3.border-bottom
+    h1.h2
+      i.fas.fa-sync-alt.me-2
+      | Mantenimientos
+    a.btn.btn-primary(href="/maintenances/create")
+      i.fas.fa-plus-circle.me-1
+      | Nuevo Mantenimiento
+
+  .card.border-0.shadow-sm
+    .card-body
+      .table-responsive
+        table.table.table-hover.align-middle
+          thead
+            tr
+              th Cliente
+              th Equipo
+              th Tipo
+              th Fecha Programada
+              th Técnico
+              th Estado
+              th Acciones
+          tbody
+            each maintenance in maintenances || []
+              tr
+                td #{maintenance.client ? maintenance.client.businessName : '-'}
+                td #{maintenance.equipment}
+                td 
+                  span.badge.bg-info #{maintenance.type}
+                td #{new Date(maintenance.scheduledDate).toLocaleDateString()}
+                td #{maintenance.technician}
+                td
+                  span.badge(class=maintenance.status === 'Completado' ? 'bg-success' : maintenance.status === 'Cancelado' ? 'bg-danger' : 'bg-warning') #{maintenance.status}
+                td
+                  .btn-group.btn-group-sm
+                    a.btn.btn-outline-info(href=`/maintenances/${maintenance._id}`)
+                      i.fas.fa-eye
+                    a.btn.btn-outline-warning(href=`/maintenances/${maintenance._id}/edit`)
+                      i.fas.fa-edit
+                    form.d-inline(method="POST", action=`/maintenances/${maintenance._id}?_method=DELETE`, onsubmit="return confirm('¿Eliminar este mantenimiento?')")
+                      button.btn.btn-outline-danger(type="submit")
+                        i.fas.fa-trash
+            else
+              tr
+                td(colspan="7").text-center.py-4
+                  p.text-muted No hay mantenimientos registrados.
+                  a.btn.btn-sm.btn-primary(href="/maintenances/create") Registrar primer mantenimiento

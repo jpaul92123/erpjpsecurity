@@ -1,0 +1,73 @@
+extends ../layouts/layout
+
+block content
+  .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pb-2.mb-3.border-bottom
+    h1.h2
+      i.fas.fa-sitemap.me-2
+      | Categorías y Subcategorías
+    a.btn.btn-primary(href="/categories/create")
+      i.fas.fa-plus-circle.me-1
+      | Nueva Categoría
+
+  .row
+    each category in categories
+      .col-12.mb-4
+        .card.border-0.shadow-sm
+          .card-header.bg-light.d-flex.justify-content-between.align-items-center
+            .d-flex.align-items-center
+              if category.image
+                img(src=category.image, alt=category.name, width="40", height="40", style="object-fit: cover; border-radius: 4px; margin-right: 10px;")
+              else
+                i.fas.fa-folder.fa-2x.text-muted.me-2
+              h5.mb-0.fw-bold #{category.name}
+              if category.isActive
+                span.badge.bg-success.ms-2 Activo
+              else
+                span.badge.bg-danger.ms-2 Inactivo
+            .btn-group
+              a.btn.btn-sm.btn-outline-success(href=`/categories/${category._id}/subcategories/create`)
+                i.fas.fa-plus-circle
+                span.ms-1 Sub
+              a.btn.btn-sm.btn-outline-primary(href=`/categories/${category._id}/edit`)
+                i.fas.fa-edit
+              form.d-inline(method="POST", action=`/categories/${category._id}?_method=DELETE`, onsubmit="return confirm('¿Eliminar esta categoría? Se eliminarán también sus subcategorías.')")
+                button.btn.btn-sm.btn-outline-danger(type="submit")
+                  i.fas.fa-trash
+          .card-body
+            if category.description
+              p.text-muted #{category.description}
+            if category.subcategories && category.subcategories.length
+              .table-responsive
+                table.table.table-sm.table-hover.align-middle.mb-0
+                  thead
+                    tr
+                      th Imagen
+                      th Nombre
+                      th Descripción
+                      th Estado
+                      th Acciones
+                  tbody
+                    each sub in category.subcategories
+                      tr
+                        td
+                          if sub.image
+                            img(src=sub.image, alt=sub.name, width="30", height="30", style="object-fit: cover; border-radius: 4px;")
+                          else
+                            i.fas.fa-folder-open.text-muted
+                        td
+                          strong #{sub.name}
+                        td #{sub.description || '-'}
+                        td
+                          if sub.isActive
+                            span.badge.bg-success Activo
+                          else
+                            span.badge.bg-danger Inactivo
+                        td
+                          .btn-group.btn-group-sm
+                            a.btn.btn-outline-warning(href=`/categories/${sub._id}/edit`)
+                              i.fas.fa-edit
+                            form.d-inline(method="POST", action=`/categories/${sub._id}?_method=DELETE`, onsubmit="return confirm('¿Eliminar esta subcategoría?')")
+                              button.btn.btn-outline-danger(type="submit")
+                                i.fas.fa-trash
+            else
+              p.text-muted.mb-0 No tiene subcategorías.

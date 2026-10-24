@@ -1,0 +1,109 @@
+form(method="POST", action=quotation ? `/quotations/${quotation._id}?_method=PUT` : "/quotations", id="quotationForm")
+  .row
+    .col-md-6
+      .mb-3
+        label.form-label Cliente *
+        select.form-control(name="client", required)
+          option(value="") Seleccionar...
+          each client in clients
+            option(value=client._id, selected=(quotation && quotation.client && quotation.client._id.toString() === client._id.toString())) #{client.businessName} - #{client.ruc}
+    .col-md-6
+      .mb-3
+        label.form-label Válido hasta *
+        input.form-control(type="date", name="validUntil", value=quotation ? quotation.validUntil.toISOString().split('T')[0] : '', required)
+
+  //- Buscador de productos
+  .mb-3
+    label.form-label Buscar productos
+    .input-group
+      input.form-control(type="text", id="buscadorProductos", placeholder="Buscar por nombre o modelo...")
+      button.btn.btn-primary(type="button", id="btnBuscar")
+        i.fas.fa-search
+    #resultadosBusqueda.mt-2(style="max-height: 200px; overflow-y: auto; display: none;")
+      table.table.table-sm.table-hover
+        thead
+          tr
+            th Nombre
+            th Modelo
+            th Precio
+            th Acción
+        tbody#tablaResultados
+
+  h5.mt-4 Productos Agregados
+  .table-responsive
+    table.table.table-bordered
+      thead
+        tr
+          th Descripción
+          th Cantidad
+          th P. Unitario
+          th Total
+          th Acciones
+      tbody#tablaItems
+        if quotation && quotation.items.length
+          each item, idx in quotation.items
+            tr
+              td #{item.description}
+              td
+                input.form-control.form-control-sm.cantidad-input(data-index=idx, type="number", value=item.quantity, min="1")
+              td
+                input.form-control.form-control-sm.precio-input(data-index=idx, type="number", value=item.unitPrice.toFixed(2), step="0.01", min="0")
+              td S/. #{item.total.toFixed(2)}
+              td
+                button.btn.btn-sm.btn-danger(onclick="eliminarItem("+idx+")")
+                  i.fas.fa-trash
+        else
+          tr#emptyRow
+            td(colspan="5").text-center No hay productos agregados.
+
+  .row.mt-3
+    .col-md-12.text-end
+      button.btn.btn-sm.btn-success(type="button", id="btnAgregarManual")
+        i.fas.fa-plus-circle
+        | Agregar Manual
+
+  hr
+  .row
+    .col-md-6
+      .mb-3
+        label.form-label RUC / DNI
+        input.form-control(type="text", name="rucDni", value=quotation ? quotation.rucDni : '')
+    .col-md-6
+      .mb-3
+        label.form-label Celular
+        input.form-control(type="text", name="celular", value=quotation ? quotation.celular : '')
+
+  .row
+    .col-md-6
+      .mb-3
+        label.form-label Modalidad de Pago
+        select.form-control(name="modalidadPago")
+          each opt in ['Contado','Crédito','Transferencia','Depósito','Otro']
+            option(value=opt, selected=(quotation && quotation.modalidadPago === opt)) #{opt}
+    .col-md-6
+      .mb-3
+        label.form-label Garantía (meses)
+        input.form-control(type="number", name="garantiaMeses", min="0", value=quotation ? quotation.garantiaMeses : 0)
+
+  .mb-3
+    label.form-label Notas
+    textarea.form-control(name="notas", rows="2") #{quotation ? quotation.notas : ''}
+
+  .row
+    .col-md-6
+      .form-check
+        input.form-check-input(type="checkbox", id="incluyeIgv", checked=quotation ? quotation.igv === 0 : true)
+        label.form-check-label(for="incluyeIgv") Los precios incluyen IGV
+    .col-md-6
+      .mb-3
+        label.form-label Descuento (S/.)
+        input.form-control(type="number", name="discount", id="descuentoMonto", min="0", step="0.01", value=quotation ? quotation.discount : 0)
+
+  #totalProforma.mt-3
+
+  button.btn.btn-primary(type="submit")
+    i.fas.fa-save.me-1
+    | Guardar
+  a.btn.btn-outline-secondary.ms-2(href="/quotations") Cancelar
+
+//- Scripts (se pueden reutilizar los de create, adaptando para cargar items iniciales)

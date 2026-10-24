@@ -1,0 +1,348 @@
+doctype html
+html(lang="es")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+
+    //- SEO
+    - const pageTitle = (typeof title !== 'undefined' && title) ? (title + ' | ' + (setting && setting.siteName ? setting.siteName : 'JP Security')) : ((setting && setting.siteName) ? setting.siteName : 'JP Security')
+    title= pageTitle
+
+    if setting && setting.favicon
+      link(rel="icon" href=setting.favicon)
+
+    //- CSS
+    link(rel="stylesheet" href="/bootstrap/css/bootstrap.min.css")
+    link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css")
+    link(rel="stylesheet" href="/css/styles.css")
+
+    //- Variables de color dinámicas
+    - const brandPrimary = (setting && setting.colors && setting.colors.primary) ? setting.colors.primary : '#0d6efd'
+    - const brandSecondary = (setting && setting.colors && setting.colors.secondary) ? setting.colors.secondary : '#0a58ca'
+    - const brandAccent = (setting && setting.colors && setting.colors.accent) ? setting.colors.accent : '#ffc107'
+
+    style.
+      :root {
+        --brand: #{brandPrimary};
+        --brand-dark: #{brandSecondary};
+        --brand-accent: #{brandAccent};
+      }
+      body {
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        color: #1f2937;
+        background: #f8fafc;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      main { flex: 1; }
+
+      /* ===== NAVBAR ===== */
+      .navbar { padding: 0.75rem 0; }
+      .navbar-brand { font-weight: 700; font-size: 1.25rem; letter-spacing: -0.5px; }
+      .navbar-brand img { max-height: 100px; }
+      .nav-link { font-weight: 500; transition: color 0.15s; }
+      .nav-link:hover { color: var(--brand) !important; }
+      .navbar-dark .navbar-nav .nav-link { color: rgba(255,255,255,0.85); }
+      .navbar-dark .navbar-nav .nav-link:hover { color: #fff; }
+
+      .btn-primary {
+        background: var(--brand);
+        border-color: var(--brand);
+      }
+      .btn-primary:hover {
+        background: var(--brand-dark);
+        border-color: var(--brand-dark);
+      }
+      .btn-outline-primary {
+        color: var(--brand);
+        border-color: var(--brand);
+      }
+      .btn-outline-primary:hover {
+        background: var(--brand);
+        border-color: var(--brand);
+        color: white;
+      }
+      .text-primary { color: var(--brand) !important; }
+      .bg-primary { background: var(--brand) !important; }
+      .bg-primary-subtle { background: rgba(13,110,253,0.1) !important; }
+
+      /* ===== AVATAR ===== */
+      .avatar-circle {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+        color: white;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.9rem;
+      }
+
+      /* ===== FOOTER ===== */
+      .footer-main {
+        background: #0f172a;
+        color: #94a3b8;
+        padding: 3rem 0 1.5rem;
+      }
+      .footer-main h6 {
+        color: white;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+        margin-bottom: 1rem;
+      }
+      .footer-main a {
+        color: #94a3b8;
+        text-decoration: none;
+        transition: color 0.15s;
+        font-size: 0.9rem;
+      }
+      .footer-main a:hover { color: white; }
+      .footer-main .footer-bottom {
+        border-top: 1px solid rgba(255,255,255,0.1);
+        padding-top: 1.5rem;
+        margin-top: 2rem;
+      }
+
+      /* ===== HOVER LIFT ===== */
+      .hover-lift {
+        transition: transform 0.25s, box-shadow 0.25s;
+      }
+      .hover-lift:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 1rem 2rem rgba(0,0,0,0.12) !important;
+      }
+
+      /* ===== MAIN CONTAINER ===== */
+      .main-container {
+        padding-top: 2rem;
+        padding-bottom: 3rem;
+      }
+
+  body
+
+    //- ============================================
+    //- NAVBAR PRINCIPAL
+    //- ============================================
+    nav.navbar.navbar-expand-lg.navbar-dark.shadow-sm.sticky-top(style="background: #0f172a;")
+      .container
+        a.navbar-brand.d-flex.align-items-center(href="/")
+          if setting && setting.logo
+            img.me-2(src=setting.logo alt=(setting.siteName || 'Logo'))
+          else
+            i.fas(class=(setting && setting.icon ? setting.icon : 'fa-shield-halved')).me-2
+          = setting && setting.siteName ? setting.siteName : 'JP Security'
+
+        button.navbar-toggler(type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain")
+          span.navbar-toggler-icon
+
+        .collapse.navbar-collapse#navbarMain
+          ul.navbar-nav.me-auto.mb-2.mb-lg-0.ms-lg-4
+            li.nav-item
+              a.nav-link(href="/products")
+                i.fas.fa-cubes.me-1
+                | Catálogo
+
+            //- 🆕 Nosotros (admin)
+            li.nav-item
+              a.nav-link(href="/about/admin")
+                i.fas.fa-building.me-1
+                | Nosotros
+
+            if setting && setting.company && setting.company.phone
+              li.nav-item.d-none.d-lg-block
+                a.nav-link(href=`tel:${setting.company.phone}`)
+                  i.fas.fa-phone.me-1
+                  = setting.company.phone
+
+          ul.navbar-nav.align-items-center.gap-1
+
+            //- ========== USUARIO LOGUEADO ==========
+            if user
+              li.nav-item
+                a.nav-link(href="/")
+                  i.fas.fa-tachometer-alt.me-1
+                  | Dashboard
+
+              li.nav-item
+                a.nav-link(href="/landing" target="_blank" title="Ver tienda pública")
+                  i.fas.fa-globe.me-1
+                  | Tienda
+
+              //- Menú de usuario
+              li.nav-item.dropdown
+                a.nav-link.dropdown-toggle.d-flex.align-items-center.gap-2(
+                  href="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                )
+                  .avatar-circle= (user.name || 'U').charAt(0).toUpperCase()
+                  span.d-none.d-md-inline= user.name
+                ul.dropdown-menu.dropdown-menu-end.shadow-lg.rounded-3.border-0
+                  li
+                    h6.dropdown-header.mb-0
+                      .d-flex.align-items-center.gap-2
+                        .avatar-circle= (user.name || 'U').charAt(0).toUpperCase()
+                        div
+                          div.fw-bold= user.name
+                          small.text-muted= user.email || ''
+                  li: hr.dropdown-divider
+                  li
+                    a.dropdown-item(href="/profile")
+                      i.fas.fa-id-card.me-2.text-primary
+                      | Mi Perfil
+                  li
+                    a.dropdown-item(href="/")
+                      i.fas.fa-gauge.me-2.text-primary
+                      | Dashboard
+                  li
+                    a.dropdown-item(href="/about/admin")
+                      i.fas.fa-building.me-2.text-primary
+                      | Nosotros
+                  li
+                    a.dropdown-item(href="/settings")
+                      i.fas.fa-cog.me-2.text-primary
+                      | Configuración
+                  li: hr.dropdown-divider
+                  li
+                    a.dropdown-item.text-danger(href="/logout")
+                      i.fas.fa-sign-out-alt.me-2
+                      | Cerrar Sesión
+
+            //- ========== VISITANTE (NO LOGUEADO) ==========
+            else
+              li.nav-item
+                a.nav-link(href="/products")
+                  i.fas.fa-cubes.me-1
+                  | Productos
+
+              li.nav-item
+                a.nav-link(href="/about")
+                  i.fas.fa-building.me-1
+                  | Nosotros
+
+              li.nav-item
+                a.nav-link(href="/")
+                  i.fas.fa-store.me-1
+                  | Tienda
+
+              li.nav-item.ms-lg-2
+                a.btn.btn-outline-light.btn-sm.rounded-pill.px-3(href="/login")
+                  i.fas.fa-sign-in-alt.me-1
+                  | Ingresar
+
+    //- ============================================
+    //- FLASH MESSAGES
+    //- ============================================
+    if (success && success.length) || (error && error.length)
+      .container.mt-3
+        if success && success.length
+          .alert.alert-success.alert-dismissible.fade.show.rounded-3.shadow-sm(role="alert")
+            i.fas.fa-check-circle.me-2
+            = success
+            button.btn-close(type="button" data-bs-dismiss="alert")
+        if error && error.length
+          .alert.alert-danger.alert-dismissible.fade.show.rounded-3.shadow-sm(role="alert")
+            i.fas.fa-exclamation-circle.me-2
+            = error
+            button.btn-close(type="button" data-bs-dismiss="alert")
+
+    //- ============================================
+    //- CONTENIDO PRINCIPAL
+    //- ============================================
+    main.main-container
+      .container-fluid.px-3.px-md-4
+        block content
+
+    //- ============================================
+    //- FOOTER PROFESIONAL
+    //- ============================================
+    footer.footer-main
+      .container
+        .row.g-4
+
+          //- Columna 1: Marca
+          .col-md-4
+            h6
+              if setting && setting.icon
+                i.fas(class=setting.icon).me-2
+              else
+                i.fas.fa-shield-halved.me-2
+              = setting && setting.siteName ? setting.siteName : 'JP Security'
+            p.small.mb-3= setting && setting.siteTagline ? setting.siteTagline : 'Soluciones integrales en seguridad electrónica.'
+            .d-flex.gap-2
+              if setting && setting.social && setting.social.facebook
+                a(href=setting.social.facebook target="_blank" title="Facebook").text-decoration-none
+                  i.fab.fa-facebook-f.fa-lg
+              if setting && setting.social && setting.social.instagram
+                a(href=setting.social.instagram target="_blank" title="Instagram").text-decoration-none.ms-2
+                  i.fab.fa-instagram.fa-lg
+              if setting && setting.social && setting.social.youtube
+                a(href=setting.social.youtube target="_blank" title="YouTube").text-decoration-none.ms-2
+                  i.fab.fa-youtube.fa-lg
+              if setting && setting.social && setting.social.whatsapp
+                a(href=`https://wa.me/${setting.social.whatsapp}` target="_blank" title="WhatsApp").text-decoration-none.ms-2
+                  i.fab.fa-whatsapp.fa-lg
+
+          //- Columna 2: Enlaces
+          .col-md-2.col-6
+            h6 Enlaces
+            ul.list-unstyled.mb-0
+              li.mb-2: a(href="/") Inicio
+              li.mb-2: a(href="/products") Catálogo
+              li.mb-2: a(href="/about/admin")
+                i.fas.fa-building.me-1
+                | Nosotros
+
+          //- Columna 3: Cuenta
+          .col-md-2.col-6
+            h6 Cuenta
+            ul.list-unstyled.mb-0
+              if user
+                li.mb-2: a(href="/") Dashboard
+                li.mb-2: a(href="/profile") Mi Perfil
+                li.mb-2: a(href="/logout") Cerrar Sesión
+              else
+                li.mb-2: a(href="/login") Ingresar
+
+          //- Columna 4: Contacto
+          .col-md-4
+            h6 Contacto
+            ul.list-unstyled.mb-0.small
+              if setting && setting.company && setting.company.phone
+                li.mb-2
+                  i.fas.fa-phone.me-2
+                  = setting.company.phone
+              if setting && setting.company && setting.company.email
+                li.mb-2
+                  i.fas.fa-envelope.me-2
+                  = setting.company.email
+              if setting && setting.company && setting.company.address
+                li.mb-2
+                  i.fas.fa-map-marker-alt.me-2
+                  = setting.company.address
+              if setting && setting.schedule && setting.schedule.weekdays
+                li.mb-2
+                  i.fas.fa-clock.me-2
+                  | Lun - Vie: #{setting.schedule.weekdays}
+
+        .footer-bottom
+          .d-flex.flex-wrap.justify-content-between.align-items-center.gap-2
+            small
+              | © #{new Date().getFullYear()} #{setting && setting.siteName ? setting.siteName : 'JP Security'}
+              if setting && setting.company && setting.company.legalName
+                |  - #{setting.company.legalName}
+            if setting && setting.company && setting.company.ruc
+              small
+                | RUC: #{setting.company.ruc}
+
+    //- ============================================
+    //- SCRIPTS
+    //- ============================================
+    script(src="/bootstrap/js/bootstrap.bundle.min.js")
+    script(src="/js/main.js")

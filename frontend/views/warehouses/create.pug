@@ -1,0 +1,24 @@
+extends ../layouts/layout
+
+block content
+  .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pb-2.mb-3.border-bottom
+    h1.h2
+      i.fas.fa-plus-circle.me-2
+      | Nuevo Almacén
+    a.btn.btn-outline-secondary(href="/warehouses")
+      i.fas.fa-arrow-left.me-1
+      | Volver
+
+  .card.border-0.shadow-sm
+    .card-body
+      form(method="POST", action="/warehouses")
+        .mb-3
+          label.form-label Nombre *
+          input.form-control(type="text", name="name", required)
+        .mb-3
+          label.form-label Ubicación
+          input.form-control(type="text", name="location")
+        button.btn.btn-primary(type="submit")
+          i.fas.fa-save.me-1
+          | Guardar
+        a.btn.btn-outline-secondary.ms-2(href="/warehouses") Cancelar

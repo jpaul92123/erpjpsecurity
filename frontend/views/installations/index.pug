@@ -1,0 +1,46 @@
+extends ../layouts/layout
+
+block content
+  .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pb-2.mb-3.border-bottom
+    h1.h2
+      i.fas.fa-wrench.me-2
+      | Instalaciones
+    a.btn.btn-primary(href="/installations/create")
+      i.fas.fa-plus-circle.me-1
+      | Nueva Instalación
+
+  .card.border-0.shadow-sm
+    .card-body
+      .table-responsive
+        table.table.table-hover.align-middle
+          thead
+            tr
+              th Cliente
+              th Equipo
+              th Fecha
+              th Técnico
+              th Estado
+              th Acciones
+          tbody
+            each installation in installations || []
+              tr
+                td #{installation.client ? installation.client.businessName : '-'}
+                td #{installation.equipment}
+                td #{new Date(installation.installationDate).toLocaleDateString()}
+                td #{installation.technician}
+                td
+                  span.badge(class=installation.status === 'Completado' ? 'bg-success' : installation.status === 'Cancelado' ? 'bg-danger' : 'bg-warning') #{installation.status}
+                td
+                  .btn-group.btn-group-sm
+                    a.btn.btn-outline-info(href=`/installations/${installation._id}`)
+                      i.fas.fa-eye
+                    a.btn.btn-outline-warning(href=`/installations/${installation._id}/edit`)
+                      i.fas.fa-edit
+                    form.d-inline(method="POST", action=`/installations/${installation._id}?_method=DELETE`, onsubmit="return confirm('¿Eliminar esta instalación?')")
+                      button.btn.btn-outline-danger(type="submit")
+                        i.fas.fa-trash
+            else
+              tr
+                td(colspan="6").text-center.py-4
+                  p.text-muted No hay instalaciones registradas.
+                  a.btn.btn-sm.btn-primary(href="/installations/create") Registrar primera instalación

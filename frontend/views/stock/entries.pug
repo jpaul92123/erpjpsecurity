@@ -1,0 +1,76 @@
+extends ../layouts/layout
+
+block content
+  .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pb-2.mb-3.border-bottom
+    h1.h2
+      i.fas.fa-arrow-down.me-2
+      | Entradas de Inventario
+    button.btn.btn-primary(type="button", data-bs-toggle="modal", data-bs-target="#entryModal")
+      i.fas.fa-plus-circle.me-1
+      | Registrar Entrada
+
+  .card.border-0.shadow-sm
+    .card-body
+      .table-responsive
+        table.table.table-hover.align-middle
+          thead
+            tr
+              th Producto
+              th Almacén
+              th Cantidad
+              th P. Unitario
+              th Total
+              th Usuario
+              th Fecha
+          tbody
+            each movement in movements
+              tr
+                td #{movement.product ? movement.product.name : '-'}
+                td #{movement.warehouse ? movement.warehouse.name : '-'}
+                td #{movement.quantity}
+                td S/ #{movement.unitPrice.toFixed(2)}
+                td S/ #{movement.total.toFixed(2)}
+                td #{movement.createdBy ? movement.createdBy.name : '-'}
+                td #{new Date(movement.createdAt).toLocaleString()}
+            else
+              tr
+                td(colspan="7").text-center.py-4
+                  p.text-muted No hay entradas registradas.
+
+//- Modal para registrar entrada
+.modal.fade#entryModal(tabindex="-1")
+  .modal-dialog.modal-lg
+    .modal-content
+      form(method="POST", action="/stock/entries")
+        .modal-header
+          h5.modal-title Registrar Entrada
+          button.btn-close(type="button", data-bs-dismiss="modal")
+        .modal-body
+          .row.g-3
+            .col-md-6
+              label.form-label Producto *
+              select.form-control(name="product", required)
+                option(value="") Seleccionar...
+                each product in products
+                  option(value=product._id) #{product.code} - #{product.name}
+            .col-md-6
+              label.form-label Almacén *
+              select.form-control(name="warehouse", required)
+                option(value="") Seleccionar...
+                each warehouse in warehouses
+                  option(value=warehouse._id) #{warehouse.name}
+            .col-md-4
+              label.form-label Cantidad *
+              input.form-control(type="number", name="quantity", min="1", required)
+            .col-md-4
+              label.form-label Precio Unitario (S/.)
+              input.form-control(type="number", name="unitPrice", step="0.01", min="0", required)
+            .col-md-4
+              label.form-label N° Documento
+              input.form-control(type="text", name="documentNumber")
+            .col-12
+              label.form-label Descripción
+              textarea.form-control(name="description", rows="2")
+        .modal-footer
+          button.btn.btn-secondary(type="button", data-bs-dismiss="modal") Cancelar
+          button.btn.btn-primary(type="submit") Guardar

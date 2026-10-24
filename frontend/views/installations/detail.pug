@@ -1,0 +1,60 @@
+extends ../layouts/layout
+
+block content
+  .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pb-2.mb-3.border-bottom
+    h1.h2
+      i.fas.fa-wrench.me-2
+      | Detalle de Instalación
+    div
+      a.btn.btn-outline-secondary.me-2(href="/installations")
+        i.fas.fa-arrow-left.me-1
+        | Volver
+      a.btn.btn-warning(href=`/installations/${installation._id}/edit`)
+        i.fas.fa-edit.me-1
+        | Editar
+
+  .row
+    .col-md-8
+      .card.border-0.shadow-sm
+        .card-body
+          .row
+            .col-md-6
+              p
+                strong Cliente: 
+                | #{installation.client ? installation.client.businessName : '-'}
+              p
+                strong Proyecto: 
+                | #{installation.project ? installation.project.name : '-'}
+              p
+                strong Equipo: 
+                | #{installation.equipment}
+            .col-md-6
+              p
+                strong N° Serie: 
+                | #{installation.serialNumber || '-'}
+              p
+                strong Técnico: 
+                | #{installation.technician}
+              p
+                strong Estado: 
+                span.badge(class=installation.status === 'Completado' ? 'bg-success' : installation.status === 'Cancelado' ? 'bg-danger' : 'bg-warning') #{installation.status}
+          hr
+          p
+            strong Fecha de Instalación: 
+            | #{new Date(installation.installationDate).toLocaleString()}
+          p
+            strong Notas:
+          p #{installation.notes || 'Sin notas'}
+    .col-md-4
+      .card.border-0.shadow-sm
+        .card-header.bg-light
+          h6.mb-0 Información Adicional
+        .card-body
+          p
+            strong Creado por: 
+            | #{installation.createdBy ? installation.createdBy.name : '-'}
+          p
+            small.text-muted Registrado: #{new Date(installation.createdAt).toLocaleString()}
+          if installation.updatedAt
+            p
+              small.text-muted Última actualización: #{new Date(installation.updatedAt).toLocaleString()}

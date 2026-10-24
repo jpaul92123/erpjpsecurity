@@ -1,0 +1,45 @@
+nav.navbar.navbar-expand-lg.navbar-dark.bg-dark.shadow-sm
+  .container
+    a.navbar-brand(href="/")
+      i.fas.fa-shield-alt.me-2
+      strong JP Security
+
+    button.navbar-toggler(type="button", data-bs-toggle="collapse", data-bs-target="#navbarNav")
+      span.navbar-toggler-icon
+
+    #navbarNav.collapse.navbar-collapse
+      ul.navbar-nav.ms-auto
+        if user
+          //- Usuario logueado
+          li.nav-item
+            a.nav-link(href="/")
+              i.fas.fa-tachometer-alt.me-1
+              | Dashboard
+          li.nav-item
+            a.nav-link(href="/landing")
+              i.fas.fa-globe.me-1
+              | Landing
+          li.nav-item.dropdown
+            a.nav-link.dropdown-toggle(href="#", data-bs-toggle="dropdown")
+              i.fas.fa-user-circle.me-1
+              | #{user.name}
+            ul.dropdown-menu.dropdown-menu-end
+              li
+                a.dropdown-item(href="#")
+                  i.fas.fa-user.me-2
+                  | Mi Perfil
+              li
+                hr.dropdown-divider
+              li
+                a.dropdown-item.text-danger(href="/logout")
+                  i.fas.fa-sign-out-alt.me-2
+                  | Cerrar Sesión
+        else
+          li.nav-item
+            a.nav-link(href="/login")
+              i.fas.fa-sign-in-alt.me-1
+              | Iniciar Sesión
+          li.nav-item
+            a.nav-link(href="/register")
+              i.fas.fa-user-plus.me-1
+              | Registrarse

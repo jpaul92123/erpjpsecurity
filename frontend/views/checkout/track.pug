@@ -1,0 +1,297 @@
+extends ../layouts/layout-public
+
+block content
+  .container.py-5
+
+    //- ============================================
+    //- BREADCRUMB
+    //- ============================================
+    nav(aria-label="breadcrumb").mb-3
+      ol.breadcrumb.mb-1
+        li.breadcrumb-item
+          a.text-decoration-none(href="/") Inicio
+        li.breadcrumb-item.active Seguimiento de Pedido
+
+    //- ============================================
+    //- HEADER
+    //- ============================================
+    .text-center.mb-5
+      h1.h3.fw-bold.mb-2
+        i.fas.fa-search-location.me-2.text-primary
+        | Seguimiento de Pedido
+      p.text-muted.mb-0 Ingresa tu número de pedido para ver su estado
+
+    //- ============================================
+    //- FORMULARIO DE BÚSQUEDA
+    //- ============================================
+    .row.justify-content-center.mb-4
+      .col-lg-6
+        .card.border-0.shadow-sm.rounded-3
+          .card-body.p-4
+            form(method="POST" action="/checkout/track")
+              label.form-label.fw-semibold Número de pedido
+              .input-group
+                span.input-group-text.bg-transparent
+                  i.fas.fa-receipt.text-muted
+                input.form-control(
+                  type="text"
+                  name="orderNumber"
+                  placeholder="Ej: PED-20260913-0001"
+                  value=(order ? order.orderNumber : '')
+                  required
+                  autofocus
+                )
+                button.btn.btn-primary(type="submit")
+                  i.fas.fa-search.me-1
+                  | Buscar
+
+              if error
+                .alert.alert-danger.mt-3.mb-0.rounded-3
+                  i.fas.fa-exclamation-circle.me-1
+                  = error
+
+              small.text-muted.d-block.mt-3
+                i.fas.fa-info-circle.me-1
+                | El número de pedido lo recibiste al confirmar tu compra.
+
+    //- ============================================
+    //- RESULTADO
+    //- ============================================
+    if order
+      .row.justify-content-center
+        .col-lg-8
+
+          //- Card principal
+          .card.border-0.shadow-sm.rounded-3.mb-4
+            .card-body.p-4
+
+              //- Header con número
+              .d-flex.flex-wrap.justify-content-between.align-items-center.gap-3.pb-3.mb-3(style="border-bottom: 2px dashed #e5e7eb;")
+                div
+                  small.text-muted.d-block Número de pedido
+                  h4.fw-bold.text-primary.mb-0= order.orderNumber
+                div.text-end
+                  small.text-muted.d-block Fecha
+                  div.fw-semibold
+                    = new Date(order.createdAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })
+
+              //- ================================================
+              //- BARRA DE PROGRESO DEL ESTADO
+              //- ================================================
+              - const steps = [{ key: 'pendiente', label: 'Pendiente', icon: 'fa-clock' }, { key: 'confirmado', label: 'Confirmado', icon: 'fa-check-circle' }, { key: 'enviado', label: 'Enviado', icon: 'fa-truck' }, { key: 'entregado', label: 'Entregado', icon: 'fa-box-open' }]
+              - const currentIndex = steps.findIndex(s => s.key === order.status)
+              - const isCancelled = order.status === 'cancelado'
+
+              if isCancelled
+                .alert.alert-danger.rounded-3.text-center.mb-4
+                  i.fas.fa-times-circle.fa-2x.mb-2.d-block
+                  h5.mb-1 Pedido Cancelado
+                  p.mb-0.small Este pedido fue cancelado. Contáctanos si tienes dudas.
+              else
+                .status-tracker.mb-4
+                  .status-progress
+                    .status-progress-bar(
+                      style=`width: ${(currentIndex / (steps.length - 1)) * 100}%;`
+                    )
+                  .status-steps
+                    each step, i in steps
+                      .status-step(
+                        class=(i <= currentIndex ? 'completed' : '')
+                      )
+                        .status-step-icon
+                          i.fas(class=step.icon)
+                        .status-step-label= step.label
+
+              //- ================================================
+              //- ESTADO DEL PAGO
+              //- ================================================
+              if order.paid
+                .alert.alert-success.rounded-3.d-flex.align-items-center.gap-3.mb-4
+                  i.fas.fa-check-double.fa-2x
+                  div
+                    strong PAGO CONFIRMADO
+                    br
+                    small
+                      | El pago fue recibido el 
+                      = new Date(order.paidAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })
+              else if order.status === 'entregado'
+                .alert.alert-warning.rounded-3.d-flex.align-items-center.gap-3.mb-4
+                  i.fas.fa-money-bill-wave.fa-2x
+                  div
+                    strong Pendiente de pago
+                    br
+                    small El pedido fue entregado pero el pago aún no se ha confirmado
+
+              //- ================================================
+              //- RESUMEN DEL PEDIDO
+              //- ================================================
+              .row.g-3.mb-3
+
+                //- Cliente
+                .col-md-6
+                  .p-3.rounded-3.bg-light
+                    small.text-muted.d-block.mb-1
+                      i.fas.fa-user.me-1
+                      | Cliente
+                    div.fw-semibold= order.customer.name
+                    small.text-muted= order.customer.phone
+
+                //- Dirección
+                .col-md-6
+                  .p-3.rounded-3.bg-light
+                    small.text-muted.d-block.mb-1
+                      i.fas.fa-map-marker-alt.me-1
+                      | Dirección de entrega
+                    div.fw-semibold= order.customer.district
+                    small.text-muted= order.customer.address
+
+                //- Pago
+                .col-md-6
+                  .p-3.rounded-3.bg-light
+                    small.text-muted.d-block.mb-1
+                      i.fas.fa-credit-card.me-1
+                      | Modo de pago
+                    div.fw-semibold
+                      case order.paymentMethod
+                        when 'yape'
+                          i.fas.fa-mobile-alt.me-1
+                          | Yape
+                        when 'plin'
+                          i.fas.fa-mobile-alt.me-1
+                          | Plin
+                        when 'transferencia'
+                          i.fas.fa-university.me-1
+                          | Transferencia
+                        when 'efectivo'
+                          i.fas.fa-money-bill-wave.me-1
+                          | Efectivo (contra entrega)
+
+                //- Total
+                .col-md-6
+                  .p-3.rounded-3.bg-primary-subtle
+                    small.text-muted.d-block.mb-1
+                      i.fas.fa-dollar-sign.me-1
+                      | Total
+                    div.fw-bold.text-primary.fs-5 S/. #{order.total.toFixed(2)}
+
+              //- Items
+              h6.fw-bold.mb-3
+                i.fas.fa-box.me-2.text-primary
+                | Productos
+              each item in order.items
+                .d-flex.gap-3.py-2.align-items-center(style="border-bottom: 1px solid #f1f5f9;")
+                  if item.image
+                    img(
+                      src=item.image
+                      alt=item.name
+                      style="width: 50px; height: 50px; object-fit: contain; background: #f8fafc; border-radius: 6px; padding: 4px;"
+                    )
+                  else
+                    .d-flex.align-items-center.justify-content-center.bg-light.rounded(
+                      style="width: 50px; height: 50px;"
+                    )
+                      i.fas.fa-image.text-muted
+                  div.flex-grow-1.min-w-0
+                    div.fw-semibold.small= item.name
+                    small.text-muted S/. #{item.price.toFixed(2)} × #{item.qty}
+                  div.fw-bold.text-primary S/. #{item.subtotal.toFixed(2)}
+
+              //- Botones
+              .d-flex.gap-2.mt-4.flex-wrap
+                a.btn.btn-primary.rounded-pill.px-4(href="/products")
+                  i.fas.fa-shopping-bag.me-1
+                  | Seguir comprando
+                if order.status === 'entregado' || order.paid
+                  a.btn.btn-outline-secondary.rounded-pill.px-4(
+                    href=`/checkout/success/${order._id}`
+                    target="_blank"
+                  )
+                    i.fas.fa-print.me-1
+                    | Imprimir comprobante
+
+  //- ============================================
+  //- ESTILOS
+  //- ============================================
+  style.
+    /* ================================================
+       STATUS TRACKER
+       ================================================ */
+    .status-tracker {
+      position: relative;
+      padding: 0 10px;
+      margin: 24px 0;
+    }
+    .status-progress {
+      position: absolute;
+      top: 22px;
+      left: 40px;
+      right: 40px;
+      height: 4px;
+      background: #e5e7eb;
+      border-radius: 4px;
+      z-index: 1;
+    }
+    .status-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--brand), var(--brand-dark));
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+    .status-steps {
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+      z-index: 2;
+    }
+    .status-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+    }
+    .status-step-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: white;
+      border: 3px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      font-size: 1rem;
+      transition: all 0.4s ease;
+      margin-bottom: 8px;
+    }
+    .status-step.completed .status-step-icon {
+      background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+      border-color: var(--brand);
+      color: white;
+      box-shadow: 0 4px 12px rgba(13,110,253,0.3);
+    }
+    .status-step-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #94a3b8;
+      text-align: center;
+      transition: color 0.4s ease;
+    }
+    .status-step.completed .status-step-label {
+      color: var(--brand);
+    }
+
+    @media (max-width: 576px) {
+      .status-step-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 0.85rem;
+      }
+      .status-step-label {
+        font-size: 0.65rem;
+      }
+      .status-progress {
+        top: 18px;
+        left: 30px;
+        right: 30px;
+      }
+    }

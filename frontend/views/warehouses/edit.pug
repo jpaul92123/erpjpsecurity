@@ -1,0 +1,27 @@
+extends ../layouts/layout
+
+block content
+  .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pb-2.mb-3.border-bottom
+    h1.h2
+      i.fas.fa-edit.me-2
+      | Editar Almacén: #{warehouse.name}
+    a.btn.btn-outline-secondary(href="/warehouses")
+      i.fas.fa-arrow-left.me-1
+      | Volver
+
+  .card.border-0.shadow-sm
+    .card-body
+      form(method="POST", action=`/warehouses/${warehouse._id}?_method=PUT`)
+        .mb-3
+          label.form-label Nombre *
+          input.form-control(type="text", name="name", value=warehouse.name, required)
+        .mb-3
+          label.form-label Ubicación
+          input.form-control(type="text", name="location", value=warehouse.location || '')
+        .form-check.mb-3
+          input#isActive.form-check-input(type="checkbox", name="isActive", checked=warehouse.isActive)
+          label.form-check-label(for="isActive") Activo
+        button.btn.btn-primary(type="submit")
+          i.fas.fa-save.me-1
+          | Actualizar
+        a.btn.btn-outline-secondary.ms-2(href="/warehouses") Cancelar

@@ -1,0 +1,448 @@
+extends ../layouts/layout
+
+block content
+  //- STATS CARDS
+  .row.g-3.mb-4
+    .col-md-3.col-6
+      .card.border-0.bg-primary.bg-gradient.text-white.shadow-sm.h-100
+        .card-body.d-flex.align-items-center
+          .me-3
+            i.fas.fa-file-invoice.fa-2x.opacity-75
+          div
+            h6.mb-0 Total Cotizaciones
+            h2.mb-0.fw-bold #{quotations.length}
+    .col-md-3.col-6
+      .card.border-0.bg-warning.bg-gradient.text-dark.shadow-sm.h-100
+        .card-body.d-flex.align-items-center
+          .me-3
+            i.fas.fa-clock.fa-2x.opacity-75
+          div
+            h6.mb-0 Pendientes
+            h2.mb-0.fw-bold #{quotations.filter(q => !q.convertedToSale).length}
+    .col-md-3.col-6
+      .card.border-0.bg-success.bg-gradient.text-white.shadow-sm.h-100
+        .card-body.d-flex.align-items-center
+          .me-3
+            i.fas.fa-check-circle.fa-2x.opacity-75
+          div
+            h6.mb-0 Convertidas a Venta
+            h2.mb-0.fw-bold #{quotations.filter(q => q.convertedToSale).length}
+    .col-md-3.col-6
+      .card.border-0.bg-info.bg-gradient.text-white.shadow-sm.h-100
+        .card-body.d-flex.align-items-center
+          .me-3
+            i.fas.fa-money-bill-wave.fa-2x.opacity-75
+          div
+            h6.mb-0 Total en Soles
+            h2.mb-0.fw-bold S/. #{quotations.reduce((sum, q) => sum + q.total, 0).toFixed(2)}
+
+  //- BARRA DE ACCIONES Y FILTROS
+  .d-flex.flex-wrap.align-items-center.justify-content-between.mb-3.gap-2
+    .d-flex.align-items-center.gap-3
+      h1.h3.mb-0
+        i.fas.fa-file-invoice.text-primary.me-2
+        | Cotizaciones
+      span.badge.bg-light.text-dark.border #{quotations.length} registros
+    .d-flex.gap-2.flex-wrap
+      a.btn.btn-primary(href="/quotations/create")
+        i.fas.fa-plus-circle.me-1
+        | Nueva Cotización
+      button.btn.btn-outline-secondary(type="button" id="btnRefresh")
+        i.fas.fa-sync-alt
+
+  //- FILTROS AVANZADOS
+  .card.border-0.shadow-sm.mb-4
+    .card-body.py-3
+      .row.g-2.align-items-end
+        .col-md-4.col-sm-6
+          label.form-label.small.text-muted Buscar
+          .input-group.input-group-sm
+            span.input-group-text.bg-light
+              i.fas.fa-search.text-muted
+            input.form-control#searchQuotation(type="text" placeholder="Número, cliente, RUC...")
+        .col-md-3.col-sm-6
+          label.form-label.small.text-muted Estado
+          select.form-select.form-select-sm#filterStatus
+            option(value="all") Todos
+            option(value="pending") Pendientes
+            option(value="converted") Convertidas
+        .col-md-3.col-sm-6
+          label.form-label.small.text-muted Ordenar por
+          select.form-select.form-select-sm#filterSort
+            option(value="newest") Más reciente
+            option(value="oldest") Más antigua
+            option(value="highest") Mayor total
+            option(value="lowest") Menor total
+        .col-md-2.col-sm-6
+          button.btn.btn-sm.btn-outline-secondary.w-100#btnClearFilters(type="button")
+            i.fas.fa-times.me-1
+            Limpiar
+
+  //- TABLA DE COTIZACIONES
+  .card.border-0.shadow-sm
+    .card-body.p-0
+      .table-responsive
+        table.table.table-hover.align-middle.mb-0#quotationsTable
+          thead.bg-light.sticky-top
+            tr
+              th(style="min-width: 130px;")
+                i.fas.fa-hashtag.me-1
+                | N° Cotización
+              th(style="min-width: 150px;")
+                i.fas.fa-user.me-1
+                | Cliente
+              th(style="min-width: 110px;")
+                i.fas.fa-calendar.me-1
+                | Fecha
+              th(style="min-width: 110px;")
+                i.fas.fa-money-bill-wave.me-1
+                | Total
+              th(style="min-width: 130px;")
+                i.fas.fa-tag.me-1
+                | Estado
+              th(style="min-width: 140px; text-align: center;")
+                i.fas.fa-cog.me-1
+                | Acciones
+          tbody#tableBody
+            if quotations && quotations.length > 0
+              each quotation in quotations
+                tr(data-status=quotation.convertedToSale ? 'converted' : 'pending')
+                  td
+                    strong #{quotation.number}
+                    if quotation.convertedToSale
+                      small.text-success.d-block
+                        i.fas.fa-check-circle
+                        |  Convertida
+                  td
+                    if quotation.client
+                      div #{quotation.client.businessName}
+                      small.text-muted #{quotation.client.ruc || 'Sin RUC'}
+                    else
+                      span.text-muted Cliente Anónimo
+                  td
+                    div #{new Date(quotation.createdAt).toLocaleDateString('es-PE')}
+                    small.text-muted #{new Date(quotation.createdAt).toLocaleTimeString('es-PE', {hour: '2-digit', minute:'2-digit'})}
+                  td
+                    strong.text-success S/. #{quotation.total.toFixed(2)}
+                  td
+                    if quotation.convertedToSale
+                      span.badge.bg-success.px-3.py-2
+                        i.fas.fa-check-circle.me-1
+                        | Convertida
+                      if quotation.saleId
+                        br
+                        a.btn.btn-sm.btn-outline-success.mt-1(href=`/sales/${quotation.saleId}`)
+                          i.fas.fa-external-link-alt.me-1
+                          | Ver Venta
+                    else
+                      span.badge.bg-warning.text-dark.px-3.py-2
+                        i.fas.fa-clock.me-1
+                        | Pendiente
+                  td
+                    .d-flex.justify-content-center.gap-1.flex-wrap
+                      a.btn.btn-sm.btn-outline-info(href=`/quotations/${quotation._id}` title="Ver detalle")
+                        i.fas.fa-eye
+                      a.btn.btn-sm.btn-outline-warning(href=`/quotations/${quotation._id}/edit` title="Editar")
+                        i.fas.fa-edit
+                      if !quotation.convertedToSale
+                        button.btn.btn-sm.btn-success(type="button" title="Crear Venta" data-bs-toggle="modal" data-bs-target="#modalCrearVentaIndex" data-quotation-id=quotation._id data-quotation-number=quotation.number data-client-name=quotation.client ? quotation.client.businessName : 'Cliente Anónimo' data-total=quotation.total)
+                          i.fas.fa-shopping-cart
+                      form.d-inline(method="POST", action=`/quotations/${quotation._id}?_method=DELETE`, onsubmit="return confirm('¿Eliminar esta cotización?')")
+                        button.btn.btn-sm.btn-outline-danger(type="submit" title="Eliminar")
+                          i.fas.fa-trash
+            else
+              tr
+                td(colspan="6").text-center.py-5
+                  i.fas.fa-file-invoice.fa-4x.text-muted.mb-3.d-block
+                  h5.text-muted No hay cotizaciones registradas
+                  p.text-muted Crea tu primera cotización haciendo clic en "Nueva Cotización"
+
+      //- PIE DE TABLA CON CONTADORES
+      .d-flex.justify-content-between.align-items-center.p-3.border-top.bg-light
+        span.text-muted.small
+          i.fas.fa-info-circle.me-1
+          | Mostrando #{quotations.length} cotizaciones
+        .d-flex.gap-2
+          span.badge.bg-success.text-white
+            i.fas.fa-check-circle.me-1
+            | Convertidas: #{quotations.filter(q => q.convertedToSale).length}
+          span.badge.bg-warning.text-dark
+            i.fas.fa-clock.me-1
+            | Pendientes: #{quotations.filter(q => !q.convertedToSale).length}
+
+  //- MODAL PARA CREAR VENTA DESDE EL ÍNDICE
+  .modal.fade#modalCrearVentaIndex(tabindex="-1" aria-hidden="true")
+    .modal-dialog.modal-dialog-centered
+      .modal-content
+        .modal-header.bg-success.text-white
+          h5.modal-title
+            i.fas.fa-shopping-cart.me-2
+            | Crear Venta
+          button.btn-close.btn-close-white(type="button" data-bs-dismiss="modal")
+        .modal-body
+          .text-center.py-4#modalLoading
+            i.fas.fa-spinner.fa-spin.fa-3x.text-primary
+            p.mt-3 Cargando datos...
+          #modalContent(style="display:none;")
+            p
+              strong Cotización: 
+              span#modalQuotationNumber -
+            p
+              strong Cliente: 
+              span#modalClientName -
+            p
+              strong Total: 
+              span#modalTotal -
+            hr
+            form#formVentaRapida(action="#" method="POST")
+              input(type="hidden" name="quotationId" id="modalQuotationId")
+              .mb-3
+                label.form-label Método de Pago
+                select.form-control(name="paymentMethod")
+                  option(value="Efectivo") Efectivo
+                  option(value="Tarjeta") Tarjeta
+                  option(value="Transferencia") Transferencia
+                  option(value="Otro") Otro
+              .mb-3
+                label.form-label Notas (opcional)
+                textarea.form-control(name="notes" rows="2" placeholder="Notas para la venta")
+        .modal-footer
+          button.btn.btn-secondary(type="button" data-bs-dismiss="modal") Cancelar
+          button.btn.btn-success#btnConfirmarVentaIndex(type="button")
+            i.fas.fa-check.me-1
+            | Confirmar Venta
+
+  style.
+    .sticky-top {
+      top: 0;
+      z-index: 1;
+    }
+    .table th {
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid #dee2e6;
+    }
+    .table td {
+      vertical-align: middle;
+      padding: 0.75rem 0.5rem;
+    }
+    .table tbody tr {
+      transition: background-color 0.15s ease;
+    }
+    .table tbody tr:hover {
+      background-color: #f8f9fa;
+    }
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 500;
+      border-radius: 20px;
+    }
+    .btn-sm {
+      padding: 0.2rem 0.6rem;
+      font-size: 0.75rem;
+      border-radius: 8px;
+    }
+    .btn-group-sm .btn {
+      padding: 0.2rem 0.5rem;
+    }
+    .card {
+      border-radius: 12px;
+      transition: box-shadow 0.2s ease;
+    }
+    .card:hover {
+      box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.08) !important;
+    }
+    .bg-gradient {
+      background-size: cover;
+      background-position: center;
+    }
+    .bg-primary.bg-gradient {
+      background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+    }
+    .bg-success.bg-gradient {
+      background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);
+    }
+    .bg-warning.bg-gradient {
+      background: linear-gradient(135deg, #f6c23e 0%, #dda20a 100%);
+    }
+    .bg-info.bg-gradient {
+      background: linear-gradient(135deg, #36b9cc 0%, #258391 100%);
+    }
+    @media (max-width: 768px) {
+      .table-responsive {
+        font-size: 0.8rem;
+      }
+      .table td, .table th {
+        padding: 0.4rem 0.2rem;
+        min-width: auto !important;
+      }
+      .btn-sm {
+        padding: 0.15rem 0.4rem;
+        font-size: 0.65rem;
+      }
+      .badge {
+        font-size: 0.65rem;
+        padding: 0.3rem 0.6rem;
+      }
+      .card-body.py-3 {
+        padding: 0.75rem;
+      }
+      .col-md-3.col-6 .card-body {
+        padding: 0.75rem;
+      }
+      .col-md-3.col-6 .card-body h2 {
+        font-size: 1.3rem;
+      }
+    }
+    @media print {
+      .btn, .card.bg-*, .no-print { display: none !important; }
+      .card { border: none !important; box-shadow: none !important; }
+      .table { font-size: 12px; }
+    }
+
+  script.
+    document.addEventListener('DOMContentLoaded', function() {
+      // ============================================================
+      // 1. BÚSQUEDA EN TIEMPO REAL CON FILTROS COMBINADOS
+      // ============================================================
+      const searchInput = document.getElementById('searchQuotation');
+      const statusFilter = document.getElementById('filterStatus');
+      const sortFilter = document.getElementById('filterSort');
+      const clearBtn = document.getElementById('btnClearFilters');
+      const refreshBtn = document.getElementById('btnRefresh');
+      const tableBody = document.getElementById('tableBody');
+
+      function filterTable() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        const status = statusFilter.value;
+        const rows = tableBody.querySelectorAll('tr');
+
+        // Filtrar
+        rows.forEach(row => {
+          if (row.querySelector('td') === null) return; // Fila de "no hay datos"
+          
+          const text = row.textContent.toLowerCase();
+          const rowStatus = row.dataset.status;
+          
+          let show = true;
+          
+          // Filtro por texto
+          if (searchTerm && !text.includes(searchTerm)) show = false;
+          
+          // Filtro por estado
+          if (status !== 'all') {
+            if (status === 'pending' && rowStatus !== 'pending') show = false;
+            if (status === 'converted' && rowStatus !== 'converted') show = false;
+          }
+          
+          row.style.display = show ? '' : 'none';
+        });
+
+        // Ordenar
+        const rowsArray = Array.from(rows).filter(row => row.style.display !== 'none');
+        if (rowsArray.length > 1) {
+          const sortBy = sortFilter.value;
+          rowsArray.sort((a, b) => {
+            const dateA = new Date(a.querySelector('td:nth-child(3) div')?.textContent || 0);
+            const dateB = new Date(b.querySelector('td:nth-child(3) div')?.textContent || 0);
+            const totalA = parseFloat(a.querySelector('td:nth-child(4) strong')?.textContent.replace('S/. ', '') || 0);
+            const totalB = parseFloat(b.querySelector('td:nth-child(4) strong')?.textContent.replace('S/. ', '') || 0);
+            
+            switch(sortBy) {
+              case 'newest': return dateB - dateA;
+              case 'oldest': return dateA - dateB;
+              case 'highest': return totalB - totalA;
+              case 'lowest': return totalA - totalB;
+              default: return 0;
+            }
+          });
+          
+          // Reordenar en el DOM
+          rowsArray.forEach(row => tableBody.appendChild(row));
+        }
+      }
+
+      // Eventos de filtros
+      searchInput.addEventListener('input', filterTable);
+      statusFilter.addEventListener('change', filterTable);
+      sortFilter.addEventListener('change', filterTable);
+
+      // Limpiar filtros
+      clearBtn.addEventListener('click', function() {
+        searchInput.value = '';
+        statusFilter.value = 'all';
+        sortFilter.value = 'newest';
+        filterTable();
+      });
+
+      // Refrescar página
+      refreshBtn.addEventListener('click', function() {
+        window.location.reload();
+      });
+
+      // ============================================================
+      // 2. MODAL PARA CREAR VENTA RÁPIDA DESDE EL ÍNDICE
+      // ============================================================
+      const modal = document.getElementById('modalCrearVentaIndex');
+      const loading = document.getElementById('modalLoading');
+      const content = document.getElementById('modalContent');
+      const quotationIdInput = document.getElementById('modalQuotationId');
+      const numberSpan = document.getElementById('modalQuotationNumber');
+      const clientSpan = document.getElementById('modalClientName');
+      const totalSpan = document.getElementById('modalTotal');
+      const confirmBtn = document.getElementById('btnConfirmarVentaIndex');
+      const formVenta = document.getElementById('formVentaRapida');
+
+      if (modal) {
+        modal.addEventListener('show.bs.modal', function(event) {
+          const button = event.relatedTarget;
+          if (!button) return;
+          
+          const quotationId = button.getAttribute('data-quotation-id');
+          const quotationNumber = button.getAttribute('data-quotation-number');
+          const clientName = button.getAttribute('data-client-name');
+          const total = button.getAttribute('data-total');
+
+          // Mostrar datos en el modal
+          quotationIdInput.value = quotationId;
+          numberSpan.textContent = quotationNumber || '-';
+          clientSpan.textContent = clientName || 'Cliente Anónimo';
+          totalSpan.textContent = `S/. ${total || '0.00'}`;
+
+          // Configurar el action del formulario
+          formVenta.action = `/quotations/${quotationId}/sale`;
+          
+          // Mostrar contenido
+          loading.style.display = 'none';
+          content.style.display = 'block';
+        });
+
+        modal.addEventListener('hide.bs.modal', function() {
+          loading.style.display = 'block';
+          content.style.display = 'none';
+        });
+      }
+
+      // Confirmar venta desde el modal
+      if (confirmBtn) {
+        confirmBtn.addEventListener('click', function() {
+          const form = document.getElementById('formVentaRapida');
+          // Enviar el formulario
+          form.submit();
+        });
+      }
+
+      // ============================================================
+      // 3. TOOLTIPS (para botones)
+      // ============================================================
+      const tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+      if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+        tooltipTriggerList.map(function (el) {
+          return new bootstrap.Tooltip(el, { placement: 'top', trigger: 'hover' });
+        });
+      }
+
+      console.log('✅ Cotizaciones listo - Filtros y modal funcionando');
+    });

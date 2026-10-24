@@ -1,0 +1,53 @@
+extends ../layouts/layout
+
+block content
+  .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pb-2.mb-3.border-bottom
+    h1.h2
+      i.fas.fa-file-pdf.me-2
+      | Comprobantes
+    a.btn.btn-primary(href="/vouchers/create")
+      i.fas.fa-plus-circle.me-1
+      | Nuevo Comprobante
+
+  .card.border-0.shadow-sm
+    .card-body
+      .table-responsive
+        table.table.table-hover.align-middle
+          thead
+            tr
+              th Tipo
+              th N° Comprobante
+              th Cliente
+              th Fecha
+              th Total
+              th Estado
+              th Acciones
+          tbody
+            each voucher in vouchers || []
+              tr
+                td 
+                  span.badge.bg-info #{voucher.type}
+                td #{voucher.number}
+                td #{voucher.businessName}
+                td #{new Date(voucher.date).toLocaleDateString()}
+                td S/. #{voucher.total.toFixed(2)}
+                td
+                  if voucher.status === 'Emitido'
+                    span.badge.bg-success Emitido
+                  else
+                    span.badge.bg-danger Anulado
+                td
+                  .btn-group.btn-group-sm
+                    a.btn.btn-outline-info(href=`/vouchers/${voucher._id}`)
+                      i.fas.fa-eye
+                    if voucher.status === 'Emitido'
+                      form.d-inline(method="POST", action=`/vouchers/${voucher._id}/annul`, onsubmit="return confirm('¿Anular este comprobante?')")
+                        button.btn.btn-outline-warning(type="submit")
+                          i.fas.fa-ban
+                    form.d-inline(method="POST", action=`/vouchers/${voucher._id}?_method=DELETE`, onsubmit="return confirm('¿Eliminar este comprobante?')")
+                      button.btn.btn-outline-danger(type="submit")
+                        i.fas.fa-trash
+            else
+              tr
+                td(colspan="7").text-center.py-4
+                  p.text-muted No hay comprobantes registrados.

@@ -1,0 +1,205 @@
+/* Estilos generales */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+}
+
+/* Gradiente para el banner */
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Círculos de iconos */
+.icon-circle {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+}
+
+.hover-card:hover .icon-circle {
+  transform: scale(1.1);
+}
+
+/* Efecto hover en cards */
+.hover-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+/* Colores personalizados */
+.bg-purple {
+  background-color: #6f42c1;
+}
+
+.bg-teal {
+  background-color: #20c997;
+}
+
+.btn-outline-purple {
+  color: #6f42c1;
+  border-color: #6f42c1;
+}
+
+.btn-outline-purple:hover {
+  background-color: #6f42c1;
+  color: white;
+}
+
+.btn-outline-teal {
+  color: #20c997;
+  border-color: #20c997;
+}
+
+.btn-outline-teal:hover {
+  background-color: #20c997;
+  color: white;
+}
+
+/* Números de estadísticas */
+.stat-number {
+  font-weight: 700;
+  font-size: 2.5rem;
+  line-height: 1.2;
+}
+
+/* Navbar personalizada */
+.navbar-dark .navbar-nav .nav-link {
+  color: rgba(255, 255, 255, 0.8);
+  transition: color 0.3s ease;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover {
+  color: white;
+}
+
+/* Footer fijo abajo */
+html, body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+.container-fluid {
+  flex: 1;
+}
+
+/* Mejoras en tablas */
+.table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+
+/* Animaciones */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card {
+  animation: fadeInUp 0.6s ease;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+  .icon-circle {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .display-5 {
+    font-size: 1.8rem;
+  }
+}
+
+/* Hover effect para tarjetas */
+.hover-lift {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15) !important;
+}
+
+/* Iconos circulares */
+.icon-circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+  .icon-circle {
+    width: 50px;
+    height: 50px;
+  }
+  .icon-circle i {
+    font-size: 1.5rem !important;
+  }
+  .card-body.p-3 {
+    padding: 0.75rem !important;
+  }
+}
+
+/* Offcanvas categorías */
+.offcanvas {
+  width: 280px;
+}
+.offcanvas .list-group-item {
+  border: none;
+  padding: 0.6rem 1rem;
+}
+.offcanvas .list-group-item.active {
+  background-color: #0d6efd;
+  color: white;
+}
+.offcanvas .list-group-item.ps-5 {
+  padding-left: 2.5rem !important;
+  font-size: 0.9rem;
+}
+
+/* Efecto hover en tarjetas */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+.total-proforma {
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  padding: 1rem;
+  border: 1px solid #dee2e6;
+}
+#resultadosBusqueda {
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  padding: 5px;
+  background: white;
+}
+#tablaItems input {
+  max-width: 80px;
+  display: inline-block;
+}

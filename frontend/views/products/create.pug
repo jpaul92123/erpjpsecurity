@@ -1,0 +1,147 @@
+extends ../layouts/layout
+
+block content
+  .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pb-2.mb-3.border-bottom
+    h1.h2
+      i.fas.fa-plus-circle.me-2
+      | Nuevo Producto
+    a.btn.btn-outline-secondary(href="/products")
+      i.fas.fa-arrow-left.me-1
+      | Volver
+
+  .card.border-0.shadow-sm
+    .card-body
+      form(method="POST", action="/products")
+        .row
+          .col-md-6
+            .mb-3
+              label.form-label Nombre *
+              input.form-control(type="text", name="name", required)
+          .col-md-6
+            .mb-3
+              label.form-label Modelo
+              input.form-control(type="text", name="model")
+        .mb-3
+          label.form-label Imagen (URL)
+          input.form-control(type="text", name="image", placeholder="https://ejemplo.com/imagen.jpg")
+        .row
+          .col-md-6
+            .mb-3
+              label.form-label Categoría *
+              select#categorySelect.form-control(name="category", required)
+                option(value="") Seleccionar...
+                each cat in categories
+                  option(value=cat._id) #{cat.name}
+          .col-md-6
+            .mb-3
+              label.form-label Subcategoría
+              select#subcategorySelect.form-control(name="subcategory")
+                option(value="") Ninguna
+                each sub in subcategories
+                  option(value=sub._id, data-parent=sub.parent.toString()) #{sub.name}
+          .col-md-6
+            .mb-3
+              label.form-label.fw-semibold Marca
+              select.form-select(name="brand")
+                option(value="") — Sin marca —
+                each brand in brands
+                  option(
+                    value=brand._id
+                    selected=(product && product.brand && product.brand.toString() === brand._id.toString())
+                  )= brand.name        
+
+        .card.bg-light.mb-3
+          .card-body
+            h5.text-primary
+              i.fas.fa-calculator.me-2
+              | Calculadora de Precios
+            .row
+              .col-md-4
+                .mb-3
+                  label.form-label Precio Proveedor (S/.) *
+                  input#supplierPrice.form-control(type="number", name="supplierPrice", step="0.01", min="0", required)
+              .col-md-4
+                .mb-3
+                  label.form-label % Ganancia
+                  .input-group
+                    input#profitPercent.form-control(type="number", name="profitPercent", step="1", min="0", value="30")
+                    span.input-group-text %
+              .col-md-4
+                .mb-3
+                  label.form-label Precio Cliente (S/.)
+                  .input-group
+                    input#customerPrice.form-control(type="number", name="customerPrice", step="0.01", min="0", readonly)
+                    button.btn.btn-outline-secondary(type="button", onclick="calculatePrice()")
+                      i.fas.fa-sync-alt
+            .row
+              .col-md-12
+                .alert.alert-success
+                  .d-flex.justify-content-between
+                    span Ganancia por unidad:
+                    span#profitDisplay.fw-bold S/. 0.00
+                small.text-muted * El IGV ya está incluido en todos los precios.
+
+        .row
+          .col-md-4
+            .mb-3
+              label.form-label Descuento (%)
+              input#discountInput.form-control(type="number", name="discount", step="0.01", min="0", max="100", value="0")
+          .col-md-8
+            .mb-3
+              label.form-label Precio con Descuento (S/.)
+              input#priceWithDiscount.form-control(type="text", readonly, style="font-weight:bold; color:#0d6efd;")
+        .mb-3
+          label.form-label Descripción
+          textarea.form-control(name="description", rows="2")
+        .mb-3
+          label.form-label Ficha Técnica (URL)
+          input.form-control(type="text", name="techSheet", placeholder="https://ejemplo.com/ficha.pdf")
+        .form-check.mb-3
+          input#isActive.form-check-input(type="checkbox", name="isActive", checked)
+          label.form-check-label(for="isActive") Activo
+        button.btn.btn-primary(type="submit")
+          i.fas.fa-save.me-1
+          | Guardar
+        a.btn.btn-outline-secondary.ms-2(href="/products") Cancelar
+
+  //- Scripts corregidos
+  script.
+    function calculatePrice() {
+      var supplierPrice = parseFloat(document.getElementById('supplierPrice').value) || 0;
+      var profitPercent = parseFloat(document.getElementById('profitPercent').value) || 0;
+      var customerPrice = supplierPrice * (1 + profitPercent / 100);
+      document.getElementById('customerPrice').value = customerPrice.toFixed(2);
+      var profit = customerPrice - supplierPrice;
+      document.getElementById('profitDisplay').textContent = 'S/. ' + profit.toFixed(2);
+      calculateDiscount();
+    }
+
+    function calculateDiscount() {
+      var customerPrice = parseFloat(document.getElementById('customerPrice').value) || 0;
+      var discount = parseFloat(document.getElementById('discountInput').value) || 0;
+      var priceWithDiscount = customerPrice * (1 - discount / 100);
+      document.getElementById('priceWithDiscount').value = 'S/. ' + priceWithDiscount.toFixed(2);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var catSelect = document.getElementById('categorySelect');
+      var subSelect = document.getElementById('subcategorySelect');
+      var allSubs = subSelect.querySelectorAll('option[data-parent]');
+
+      function filterSubs() {
+        var selectedCat = catSelect.value;
+        subSelect.innerHTML = '<option value="">Ninguna</option>';
+        allSubs.forEach(function(opt) {
+          if (opt.dataset.parent === selectedCat) {
+            subSelect.appendChild(opt.cloneNode(true));
+          }
+        });
+      }
+
+      catSelect.addEventListener('change', filterSubs);
+      filterSubs();
+
+      document.getElementById('supplierPrice').addEventListener('input', calculatePrice);
+      document.getElementById('profitPercent').addEventListener('input', calculatePrice);
+      document.getElementById('discountInput').addEventListener('input', calculateDiscount);
+    });

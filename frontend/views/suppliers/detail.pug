@@ -1,0 +1,349 @@
+extends ../layouts/layout
+
+block content
+
+  //- ============================================
+  //- HEADER
+  //- ============================================
+  .d-flex.flex-wrap.flex-md-nowrap.align-items-center.justify-content-between.pb-3.mb-4.border-bottom
+    .d-flex.align-items-center
+      .bg-primary.bg-opacity-10.rounded-3.p-3.me-3
+        i.fas.fa-truck.text-primary.fa-2x
+      div
+        nav(aria-label="breadcrumb")
+          ol.breadcrumb.mb-1
+            li.breadcrumb-item
+              a.text-decoration-none(href="/suppliers") Proveedores
+            li.breadcrumb-item.active= supplier.businessName
+        h1.h2.mb-0.fw-bold= supplier.businessName
+        p.text-muted.mb-0
+          if supplier.isActive
+            span.badge.bg-success-subtle.text-success.px-3.py-2.rounded-pill.border.border-success-subtle
+              i.fas.fa-check-circle.me-1
+              | Activo
+          else
+            span.badge.bg-danger-subtle.text-danger.px-3.py-2.rounded-pill.border.border-danger-subtle
+              i.fas.fa-times-circle.me-1
+              | Inactivo
+    div.d-flex.gap-2
+      a.btn.btn-outline-secondary.rounded-pill.px-3(href="/suppliers")
+        i.fas.fa-arrow-left.me-1
+        | Volver
+      a.btn.btn-warning.rounded-pill.px-4(href=`/suppliers/${supplier._id}/edit`)
+        i.fas.fa-pen.me-1
+        | Editar
+
+  //- ============================================
+  //- TARJETAS DE ESTADÍSTICAS RÁPIDAS
+  //- ============================================
+  .row.g-3.mb-4
+    .col-sm-6.col-lg-3
+      .card.border-0.shadow-sm.rounded-3.stat-card.h-100
+        .card-body.d-flex.justify-content-between.align-items-center
+          div
+            h6.card-title.mb-1.small.text-uppercase.text-muted.fw-semibold RUC
+            h6.card-text.mb-0.fw-bold.text-dark #{supplier.ruc || '—'}
+          .stat-icon.bg-primary.bg-opacity-10.text-primary.rounded-3
+            i.fas.fa-id-card.fa-lg
+
+    .col-sm-6.col-lg-3
+      .card.border-0.shadow-sm.rounded-3.stat-card.h-100
+        .card-body.d-flex.justify-content-between.align-items-center
+          div
+            h6.card-title.mb-1.small.text-uppercase.text-muted.fw-semibold Teléfono
+            h6.card-text.mb-0.fw-bold.text-dark #{supplier.phone || '—'}
+          .stat-icon.bg-success.bg-opacity-10.text-success.rounded-3
+            i.fas.fa-phone.fa-lg
+
+    .col-sm-6.col-lg-3
+      .card.border-0.shadow-sm.rounded-3.stat-card.h-100
+        .card-body.d-flex.justify-content-between.align-items-center
+          div
+            h6.card-title.mb-1.small.text-uppercase.text-muted.fw-semibold Email
+            h6.card-text.mb-0.fw-bold.text-dark.text-truncate #{supplier.email || '—'}
+          .stat-icon.bg-info.bg-opacity-10.text-info.rounded-3
+            i.fas.fa-envelope.fa-lg
+
+    .col-sm-6.col-lg-3
+      .card.border-0.shadow-sm.rounded-3.stat-card.h-100
+        .card-body.d-flex.justify-content-between.align-items-center
+          div
+            h6.card-title.mb-1.small.text-uppercase.text-muted.fw-semibold Productos
+            h6.card-text.mb-0.fw-bold.text-dark #{supplier.productsCount || 0}
+          .stat-icon.bg-warning.bg-opacity-10.text-warning.rounded-3
+            i.fas.fa-boxes.fa-lg
+
+  //- ============================================
+  //- CONTENIDO PRINCIPAL
+  //- ============================================
+  .row.g-4
+
+    //- ========== COLUMNA IZQUIERDA ==========
+    .col-lg-7
+
+      //- INFORMACIÓN GENERAL
+      .card.border-0.shadow-sm.rounded-3.mb-4
+        .card-header.bg-white.border-bottom.py-3
+          h6.mb-0.fw-bold
+            i.fas.fa-info-circle.me-2.text-primary
+            | Información General
+        .card-body.p-4
+
+          .info-list
+            .info-item
+              .info-icon.bg-primary.bg-opacity-10.text-primary
+                i.fas.fa-id-card
+              div
+                small.text-muted.d-block RUC
+                strong= supplier.ruc || '—'
+
+            .info-item
+              .info-icon.bg-info.bg-opacity-10.text-info
+                i.fas.fa-envelope
+              div
+                small.text-muted.d-block Email
+                strong= supplier.email || '—'
+
+            .info-item
+              .info-icon.bg-success.bg-opacity-10.text-success
+                i.fas.fa-phone
+              div
+                small.text-muted.d-block Teléfono
+                strong= supplier.phone || '—'
+
+            if supplier.contactPerson
+              .info-item
+                .info-icon.bg-secondary.bg-opacity-10.text-secondary
+                  i.fas.fa-user-tie
+                div
+                  small.text-muted.d-block Persona de Contacto
+                  strong= supplier.contactPerson
+
+            if supplier.address
+              .info-item
+                .info-icon.bg-warning.bg-opacity-10.text-warning
+                  i.fas.fa-map-marker-alt
+                div
+                  small.text-muted.d-block Dirección
+                  strong= supplier.address
+
+            .info-item
+              .info-icon.bg-primary.bg-opacity-10.text-primary
+                i.fas.fa-calendar
+              div
+                small.text-muted.d-block Registrado
+                strong= new Date(supplier.createdAt).toLocaleDateString('es-PE', { day: '2-digit', month: 'long', year: 'numeric' })
+
+    //- ========== COLUMNA DERECHA ==========
+    .col-lg-5
+
+      //- ESTADO
+      .card.border-0.shadow-sm.rounded-3.mb-4
+        .card-header.bg-white.border-bottom.py-3
+          h6.mb-0.fw-bold
+            i.fas.fa-toggle-on.me-2.text-primary
+            | Estado del Proveedor
+        .card-body.p-4.text-center
+
+          if supplier.isActive
+            .bg-success.bg-opacity-10.rounded-circle.d-inline-flex.align-items-center.justify-content-center.mb-3(
+              style="width: 80px; height: 80px;"
+            )
+              i.fas.fa-check-circle.text-success.fa-3x
+            h5.fw-bold.text-success.mb-1 Activo
+            p.text-muted.small.mb-0 Este proveedor está disponible en el sistema
+          else
+            .bg-danger.bg-opacity-10.rounded-circle.d-inline-flex.align-items-center.justify-content-center.mb-3(
+              style="width: 80px; height: 80px;"
+            )
+              i.fas.fa-times-circle.text-danger.fa-3x
+            h5.fw-bold.text-danger.mb-1 Inactivo
+            p.text-muted.small.mb-0 Este proveedor está deshabilitado
+
+      //- ACCIONES RÁPIDAS
+      .card.border-0.shadow-sm.rounded-3
+        .card-header.bg-white.border-bottom.py-3
+          h6.mb-0.fw-bold
+            i.fas.fa-bolt.me-2.text-primary
+            | Acciones Rápidas
+        .card-body.p-4
+
+          .d-grid.gap-2
+            a.btn.btn-outline-primary.rounded-pill(
+              href=`/suppliers/${supplier._id}/edit`
+            )
+              i.fas.fa-pen.me-2
+              | Editar Proveedor
+
+            if supplier.phone
+              a.btn.btn-outline-success.rounded-pill(
+                href=`tel:${supplier.phone}`
+              )
+                i.fas.fa-phone.me-2
+                | Llamar
+
+            if supplier.email
+              a.btn.btn-outline-info.rounded-pill(
+                href=`mailto:${supplier.email}`
+              )
+                i.fas.fa-envelope.me-2
+                | Enviar Email
+
+            if supplier.address
+              a.btn.btn-outline-warning.rounded-pill(
+                href=`https://maps.google.com/?q=${encodeURIComponent(supplier.address)}`
+                target="_blank"
+                rel="noopener"
+              )
+                i.fas.fa-map-marker-alt.me-2
+                | Ver en Maps
+
+            button.btn.btn-outline-danger.rounded-pill.btn-delete-supplier(
+              type="button"
+              data-supplier-id=supplier._id
+              data-supplier-name=supplier.businessName
+            )
+              i.fas.fa-trash.me-2
+              | Eliminar Proveedor
+
+  //- ============================================
+  //- MODAL CONFIRMAR ELIMINACIÓN
+  //- ============================================
+  .modal.fade#modalDeleteSupplier(tabindex="-1")
+    .modal-dialog.modal-dialog-centered
+      .modal-content.rounded-4.border-0.shadow-lg
+
+        .modal-header.bg-danger.text-white.rounded-top-4
+          h5.modal-title
+            i.fas.fa-exclamation-triangle.me-2
+            | Eliminar Proveedor
+          button.btn-close.btn-close-white(type="button" data-bs-dismiss="modal")
+
+        .modal-body.p-4
+          .text-center.mb-4
+            .bg-danger.bg-opacity-10.rounded-circle.d-inline-flex.align-items-center.justify-content-center.mb-3(
+              style="width: 80px; height: 80px;"
+            )
+              i.fas.fa-trash.text-danger.fa-2x
+
+            h5.fw-bold.mb-2 ¿Estás seguro de eliminar este proveedor?
+            p.text-muted.mb-0
+              | Se eliminará el proveedor 
+              strong#deleteSupplierName.text-primary -
+              | . Esta acción no se puede deshacer.
+
+          .alert.alert-warning.rounded-3.mb-0
+            i.fas.fa-info-circle.me-2
+            small
+              strong Nota:
+              |  Si el proveedor tiene productos asociados, no se podrá eliminar.
+
+        .modal-footer.border-top-0.p-3
+          button.btn.btn-outline-secondary.rounded-pill.px-4(
+            type="button"
+            data-bs-dismiss="modal"
+          )
+            i.fas.fa-times.me-1
+            | Cancelar
+          form#formDeleteSupplier(method="POST" action="")
+            input(type="hidden" name="_method" value="DELETE")
+            button.btn.btn-danger.rounded-pill.px-4(
+              type="submit"
+              id="btnConfirmarDelete"
+            )
+              i.fas.fa-trash.me-1
+              | Sí, eliminar
+
+  //- ============================================
+  //- ESTILOS
+  //- ============================================
+  style.
+    .stat-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.08) !important;
+    }
+    .stat-icon {
+      width: 52px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .info-list {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .info-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .info-item strong {
+      color: #1e293b;
+      font-size: 0.95rem;
+      word-break: break-word;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+
+    @media (max-width: 768px) {
+      .info-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 14px;
+      }
+      .stat-icon {
+        width: 44px;
+        height: 44px;
+      }
+    }
+
+  //- ============================================
+  //- SCRIPT
+  //- ============================================
+  script.
+    document.addEventListener('DOMContentLoaded', function() {
+      const modalDelete = new bootstrap.Modal(document.getElementById('modalDeleteSupplier'));
+      const deleteSupplierName = document.getElementById('deleteSupplierName');
+      const formDeleteSupplier = document.getElementById('formDeleteSupplier');
+      const btnConfirmarDelete = document.getElementById('btnConfirmarDelete');
+
+      document.querySelectorAll('.btn-delete-supplier').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const supplierId = this.dataset.supplierId;
+          const supplierName = this.dataset.supplierName;
+
+          deleteSupplierName.textContent = supplierName;
+          formDeleteSupplier.action = `/suppliers/${supplierId}?_method=DELETE`;
+
+          modalDelete.show();
+        });
+      });
+
+      if (formDeleteSupplier) {
+        formDeleteSupplier.addEventListener('submit', function() {
+          btnConfirmarDelete.disabled = true;
+          btnConfirmarDelete.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Eliminando...';
+        });
+      }
+    });

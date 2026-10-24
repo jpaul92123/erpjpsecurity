@@ -1,0 +1,51 @@
+extends ../layouts/layout
+
+block content
+  .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pb-2.mb-3.border-bottom
+    h1.h2
+      i.fas.fa-chart-simple.me-2
+      | Reporte de Ventas
+    button.btn.btn-primary(onclick="window.print()")
+      i.fas.fa-print.me-1
+      | Imprimir
+
+  .card.border-0.shadow-sm
+    .card-body
+      form(method="GET", action="/reports/sales")
+        .row
+          .col-md-4
+            .mb-3
+              label.form-label Desde
+              input.form-control(type="date", name="startDate")
+          .col-md-4
+            .mb-3
+              label.form-label Hasta
+              input.form-control(type="date", name="endDate")
+          .col-md-4
+            .mb-3
+              label.form-label &nbsp;
+              button.btn.btn-primary(type="submit")
+                i.fas.fa-filter.me-1
+                | Filtrar
+
+      hr
+
+      .table-responsive
+        table.table.table-hover
+          thead
+            tr
+              th N° Venta
+              th Cliente
+              th Fecha
+              th Total
+          tbody
+            each sale in sales || []
+              tr
+                td #{sale.number}
+                td #{sale.client ? sale.client.businessName : '-'}
+                td #{new Date(sale.createdAt).toLocaleDateString()}
+                td S/. #{sale.total.toFixed(2)}
+            else
+              tr
+                td(colspan="4").text-center.py-4
+                  p.text-muted No hay ventas en el período seleccionado.

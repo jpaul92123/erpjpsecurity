@@ -1,0 +1,844 @@
+extends ../layouts/layout
+
+block content
+
+  //- ============================================
+  //- HEADER DEL DASHBOARD
+  //- ============================================
+  .dashboard-header.mb-4
+    .d-flex.flex-wrap.justify-content-between.align-items-center.gap-3
+
+      div
+        nav(aria-label="breadcrumb")
+          ol.breadcrumb.mb-1
+            li.breadcrumb-item
+              a.text-decoration-none(href="/") Inicio
+            li.breadcrumb-item.active(aria-current="page") Dashboard
+
+        h1.h3.fw-bold.mb-1.text-dark Panel de Control
+
+        p.text-muted.mb-0.small
+          i.fas.fa-circle.text-success.me-1(style="font-size: 0.5rem;")
+          | Sistema operativo · 
+          = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+
+      .d-flex.align-items-center.gap-2
+
+        //- ⚙️ Configuración
+        a.btn.btn-light.rounded-circle.shadow-sm(
+          href="/settings"
+          title="Configuración"
+          style="width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center;"
+        )
+          i.fas.fa-cog
+
+        //- 🔔 Campana con dropdown de notificaciones
+        .dropdown.notification-dropdown
+          button.btn.btn-light.rounded-circle.shadow-sm.position-relative(
+            type="button"
+            data-bs-toggle="dropdown"
+            data-bs-auto-close="outside"
+            aria-expanded="false"
+            title="Notificaciones"
+            style="width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center;"
+          )
+            i.fas.fa-bell
+            span.badge.rounded-pill.bg-danger.position-absolute#notificationBadge(
+              class=(pendingOrdersCount > 0 ? '' : 'd-none')
+              style="top: -4px; right: -4px; font-size: 0.65rem; padding: 4px 6px;"
+            )= pendingOrdersCount || 0
+
+          ul.dropdown-menu.dropdown-menu-end.shadow-lg.rounded-3.border-0.p-0(
+            style="min-width: 360px; max-width: 90vw;"
+          )
+            li.px-3.py-3.border-bottom.d-flex.justify-content-between.align-items-center
+              div
+                h6.mb-0.fw-bold
+                  i.fas.fa-bell.me-2.text-primary
+                  | Notificaciones
+                small.text-muted#notifSubtitle
+                  = pendingOrdersCount + ' pedidos pendientes'
+              button.btn.btn-sm.btn-link.text-decoration-none.p-0#markAllRead(
+                type="button"
+                title="Marcar todas como leídas"
+              )
+                i.fas.fa-check-double
+
+            li
+              #notificationList(
+                style="max-height: 400px; overflow-y: auto;"
+              )
+                if pendingOrders && pendingOrders.length
+                  each order in pendingOrders
+                    a.dropdown-item.d-flex.align-items-start.gap-3.py-3.border-bottom.text-wrap(
+                      href=`/orders/${order._id}`
+                      style="white-space: normal;"
+                    )
+                      .rounded-circle.bg-warning-subtle.text-warning.d-flex.align-items-center.justify-content-center.flex-shrink-0(
+                        style="width: 42px; height: 42px;"
+                      )
+                        i.fas.fa-shopping-bag
+                      div.flex-grow-1.min-w-0
+                        div.d-flex.justify-content-between.align-items-center.mb-1
+                          span.fw-bold.text-primary= order.orderNumber
+                          small.text-muted
+                            = new Date(order.createdAt).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+                        div.small.fw-semibold.text-truncate= order.customer.name
+                        div.small.text-muted
+                          = order.customer.phone + ' · S/. ' + order.total.toFixed(2)
+                        div.small.text-muted
+                          i.fas.fa-box.me-1
+                          = order.items.length + ' producto' + (order.items.length !== 1 ? 's' : '')
+
+                  li.px-3.py-2.text-center.border-top
+                    a.btn.btn-sm.btn-link.text-decoration-none.fw-semibold(
+                      href="/orders?status=pendiente"
+                    )
+                      | Ver todos los pedidos pendientes
+                      i.fas.fa-arrow-right.ms-1
+                else
+                  li.text-center.py-5.text-muted
+                    i.fas.fa-bell-slash.fa-3x.mb-3.opacity-25.d-block
+                    p.mb-0 No hay pedidos pendientes
+
+        //- 🛒 Tienda pública
+        a.btn.btn-light.rounded-circle.shadow-sm(
+          href="/landing"
+          target="_blank"
+          title="Ver tienda"
+          style="width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center;"
+        )
+          i.fas.fa-store
+
+  //- ============================================
+  //- TARJETA DE BIENVENIDA
+  //- ============================================
+  .row.mb-4
+    .col-12
+      .welcome-card.p-4.rounded-4.shadow-sm.position-relative.overflow-hidden
+        .row.align-items-center.position-relative(style="z-index: 2;")
+          .col-lg-8
+            .d-flex.align-items-center.mb-3
+              .avatar-circle-lg.bg-white.text-primary.me-3
+                i.fas.fa-user.fa-lg
+              div
+                h4.fw-bold.mb-0 ¡Hola, #{user.name}!
+
+          .col-lg-4.d-none.d-lg-flex.justify-content-end
+            i.fas.fa-shield-halved.welcome-icon
+
+  //- ============================================
+  //- ALERTA DE PEDIDOS PENDIENTES
+  //- ============================================
+  if pendingOrdersCount > 0
+    .row.mb-4
+      .col-12
+        .alert.alert-warning.border-0.shadow-sm.rounded-3.d-flex.align-items-center.justify-content-between.flex-wrap.gap-3
+          .d-flex.align-items-center.gap-3
+            .rounded-circle.bg-warning.text-white.d-flex.align-items-center.justify-content-center(
+              style="width: 48px; height: 48px; font-size: 1.3rem;"
+            )
+              i.fas.fa-bell.animate-ring
+            div
+              h6.mb-1.fw-bold.text-dark
+                | ¡Tienes #{pendingOrdersCount} pedido#{pendingOrdersCount !== 1 ? 's' : ''} pendiente#{pendingOrdersCount !== 1 ? 's' : ''}!
+              small.text-muted Los clientes están esperando confirmación.
+          a.btn.btn-warning.rounded-pill.px-4.text-dark.fw-bold(
+            href="/orders?status=pendiente"
+          )
+            i.fas.fa-eye.me-1
+            | Ver pedidos
+
+  //- ============================================
+  //- ESTADÍSTICAS
+  //- ============================================
+  .row.g-3.mb-4
+
+    .col-6.col-lg-3
+      .card.stat-card.border-0.shadow-sm.h-100
+        .card-body.p-3
+          .d-flex.justify-content-between.align-items-start.mb-2
+            .stat-icon.bg-primary-subtle.text-primary
+              i.fas.fa-users
+            span.badge.bg-success-subtle.text-success.rounded-pill
+              i.fas.fa-arrow-up.me-1
+              | 12%
+          h3.fw-bold.mb-1 #{totalUsers || 0}
+          p.text-muted.small.mb-0 Usuarios activos
+
+    .col-6.col-lg-3
+      .card.stat-card.border-0.shadow-sm.h-100
+        .card-body.p-3
+          .d-flex.justify-content-between.align-items-start.mb-2
+            .stat-icon.bg-success-subtle.text-success
+              i.fas.fa-building
+            span.badge.bg-success-subtle.text-success.rounded-pill
+              i.fas.fa-arrow-up.me-1
+              | 8%
+          h3.fw-bold.mb-1 #{totalClients || 0}
+          p.text-muted.small.mb-0 Clientes registrados
+
+    .col-6.col-lg-3
+      .card.stat-card.border-0.shadow-sm.h-100
+        .card-body.p-3
+          .d-flex.justify-content-between.align-items-start.mb-2
+            .stat-icon.bg-warning-subtle.text-warning
+              i.fas.fa-box
+            span.badge.bg-danger-subtle.text-danger.rounded-pill
+              i.fas.fa-arrow-down.me-1
+              | 3%
+          h3.fw-bold.mb-1 #{totalProducts || 0}
+          p.text-muted.small.mb-0 Productos en stock
+
+    .col-6.col-lg-3
+      .card.stat-card.border-0.shadow-sm.h-100(
+        class=(pendingOrdersCount > 0 ? 'border-warning' : '')
+      )
+        .card-body.p-3
+          .d-flex.justify-content-between.align-items-start.mb-2
+            .stat-icon.bg-warning-subtle.text-warning
+              i.fas.fa-shopping-bag
+            if pendingOrdersCount > 0
+              span.badge.bg-danger-subtle.text-danger.rounded-pill
+                i.fas.fa-exclamation-circle.me-1
+                | Nuevos
+            else
+              span.badge.bg-success-subtle.text-success.rounded-pill
+                i.fas.fa-check.me-1
+                | Al día
+          h3.fw-bold.mb-1 #{pendingOrdersCount || 0}
+          p.text-muted.small.mb-0 Pedidos pendientes
+
+  //- ============================================
+  //- CARRUSEL DE MARCAS
+  //- ============================================
+  if brands && brands.length
+    .row.mb-4
+      .col-12
+        .card.border-0.shadow-sm.rounded-3.overflow-hidden.brands-carousel-card
+          .card-header.bg-white.border-bottom.py-3.d-flex.justify-content-between.align-items-center
+            h6.mb-0.fw-bold
+              i.fas.fa-trademark.me-2.text-primary
+              | Nuestras Marcas
+              span.badge.bg-primary-subtle.text-primary.ms-2 #{brands.length}
+            a.btn.btn-sm.btn-link.text-decoration-none.fw-semibold(href="/brands")
+              | Ver todas
+              i.fas.fa-arrow-right.ms-1
+
+          .card-body.p-0
+            .brands-marquee
+              .brands-marquee-inner
+
+                //- Primera vuelta
+                each brand in brands
+                  a.brand-chip(
+                    href=`/brands/${brand._id}`
+                    title=brand.name
+                  )
+                    .brand-chip-logo
+                      if brand.logo && !brand.logo.includes('default')
+                        img(
+                          src=brand.logo
+                          alt=brand.name
+                          loading="lazy"
+                          onerror="this.style.display='none'; this.parentElement.classList.add('no-logo');"
+                        )
+                      else
+                        i.fas.fa-trademark
+
+                    .brand-chip-info
+                      span.brand-chip-name= brand.name
+
+                //- Segunda vuelta (loop infinito)
+                each brand in brands
+                  a.brand-chip(
+                    href=`/brands/${brand._id}`
+                    title=brand.name
+                  )
+                    .brand-chip-logo
+                      if brand.logo && !brand.logo.includes('default')
+                        img(
+                          src=brand.logo
+                          alt=brand.name
+                          loading="lazy"
+                          onerror="this.style.display='none'; this.parentElement.classList.add('no-logo');"
+                        )
+                      else
+                        i.fas.fa-trademark
+
+                    .brand-chip-info
+                      span.brand-chip-name= brand.name
+  else
+    .row.mb-4
+      .col-12
+        .alert.alert-info.rounded-3.text-center.border-0.shadow-sm
+          i.fas.fa-info-circle.me-2
+          | No hay marcas activas. 
+          a.alert-link(href="/brands/create") Crea la primera aquí
+
+  //- ============================================
+  //- PEDIDOS RECIENTES + VENTAS DEL DÍA
+  //- ============================================
+  .row.g-3.mb-4
+
+    .col-lg-7
+      .card.border-0.shadow-sm.rounded-3.h-100
+        .card-header.bg-transparent.border-0.py-3.d-flex.justify-content-between.align-items-center
+          h6.mb-0.fw-bold
+            i.fas.fa-clock-rotate-left.me-2.text-primary
+            | Pedidos recientes
+          a.btn.btn-sm.btn-link.text-decoration-none.fw-semibold(href="/orders")
+            | Ver todos
+            i.fas.fa-arrow-right.ms-1
+
+        .card-body.pt-0
+          if pendingOrders && pendingOrders.length
+            .table-responsive
+              table.table.table-sm.table-hover.align-middle.mb-0
+                tbody
+                  each order in pendingOrders.slice(0, 5)
+                    tr
+                      td
+                        a.fw-bold.text-primary.text-decoration-none(
+                          href=`/orders/${order._id}`
+                        )= order.orderNumber
+                      td
+                        div.small.fw-semibold= order.customer.name
+                        small.text-muted= order.customer.phone
+                      td.text-end
+                        span.fw-bold.text-primary S/. #{order.total.toFixed(2)}
+                      td.text-end
+                        span.badge.bg-warning-subtle.text-warning.rounded-pill
+                          i.fas.fa-clock.me-1
+                          | Pendiente
+          else
+            .text-center.py-4.text-muted
+              i.fas.fa-check-circle.fa-3x.mb-3.opacity-25.d-block.text-success
+              p.mb-0 No hay pedidos pendientes
+
+    .col-lg-5
+      .card.border-0.shadow-sm.rounded-3.h-100
+        .card-header.bg-transparent.border-0.py-3
+          h6.mb-0.fw-bold
+            i.fas.fa-chart-line.me-2.text-success
+            | Ventas de hoy
+
+        .card-body.pt-0
+          .text-center.py-3
+            .display-6.fw-bold.text-success.mb-2
+              | S/. #{todaySalesTotal.toFixed(2)}
+            p.text-muted.mb-3
+              = todaySalesCount
+              |  pedido#{todaySalesCount !== 1 ? 's' : ''} registrado#{todaySalesCount !== 1 ? 's' : ''}
+          .d-grid
+            a.btn.btn-outline-success.rounded-pill(
+              href="/orders?from=" + new Date().toISOString().split('T')[0]
+            )
+              i.fas.fa-list.me-1
+              | Ver pedidos de hoy
+
+  //- ============================================
+  //- BUSCADOR DE MÓDULOS
+  //- ============================================
+  .row.mb-4
+    .col-12
+      .card.border-0.shadow-sm.rounded-3
+        .card-body.p-3
+          .input-group
+            span.input-group-text.bg-transparent.border-end-0
+              i.fas.fa-search.text-muted
+            input.form-control.border-start-0#moduleSearch(
+              type="text"
+              placeholder="Buscar módulo... (ej: ventas, clientes, reportes)"
+            )
+            kbd.d-none.d-md-inline.align-self-center.me-2 Ctrl + K
+
+  //- ============================================
+  //- MÓDULOS DEL SISTEMA
+  //- ============================================
+  .row.mb-3
+    .col-12
+      h5.fw-bold.mb-0
+        i.fas.fa-th-large.me-2.text-primary
+        | Módulos del Sistema
+
+  mixin moduleCard(href, icon, label, color, category)
+    .col-6.col-md-4.col-lg-3.module-item(data-category=category)
+      a.module-card.card.text-decoration-none.border-0.shadow-sm.h-100(href=href, class=`module-${color}`)
+        .card-body.p-3.d-flex.align-items-center.gap-3
+          .module-icon
+            i(class=icon)
+          .flex-grow-1.min-w-0
+            .module-label.fw-semibold.text-truncate= label
+            small.text-muted.module-sub= category
+          i.fas.fa-chevron-right.module-arrow
+
+  //- SEGURIDAD
+  .row.mb-2
+    .col-12
+      .d-flex.align-items-center.mb-2
+        span.badge.bg-primary-subtle.text-primary.me-2
+          i.fas.fa-shield-alt.me-1
+          | Seguridad
+        .flex-grow-1.border-bottom
+  .row.g-3.mb-4
+    +moduleCard('/users', 'fas.fa-users', 'Usuarios', 'indigo', 'seguridad')
+    +moduleCard('/clients', 'fas.fa-building', 'Clientes', 'success', 'seguridad')
+    +moduleCard('/suppliers', 'fas.fa-handshake', 'Proveedores', 'teal', 'seguridad')
+
+  //- INVENTARIO
+  .row.mb-2
+    .col-12
+      .d-flex.align-items-center.mb-2
+        span.badge.bg-warning-subtle.text-warning.me-2
+          i.fas.fa-boxes-stacked.me-1
+          | Inventario
+        .flex-grow-1.border-bottom
+  .row.g-3.mb-4
+    +moduleCard('/products', 'fas.fa-box', 'Productos', 'danger', 'inventario')
+    +moduleCard('/categories', 'fas.fa-tags', 'Categorías', 'purple', 'inventario')
+    +moduleCard('/brands', 'fas.fa-trademark', 'Marcas', 'slate', 'inventario')
+    +moduleCard('/warehouses', 'fas.fa-warehouse', 'Almacenes', 'amber', 'inventario')
+
+  //- VENTAS
+  .row.mb-2
+    .col-12
+      .d-flex.align-items-center.mb-2
+        span.badge.bg-success-subtle.text-success.me-2
+          i.fas.fa-shopping-cart.me-1
+          | Ventas
+        .flex-grow-1.border-bottom
+  .row.g-3.mb-4
+    +moduleCard('/quotations', 'fas.fa-file-invoice', 'Cotizaciones', 'blue', 'ventas')
+    +moduleCard('/orders', 'fas.fa-clipboard-list', 'Pedidos', 'orange', 'ventas')
+    +moduleCard('/sales', 'fas.fa-cart-plus', 'Ventas', 'emerald', 'ventas')
+    +moduleCard('/vouchers', 'fas.fa-file-pdf', 'Comprobantes', 'rose', 'ventas')
+
+  //- SERVICIOS
+  .row.mb-2
+    .col-12
+      .d-flex.align-items-center.mb-2
+        span.badge.bg-info-subtle.text-info.me-2
+          i.fas.fa-tools.me-1
+          | Servicios
+        .flex-grow-1.border-bottom
+  .row.g-3.mb-4
+    +moduleCard('/installations', 'fas.fa-wrench', 'Instalaciones', 'cyan', 'servicios')
+    +moduleCard('/maintenances', 'fas.fa-sync-alt', 'Mantenimientos', 'amber', 'servicios')
+    +moduleCard('/visits', 'fas.fa-clipboard-check', 'Visitas', 'teal', 'servicios')
+    +moduleCard('/work-orders', 'fas.fa-tasks', 'Órdenes Trabajo', 'red', 'servicios')
+    +moduleCard('/projects', 'fas.fa-project-diagram', 'Proyectos', 'violet', 'servicios')
+
+  //- ANALÍTICA
+  .row.mb-2
+    .col-12
+      .d-flex.align-items-center.mb-2
+        span.badge.bg-secondary-subtle.text-secondary.me-2
+          i.fas.fa-chart-line.me-1
+          | Analítica
+        .flex-grow-1.border-bottom
+  .row.g-3.mb-4
+    +moduleCard('/reports/sales', 'fas.fa-chart-simple', 'Reportes', 'indigo', 'reportes')
+
+  //- SISTEMA
+  .row.mb-2
+    .col-12
+      .d-flex.align-items-center.mb-2
+        span.badge.bg-dark-subtle.text-dark.me-2
+          i.fas.fa-cog.me-1
+          | Sistema
+        .flex-grow-1.border-bottom
+  .row.g-3.mb-4
+    +moduleCard('/settings', 'fas.fa-cog', 'Configuración', 'slate', 'sistema')
+    +moduleCard('/about/admin', 'fas.fa-building', 'Nosotros', 'slate', 'sistema')
+
+  //- CTA LANDING
+  .row.mt-4.mb-4
+    .col-12
+      .card.border-0.shadow-sm.rounded-4.overflow-hidden
+        .card-body.p-4.cta-landing
+          .d-flex.flex-wrap.justify-content-between.align-items-center.gap-3
+            div
+              h5.fw-bold.mb-1
+                i.fas.fa-store.me-2.text-primary
+                | Tienda en línea
+              p.text-muted.mb-0.small Muestra tu catálogo de productos a tus clientes
+            a.btn.btn-primary.rounded-pill.px-4(href="/landing" target="_blank")
+              | Visitar Landing
+              i.fas.fa-arrow-up-right-from-square.ms-2
+
+  //- ============================================
+  //- ESTILOS
+  //- ============================================
+  style.
+    /* NOTIFICACIONES */
+    .notification-dropdown .dropdown-menu { padding: 0; }
+    .notification-dropdown .dropdown-item:last-child { border-bottom: none; }
+    .notification-dropdown .dropdown-item:hover { background: #f8fafc; }
+
+    .animate-ring {
+      animation: ring 2s ease-in-out infinite;
+      transform-origin: top center;
+    }
+    @keyframes ring {
+      0%, 100% { transform: rotate(0); }
+      10%, 30%, 50%, 70%, 90% { transform: rotate(-10deg); }
+      20%, 40%, 60%, 80% { transform: rotate(10deg); }
+    }
+
+    .stat-card.border-warning {
+      border: 2px solid #f59e0b !important;
+      animation: pulse-warning 2s ease-in-out infinite;
+    }
+    @keyframes pulse-warning {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+      50% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+    }
+
+    .notification-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+      padding: 16px;
+      z-index: 9999;
+      max-width: 360px;
+      border-left: 4px solid #f59e0b;
+      animation: slideInRight 0.35s ease;
+    }
+    @keyframes slideInRight {
+      from { transform: translateX(120%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* ============================================
+       CARRUSEL DE MARCAS
+       ============================================ */
+    .brands-carousel-card {
+      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    }
+
+    .brands-marquee {
+      position: relative;
+      overflow: hidden;
+      padding: 20px 0;
+      background: white;
+      width: 100%;
+    }
+
+    .brands-marquee::before,
+    .brands-marquee::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 60px;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .brands-marquee::before {
+      left: 0;
+      background: linear-gradient(to right, white 0%, rgba(255,255,255,0) 100%);
+    }
+    .brands-marquee::after {
+      right: 0;
+      background: linear-gradient(to left, white 0%, rgba(255,255,255,0) 100%);
+    }
+
+    .brands-marquee-inner {
+      display: flex;
+      gap: 14px;
+      width: max-content;
+      animation: brands-scroll 30s linear infinite;
+      will-change: transform;
+      padding: 0 20px;
+    }
+
+    .brands-marquee:hover .brands-marquee-inner {
+      animation-play-state: paused;
+    }
+
+    @keyframes brands-scroll {
+      0% {
+        transform: translate3d(0, 0, 0);
+      }
+      100% {
+        transform: translate3d(-50%, 0, 0);
+      }
+    }
+
+    /* CHIP DE MARCA */
+    .brand-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 18px 10px 10px;
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 999px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+      min-width: 130px;
+      max-width: 200px;
+    }
+
+    .brand-chip:hover {
+      border-color: #0d6efd;
+      background: #f0f7ff;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(13, 110, 253, 0.15);
+    }
+
+    .brand-chip-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+      color: #64748b;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .brand-chip:hover .brand-chip-logo {
+      background: #dbeafe;
+      color: #0d6efd;
+    }
+
+    .brand-chip-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 4px;
+    }
+
+    .brand-chip-logo.no-logo::before {
+      content: '\f1f8';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+    }
+
+    .brand-chip-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .brand-chip-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1e293b;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: color 0.3s ease;
+    }
+
+    .brand-chip:hover .brand-chip-name {
+      color: #0d6efd;
+    }
+
+    /* Móvil */
+    @media (max-width: 768px) {
+      .brand-chip {
+        padding: 8px 14px 8px 8px;
+        min-width: 110px;
+        gap: 8px;
+      }
+      .brand-chip-logo {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+      }
+      .brand-chip-name {
+        font-size: 12px;
+      }
+      .brands-marquee-inner {
+        animation-duration: 20s;
+      }
+      .brands-marquee::before,
+      .brands-marquee::after {
+        width: 30px;
+      }
+    }
+
+  //- ============================================
+  //- SCRIPT
+  //- ============================================
+  script.
+    document.addEventListener('DOMContentLoaded', function() {
+      // BUSCADOR
+      const searchInput = document.getElementById('moduleSearch');
+      const items = document.querySelectorAll('.module-item');
+      const sectionRows = document.querySelectorAll('.row.mb-2');
+
+      if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+          const term = e.target.value.toLowerCase().trim();
+          items.forEach(item => {
+            const label = item.querySelector('.module-label').textContent.toLowerCase();
+            const category = (item.dataset.category || '').toLowerCase();
+            const match = label.includes(term) || category.includes(term);
+            item.style.display = (match || !term) ? '' : 'none';
+          });
+          sectionRows.forEach(row => {
+            if (!term) { row.style.display = ''; return; }
+            const nextRow = row.nextElementSibling;
+            if (nextRow && nextRow.classList.contains('row')) {
+              const visible = nextRow.querySelectorAll('.module-item:not([style*="display: none"])').length;
+              row.style.display = visible > 0 ? '' : 'none';
+              nextRow.style.display = visible > 0 ? '' : 'none';
+            }
+          });
+        });
+
+        document.addEventListener('keydown', function(e) {
+          if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            searchInput.focus();
+          }
+        });
+      }
+
+      // NOTIFICACIONES
+      const notificationBadge = document.getElementById('notificationBadge');
+      const notificationList = document.getElementById('notificationList');
+      const notifSubtitle = document.getElementById('notifSubtitle');
+      let lastPendingCount = #{pendingOrdersCount || 0};
+
+      function renderNotifications(data) {
+        if (!notificationList) return;
+
+        if (notificationBadge) {
+          notificationBadge.textContent = data.pendingOrdersCount || 0;
+          if (data.pendingOrdersCount > 0) {
+            notificationBadge.classList.remove('d-none');
+          } else {
+            notificationBadge.classList.add('d-none');
+          }
+        }
+
+        if (notifSubtitle) {
+          notifSubtitle.textContent = (data.pendingOrdersCount || 0) + ' pedidos pendientes';
+        }
+
+        if (data.pendingOrders && data.pendingOrders.length > 0) {
+          notificationList.innerHTML = data.pendingOrders.map(order => `
+            <a class="dropdown-item d-flex align-items-start gap-3 py-3 border-bottom text-wrap" href="/orders/${order._id}" style="white-space: normal;">
+              <div class="rounded-circle bg-warning-subtle text-warning d-flex align-items-center justify-content-center flex-shrink-0" style="width: 42px; height: 42px;">
+                <i class="fas fa-shopping-bag"></i>
+              </div>
+              <div class="flex-grow-1 min-w-0">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="fw-bold text-primary">${order.orderNumber}</span>
+                  <small class="text-muted">${new Date(order.createdAt).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</small>
+                </div>
+                <div class="small fw-semibold text-truncate">${order.customerName}</div>
+                <div class="small text-muted">${order.customerPhone} · S/. ${order.total.toFixed(2)}</div>
+                <div class="small text-muted">
+                  <i class="fas fa-box me-1"></i>${order.itemsCount} producto${order.itemsCount !== 1 ? 's' : ''}
+                </div>
+              </div>
+            </a>
+          `).join('') + `
+            <li class="px-3 py-2 text-center border-top">
+              <a class="btn btn-sm btn-link text-decoration-none fw-semibold" href="/orders?status=pendiente">
+                Ver todos los pedidos pendientes <i class="fas fa-arrow-right ms-1"></i>
+              </a>
+            </li>
+          `;
+        } else {
+          notificationList.innerHTML = `
+            <li class="text-center py-5 text-muted">
+              <i class="fas fa-bell-slash fa-3x mb-3 opacity-25 d-block"></i>
+              <p class="mb-0">No hay pedidos pendientes</p>
+            </li>
+          `;
+        }
+      }
+
+      function checkNotifications() {
+        fetch('/api/notifications')
+          .then(r => r.json())
+          .then(data => {
+            if (!data.success) return;
+            const newPendingCount = data.pendingOrdersCount || 0;
+            if (newPendingCount > lastPendingCount) {
+              showNotificationToast(data.pendingOrders[0]);
+              playNotificationSound();
+            }
+            lastPendingCount = newPendingCount;
+            renderNotifications(data);
+          })
+          .catch(err => console.error('Error:', err));
+      }
+
+      setInterval(checkNotifications, 30000);
+
+      function showNotificationToast(order) {
+        if (!order) return;
+        const toast = document.createElement('div');
+        toast.className = 'notification-toast';
+        toast.innerHTML = `
+          <div class="d-flex align-items-start gap-3">
+            <div class="rounded-circle bg-warning text-white d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px; font-size: 1.3rem;">
+              <i class="fas fa-bell animate-ring"></i>
+            </div>
+            <div class="flex-grow-1">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <strong class="text-dark">¡Nuevo pedido!</strong>
+                <button type="button" class="btn-close btn-sm" onclick="this.closest('.notification-toast').remove()"></button>
+              </div>
+              <div class="small fw-semibold text-primary">${order.orderNumber}</div>
+              <div class="small text-muted">${order.customerName}</div>
+              <div class="small text-muted mb-2">S/. ${order.total.toFixed(2)}</div>
+              <a href="/orders/${order._id}" class="btn btn-sm btn-warning rounded-pill fw-semibold">
+                Ver pedido
+              </a>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+          if (toast.parentNode) {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(120%)';
+            setTimeout(() => toast.remove(), 300);
+          }
+        }, 10000);
+      }
+
+      function playNotificationSound() {
+        try {
+          const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          const oscillator = audioCtx.createOscillator();
+          const gainNode = audioCtx.createGain();
+          oscillator.connect(gainNode);
+          gainNode.connect(audioCtx.destination);
+          oscillator.frequency.value = 800;
+          oscillator.type = 'sine';
+          gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+          oscillator.start(audioCtx.currentTime);
+          oscillator.stop(audioCtx.currentTime + 0.5);
+        } catch (e) {
+          console.log('No se pudo reproducir sonido:', e);
+        }
+      }
+
+      const markAllReadBtn = document.getElementById('markAllRead');
+      if (markAllReadBtn) {
+        markAllReadBtn.addEventListener('click', function() {
+          if (notificationBadge) notificationBadge.classList.add('d-none');
+          this.innerHTML = '<i class="fas fa-check-double text-success"></i>';
+        });
+      }
+    });

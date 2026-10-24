@@ -1,0 +1,824 @@
+doctype html
+html(lang="es")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    title= title + ' - ' + (setting && setting.siteName ? setting.siteName : 'JP Security')
+
+    link(rel="stylesheet" href="/bootstrap/css/bootstrap.min.css")
+    link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css")
+
+    - const brandPrimary = (setting && setting.colors && setting.colors.primary) ? setting.colors.primary : '#0d6efd'
+    - const brandSecondary = (setting && setting.colors && setting.colors.secondary) ? setting.colors.secondary : '#0a58ca'
+    - const brandAccent = (setting && setting.colors && setting.colors.accent) ? setting.colors.accent : '#ffc107'
+
+    style.
+      /* ================================================
+         VARIABLES
+         ================================================ */
+      :root {
+        --brand: #{brandPrimary};
+        --brand-dark: #{brandSecondary};
+        --accent: #{brandAccent};
+        --dark: #0f172a;
+        --gray-50: #f8fafc;
+        --gray-100: #f1f5f9;
+        --gray-200: #e5e7eb;
+        --gray-400: #94a3b8;
+        --gray-600: #64748b;
+      }
+
+      /* ================================================
+         BASE
+         ================================================ */
+      * { box-sizing: border-box; }
+
+      body {
+        font-family: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+        color: #1f2937;
+        background: white;
+        padding: 0;
+        margin: 0;
+        line-height: 1.5;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .catalog-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 32px;
+      }
+
+      /* ================================================
+         PORTADA / COVER
+         ================================================ */
+      .catalog-cover {
+        position: relative;
+        background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 60%, #084298 100%);
+        color: white;
+        padding: 48px 40px;
+        border-radius: 16px;
+        margin-bottom: 40px;
+        overflow: hidden;
+        page-break-after: avoid;
+      }
+      .catalog-cover::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 400px;
+        height: 400px;
+        background: rgba(255,255,255,0.08);
+        border-radius: 50%;
+      }
+      .catalog-cover::after {
+        content: '';
+        position: absolute;
+        bottom: -60%;
+        right: 15%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 50%;
+      }
+      .catalog-cover-inner {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 32px;
+        flex-wrap: wrap;
+      }
+      .catalog-cover-left {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex: 1;
+        min-width: 280px;
+      }
+      .catalog-cover-logo {
+        width: 80px;
+        height: 80px;
+        border-radius: 20px;
+        background: rgba(255,255,255,0.15);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255,255,255,0.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        flex-shrink: 0;
+      }
+      .catalog-cover-logo img {
+        max-width: 60%;
+        max-height: 60%;
+        object-fit: contain;
+      }
+      .catalog-cover-info h1 {
+        font-size: 2rem;
+        font-weight: 800;
+        margin: 0 0 6px;
+        letter-spacing: -0.5px;
+      }
+      .catalog-cover-info p {
+        margin: 0;
+        font-size: 0.95rem;
+        opacity: 0.85;
+        font-weight: 500;
+      }
+      .catalog-cover-right {
+        text-align: right;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        font-size: 0.85rem;
+      }
+      .catalog-cover-right .info-item {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+      .catalog-cover-right .info-item i {
+        opacity: 0.7;
+        width: 16px;
+      }
+      .catalog-cover-right strong {
+        font-weight: 700;
+        opacity: 0.7;
+        margin-right: 4px;
+      }
+      .catalog-cover-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255,255,255,0.2);
+        backdrop-filter: blur(10px);
+        padding: 8px 18px;
+        border-radius: 50rem;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 4px;
+        border: 1px solid rgba(255,255,255,0.3);
+      }
+
+      /* ================================================
+         TÍTULO DEL CATÁLOGO
+         ================================================ */
+      .catalog-title-section {
+        text-align: center;
+        margin-bottom: 48px;
+        page-break-after: avoid;
+      }
+      .catalog-title-section h2 {
+        font-size: 1.75rem;
+        font-weight: 800;
+        margin: 0 0 8px;
+        letter-spacing: -0.3px;
+        color: var(--dark);
+      }
+      .catalog-title-section .divider {
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--brand), var(--brand-dark));
+        border-radius: 4px;
+        margin: 0 auto 16px;
+      }
+      .catalog-title-section p {
+        font-size: 0.9rem;
+        color: var(--gray-600);
+        margin: 0;
+      }
+      .catalog-title-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--gray-100);
+        color: var(--brand);
+        padding: 8px 20px;
+        border-radius: 50rem;
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin-top: 12px;
+        border: 1px solid var(--gray-200);
+      }
+
+      /* ================================================
+         SECCIONES
+         ================================================ */
+      .catalog-section {
+        margin-bottom: 48px;
+        page-break-inside: avoid;
+      }
+
+      .section-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px 20px;
+        background: linear-gradient(90deg, var(--gray-50) 0%, white 100%);
+        border-left: 5px solid var(--brand);
+        border-radius: 10px;
+        margin-bottom: 24px;
+        page-break-after: avoid;
+      }
+      .section-header-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        background: var(--brand);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+      }
+      .section-header-text {
+        flex: 1;
+        min-width: 0;
+      }
+      .section-header-text h3 {
+        font-size: 1.2rem;
+        font-weight: 800;
+        margin: 0;
+        color: var(--dark);
+        letter-spacing: -0.3px;
+      }
+      .section-header-text small {
+        color: var(--gray-600);
+        font-size: 0.8rem;
+      }
+      .section-header-badge {
+        background: white;
+        color: var(--brand);
+        border: 1.5px solid var(--brand);
+        font-weight: 700;
+        font-size: 0.75rem;
+        padding: 6px 14px;
+        border-radius: 50rem;
+        white-space: nowrap;
+      }
+
+      /* ================================================
+         SUB-SECCIONES
+         ================================================ */
+      .subsection {
+        margin-bottom: 32px;
+      }
+      .subsection-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 16px;
+        padding-bottom: 10px;
+        border-bottom: 1.5px dashed var(--gray-200);
+        page-break-after: avoid;
+      }
+      .subsection-header i {
+        color: var(--brand);
+        font-size: 0.85rem;
+      }
+      .subsection-header span {
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--gray-600);
+      }
+      .subsection-header .count {
+        margin-left: auto;
+        background: var(--gray-100);
+        color: var(--gray-600);
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 50rem;
+      }
+
+      /* ================================================
+         GRID DE PRODUCTOS
+         ================================================ */
+      .products-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+      }
+
+      .product-card {
+        border: 1px solid var(--gray-200);
+        border-radius: 12px;
+        overflow: hidden;
+        background: white;
+        page-break-inside: avoid;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.25s ease;
+        position: relative;
+      }
+      .product-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--brand), var(--brand-dark));
+        opacity: 0;
+        transition: opacity 0.25s ease;
+      }
+      .product-card:hover::before { opacity: 1; }
+
+      .product-image {
+        height: 160px;
+        background: linear-gradient(135deg, var(--gray-50), var(--gray-100));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px;
+        overflow: hidden;
+        position: relative;
+      }
+      .product-image img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        transition: transform 0.4s ease;
+      }
+      .product-card:hover .product-image img {
+        transform: scale(1.08);
+      }
+      .product-image .placeholder {
+        font-size: 2.5rem;
+        color: #cbd5e1;
+      }
+      .product-discount {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        font-size: 0.7rem;
+        font-weight: 800;
+        padding: 4px 10px;
+        border-radius: 50rem;
+        box-shadow: 0 2px 8px rgba(239,68,68,0.4);
+        letter-spacing: 0.3px;
+      }
+
+      .product-body {
+        padding: 12px 14px 14px;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+      }
+      .product-brand {
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: var(--brand);
+        margin-bottom: 6px;
+      }
+      .product-name {
+        font-size: 0.85rem;
+        font-weight: 700;
+        line-height: 1.35;
+        margin: 0 0 6px;
+        color: var(--dark);
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        min-height: 2.3rem;
+      }
+      .product-model {
+        font-size: 0.7rem;
+        color: var(--gray-600);
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .product-model i {
+        font-size: 0.65rem;
+        opacity: 0.7;
+      }
+      .product-category {
+        display: inline-block;
+        font-size: 0.6rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--gray-600);
+        background: var(--gray-100);
+        padding: 2px 8px;
+        border-radius: 50rem;
+        margin-bottom: 8px;
+        width: fit-content;
+      }
+      .product-price {
+        margin-top: auto;
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        flex-wrap: wrap;
+        padding-top: 8px;
+        border-top: 1px solid var(--gray-100);
+      }
+      .price-current {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: var(--brand);
+        letter-spacing: -0.3px;
+      }
+      .price-old {
+        font-size: 0.75rem;
+        color: var(--gray-400);
+        text-decoration: line-through;
+      }
+
+      /* ================================================
+         EMPTY STATE
+         ================================================ */
+      .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        color: var(--gray-400);
+      }
+      .empty-state i {
+        font-size: 5rem;
+        margin-bottom: 20px;
+        opacity: 0.3;
+        display: block;
+      }
+      .empty-state h4 {
+        font-size: 1.25rem;
+        color: var(--gray-600);
+        font-weight: 700;
+      }
+
+      /* ================================================
+         FOOTER
+         ================================================ */
+      .catalog-footer {
+        margin-top: 60px;
+        padding: 32px 0 20px;
+        border-top: 3px solid var(--brand);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+        page-break-inside: avoid;
+      }
+      .catalog-footer-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .catalog-footer-logo {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+      }
+      .catalog-footer-brand-info strong {
+        display: block;
+        font-size: 1rem;
+        color: var(--dark);
+        font-weight: 800;
+      }
+      .catalog-footer-brand-info small {
+        color: var(--gray-600);
+        font-size: 0.8rem;
+      }
+      .catalog-footer-contact {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 0.82rem;
+        color: var(--gray-600);
+      }
+      .catalog-footer-contact .contact-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .catalog-footer-contact i {
+        color: var(--brand);
+        width: 16px;
+        text-align: center;
+      }
+      .catalog-footer-copy {
+        text-align: right;
+        font-size: 0.75rem;
+        color: var(--gray-400);
+      }
+      .catalog-footer-copy strong {
+        color: var(--gray-600);
+        font-weight: 700;
+      }
+
+      /* ================================================
+         BARRA DE ACCIONES (no se imprime)
+         ================================================ */
+      .action-bar {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        display: flex;
+        gap: 8px;
+        background: white;
+        padding: 8px;
+        border-radius: 50rem;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+        z-index: 1000;
+        border: 1px solid var(--gray-200);
+      }
+      .action-bar .btn {
+        border-radius: 50rem;
+        font-weight: 600;
+        padding: 8px 18px;
+      }
+
+      /* ================================================
+         IMPRESIÓN
+         ================================================ */
+      @media print {
+        body { padding: 0; }
+
+        .catalog-container {
+          padding: 0;
+          max-width: 100%;
+        }
+
+        .action-bar { display: none !important; }
+
+        .catalog-cover {
+          border-radius: 0;
+          margin-bottom: 24px;
+          page-break-after: avoid;
+        }
+
+        .catalog-title-section {
+          page-break-after: avoid;
+        }
+
+        .catalog-section {
+          page-break-inside: avoid;
+        }
+
+        .product-card {
+          page-break-inside: avoid;
+          box-shadow: none !important;
+        }
+
+        .section-header {
+          page-break-after: avoid;
+        }
+
+        .subsection-header {
+          page-break-after: avoid;
+        }
+
+        .catalog-footer {
+          page-break-before: avoid;
+        }
+
+        @page {
+          size: A4;
+          margin: 12mm 10mm;
+        }
+      }
+
+      /* ================================================
+         RESPONSIVE
+         ================================================ */
+      @media (max-width: 992px) {
+        .products-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+      @media (max-width: 768px) {
+        .catalog-container { padding: 20px 16px; }
+        .catalog-cover { padding: 32px 24px; }
+        .catalog-cover-info h1 { font-size: 1.5rem; }
+        .catalog-cover-left { gap: 14px; }
+        .catalog-cover-logo { width: 60px; height: 60px; font-size: 1.5rem; }
+        .catalog-cover-right { text-align: left; }
+        .catalog-cover-right .info-item { justify-content: flex-start; }
+        .products-grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 12px;
+        }
+        .product-image { height: 130px; }
+      }
+      @media (max-width: 480px) {
+        .products-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+  body
+
+    //- ============================================
+    //- BARRA DE ACCIONES
+    //- ============================================
+    .action-bar
+      button.btn.btn-primary(type="button" onclick="window.print()")
+        i.fas.fa-print.me-1
+        | Guardar como PDF
+      button.btn.btn-outline-secondary(type="button" onclick="window.close()")
+        i.fas.fa-times
+
+    //- ============================================
+    //- CONTENEDOR PRINCIPAL
+    //- ============================================
+    .catalog-container
+
+      //- ============================================
+      //- PORTADA / COVER
+      //- ============================================
+      .catalog-cover
+        .catalog-cover-inner
+
+          .catalog-cover-left
+            .catalog-cover-logo
+              if setting && setting.logo
+                img(src=setting.logo alt=(setting.siteName || 'Logo'))
+              else if setting && setting.icon
+                i.fas(class=setting.icon)
+              else
+                i.fas.fa-shield-halved
+
+            .catalog-cover-info
+              h1= setting && setting.siteName ? setting.siteName : 'JP Security'
+              if setting && setting.siteTagline
+                p= setting.siteTagline
+              else
+                p Soluciones en Seguridad Electrónica
+
+          .catalog-cover-right
+            if setting && setting.company && setting.company.ruc
+              .info-item
+                strong RUC:
+                span= setting.company.ruc
+            if setting && setting.company && setting.company.phone
+              .info-item
+                i.fas.fa-phone
+                span= setting.company.phone
+            if setting && setting.company && setting.company.email
+              .info-item
+                i.fas.fa-envelope
+                span= setting.company.email
+            if setting && setting.company && setting.company.address
+              .info-item
+                i.fas.fa-map-marker-alt
+                span= setting.company.address
+
+            .catalog-cover-badge
+              i.fas.fa-book-open
+              | Catálogo
+
+      //- ============================================
+      //- TÍTULO DEL CATÁLOGO
+      //- ============================================
+      .catalog-title-section
+        h2 Catálogo de Productos
+        .divider
+        p Productos de seguridad electrónica de la más alta calidad
+
+        if categoryObj
+          .catalog-title-badge
+            i.fas.fa-folder-open
+            = categoryObj.name
+        else
+          .catalog-title-badge
+            i.fas.fa-boxes-stacked
+            | Todas las categorías · #{totalProducts} productos
+
+      //- ============================================
+      //- CONTENIDO
+      //- ============================================
+      if grouped && Object.keys(grouped).length
+
+        each catGroup, catId in grouped
+          - const catName = catGroup.category ? catGroup.category.name : 'Sin categoría'
+          - const catDescription = catGroup.category && catGroup.category.description ? catGroup.category.description : ''
+          - const totalCatProducts = Object.values(catGroup.subcategories).reduce((sum, sg) => sum + sg.products.length, 0)
+
+          .catalog-section
+
+            //- Header de categoría
+            .section-header
+              .section-header-icon
+                i.fas.fa-folder-open
+              .section-header-text
+                h3= catName
+                if catDescription
+                  small= catDescription
+                else
+                  small Productos disponibles
+              .section-header-badge
+                = totalCatProducts + ' productos'
+
+            //- Subcategorías
+            each subGroup, subId in catGroup.subcategories
+              - const subName = subGroup.subcategory ? subGroup.subcategory.name : 'Sin subcategoría'
+
+              if subGroup.products && subGroup.products.length
+
+                .subsection
+                  if subGroup.subcategory
+                    .subsection-header
+                      i.fas.fa-tag
+                      span= subName
+                      span.count= subGroup.products.length + ' productos'
+
+                  .products-grid
+                    each product in subGroup.products
+                      .product-card
+
+                        //- Imagen
+                        .product-image
+                          if product.image
+                            img(src=product.image alt=product.name)
+                          else
+                            i.fas.fa-image.placeholder
+
+                          if product.discount && product.discount > 0
+                            span.product-discount= '-' + product.discount + '%'
+
+                        //- Cuerpo
+                        .product-body
+
+                          if product.brand
+                            .product-brand= product.brand.name
+
+                          .product-name= product.name
+
+                          if product.model
+                            .product-model
+                              i.fas.fa-barcode
+                              = product.model
+
+                          if !categoryObj && product.category
+                            .product-category= product.category.name
+
+                          .product-price
+                            if product.discount && product.discount > 0
+                              span.price-current S/. #{product.finalPrice.toFixed(2)}
+                              span.price-old S/. #{product.customerPrice.toFixed(2)}
+                            else
+                              span.price-current S/. #{product.finalPrice.toFixed(2)}
+
+      else
+        .empty-state
+          i.fas.fa-box-open
+          h4 No hay productos para mostrar
+
+      //- ============================================
+      //- FOOTER
+      //- ============================================
+      .catalog-footer
+
+        .catalog-footer-brand
+          .catalog-footer-logo
+            if setting && setting.icon
+              i.fas(class=setting.icon)
+            else
+              i.fas.fa-shield-halved
+          .catalog-footer-brand-info
+            strong= setting && setting.company && setting.company.legalName ? setting.company.legalName : (setting && setting.siteName ? setting.siteName : 'JP Security')
+            small Catálogo generado el #{generatedAt.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+
+        .catalog-footer-contact
+          if setting && setting.company && setting.company.phone
+            .contact-item
+              i.fas.fa-phone
+              span= setting.company.phone
+          if setting && setting.company && setting.company.email
+            .contact-item
+              i.fas.fa-envelope
+              span= setting.company.email
+          if setting && setting.company && setting.company.address
+            .contact-item
+              i.fas.fa-map-marker-alt
+              span= setting.company.address
+
+        .catalog-footer-copy
+          strong= setting && setting.siteName ? setting.siteName : 'JP Security'
+          br
+          | © #{new Date().getFullYear()} — Todos los derechos reservados

@@ -1,0 +1,47 @@
+nav.navbar.navbar-expand-lg.navbar-dark.bg-dark.shadow-sm.fixed-top
+  .container
+    a.navbar-brand(href="/")
+      i.fas.fa-shield-alt.me-2
+      strong JP Security
+    button.navbar-toggler(type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain")
+      span.navbar-toggler-icon
+    .collapse.navbar-collapse#navbarMain
+      ul.navbar-nav.me-auto.mb-2.mb-lg-0
+        if categories && categories.length
+          li.nav-item.dropdown
+            a.nav-link.dropdown-toggle(href="#" role="button" data-bs-toggle="dropdown")
+              i.fas.fa-list.me-1
+              | Categorías
+            ul.dropdown-menu.dropdown-menu-end
+              each cat in categories
+                li
+                  a.dropdown-item(href=`/products?category=${cat._id}`)
+                    i.fas.fa-folder-open.me-2
+                    | #{cat.name}
+                if cat.subcategories && cat.subcategories.length
+                  each sub in cat.subcategories
+                    li
+                      a.dropdown-item.ps-4(href=`/products?category=${sub._id}`)
+                        i.fas.fa-tag.me-2
+                        | #{sub.name}
+                  li
+                    hr.dropdown-divider
+      ul.navbar-nav
+        if user
+          li.nav-item
+            a.nav-link(href="/")
+              i.fas.fa-tachometer-alt.me-1
+              | Dashboard
+          li.nav-item
+            a.nav-link(href="/logout")
+              i.fas.fa-sign-out-alt.me-1
+              | Cerrar Sesión
+        else
+          li.nav-item
+            a.nav-link(href="/login")
+              i.fas.fa-sign-in-alt.me-1
+              | Iniciar Sesión
+          li.nav-item
+            a.nav-link(href="/register")
+              i.fas.fa-user-plus.me-1
+              | Registrarse

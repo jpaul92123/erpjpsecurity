@@ -1,0 +1,69 @@
+extends ../layouts/layout
+
+block content
+  .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pb-2.mb-3.border-bottom
+    h1.h2
+      i.fas.fa-arrow-up.me-2
+      | Salidas de Inventario
+    button.btn.btn-danger(type="button", data-bs-toggle="modal", data-bs-target="#exitModal")
+      i.fas.fa-plus-circle.me-1
+      | Registrar Salida
+
+  .card.border-0.shadow-sm
+    .card-body
+      .table-responsive
+        table.table.table-hover.align-middle
+          thead
+            tr
+              th Producto
+              th Almacén
+              th Cantidad
+              th Usuario
+              th Fecha
+          tbody
+            each movement in movements
+              tr
+                td #{movement.product ? movement.product.name : '-'}
+                td #{movement.warehouse ? movement.warehouse.name : '-'}
+                td #{movement.quantity}
+                td #{movement.createdBy ? movement.createdBy.name : '-'}
+                td #{new Date(movement.createdAt).toLocaleString()}
+            else
+              tr
+                td(colspan="5").text-center.py-4
+                  p.text-muted No hay salidas registradas.
+
+//- Modal para registrar salida
+.modal.fade#exitModal(tabindex="-1")
+  .modal-dialog.modal-lg
+    .modal-content
+      form(method="POST", action="/stock/exits")
+        .modal-header
+          h5.modal-title Registrar Salida
+          button.btn-close(type="button", data-bs-dismiss="modal")
+        .modal-body
+          .row.g-3
+            .col-md-6
+              label.form-label Producto *
+              select.form-control(name="product", required)
+                option(value="") Seleccionar...
+                each product in products
+                  option(value=product._id) #{product.code} - #{product.name}
+            .col-md-6
+              label.form-label Almacén *
+              select.form-control(name="warehouse", required)
+                option(value="") Seleccionar...
+                each warehouse in warehouses
+                  option(value=warehouse._id) #{warehouse.name}
+            .col-md-4
+              label.form-label Cantidad *
+              input.form-control(type="number", name="quantity", min="1", required)
+            .col-md-4
+              label.form-label N° Documento
+              input.form-control(type="text", name="documentNumber")
+            .col-md-4
+              label.form-label Motivo
+              input.form-control(type="text", name="description")
+        .modal-footer
+          button.btn.btn-secondary(type="button", data-bs-dismiss="modal") Cancelar
+          button.btn.btn-danger(type="submit") Registrar Salida

@@ -1,0 +1,525 @@
+extends ../layouts/layout
+
+block content
+
+  //- ============================================
+  //- HEADER
+  //- ============================================
+  .d-flex.flex-wrap.justify-content-between.align-items-center.gap-3.mb-4
+    div
+      nav(aria-label="breadcrumb")
+        ol.breadcrumb.mb-1
+          li.breadcrumb-item
+            a.text-decoration-none(href="/") Dashboard
+          li.breadcrumb-item.active Nosotros
+      h1.h3.fw-bold.mb-1
+        i.fas.fa-building.me-2.text-primary
+        | Administrar "Nosotros"
+      p.text-muted.mb-0 Gestiona la información de la empresa, servicios y proyectos
+
+    div.d-flex.gap-2
+      a.btn.btn-outline-primary.rounded-pill.px-4(href="/about" target="_blank")
+        i.fas.fa-eye.me-1
+        | Ver página pública
+
+  //- ============================================
+  //- MENSAJES FLASH
+  //- ============================================
+  if success && success.length
+    .alert.alert-success.alert-dismissible.fade.show.rounded-3
+      i.fas.fa-check-circle.me-2
+      = success
+      button.btn-close(type="button" data-bs-dismiss="alert")
+
+  if error && error.length
+    .alert.alert-danger.alert-dismissible.fade.show.rounded-3
+      i.fas.fa-exclamation-circle.me-2
+      = error
+      button.btn-close(type="button" data-bs-dismiss="alert")
+
+  //- ============================================
+  //- TABS
+  //- ============================================
+  ul.nav.nav-pills.mb-4.gap-2.about-tabs
+    li.nav-item
+      button.nav-link.active(data-bs-toggle="pill" data-bs-target="#tab-empresa" type="button")
+        i.fas.fa-building.me-1
+        | Empresa
+    li.nav-item
+      button.nav-link(data-bs-toggle="pill" data-bs-target="#tab-valores" type="button")
+        i.fas.fa-star.me-1
+        | Valores
+    li.nav-item
+      button.nav-link(data-bs-toggle="pill" data-bs-target="#tab-servicios" type="button")
+        i.fas.fa-tools.me-1
+        | Servicios
+        span.badge.bg-primary.ms-1= about.services ? about.services.length : 0
+    li.nav-item
+      button.nav-link(data-bs-toggle="pill" data-bs-target="#tab-proyectos" type="button")
+        i.fas.fa-hard-hat.me-1
+        | Proyectos
+        span.badge.bg-primary.ms-1= about.projects ? about.projects.length : 0
+
+  .tab-content
+
+    //- ============================================
+    //- TAB: EMPRESA
+    //- ============================================
+    .tab-pane.fade.show.active#tab-empresa
+      form(method="POST" action="/about/company")
+        .card.border-0.shadow-sm.rounded-3.mb-3
+          .card-header.bg-white.border-bottom.py-3
+            h6.mb-0.fw-bold
+              i.fas.fa-image.me-2.text-primary
+              | Hero (Encabezado)
+          .card-body
+            .row.g-3
+              .col-md-6
+                label.form-label.fw-semibold Título
+                input.form-control(name="heroTitle" value=(about.companyInfo && about.companyInfo.hero ? about.companyInfo.hero.title : 'Nosotros'))
+              .col-md-6
+                label.form-label.fw-semibold Subtítulo
+                input.form-control(name="heroSubtitle" value=(about.companyInfo && about.companyInfo.hero ? about.companyInfo.hero.subtitle : ''))
+              .col-12
+                label.form-label.fw-semibold Imagen de fondo (URL)
+                input.form-control(name="heroBackground" value=(about.companyInfo && about.companyInfo.hero ? about.companyInfo.hero.background : '') placeholder="https://...")
+
+        .card.border-0.shadow-sm.rounded-3.mb-3
+          .card-header.bg-white.border-bottom.py-3
+            h6.mb-0.fw-bold
+              i.fas.fa-align-left.me-2.text-primary
+              | Descripción
+          .card-body
+            .mb-3
+              label.form-label.fw-semibold Descripción principal
+              textarea.form-control(name="description" rows="4" placeholder="Describe tu empresa...")= about.companyInfo ? about.companyInfo.description : ''
+            .mb-3
+              label.form-label.fw-semibold Historia
+              textarea.form-control(name="history" rows="4" placeholder="Historia de la empresa...")= about.companyInfo ? about.companyInfo.history : ''
+
+        .card.border-0.shadow-sm.rounded-3.mb-3
+          .card-header.bg-white.border-bottom.py-3
+            h6.mb-0.fw-bold
+              i.fas.fa-bullseye.me-2.text-primary
+              | Misión y Visión
+          .card-body
+            .row.g-3
+              .col-md-6
+                label.form-label.fw-semibold Misión
+                textarea.form-control(name="mission" rows="4")= about.companyInfo ? about.companyInfo.mission : ''
+              .col-md-6
+                label.form-label.fw-semibold Visión
+                textarea.form-control(name="vision" rows="4")= about.companyInfo ? about.companyInfo.vision : ''
+
+        .card.border-0.shadow-sm.rounded-3.mb-3
+          .card-header.bg-white.border-bottom.py-3
+            h6.mb-0.fw-bold
+              i.fas.fa-chart-line.me-2.text-primary
+              | Estadísticas
+          .card-body
+            .row.g-3
+              .col-md-4
+                label.form-label.fw-semibold Años de experiencia
+                input.form-control(
+                  type="number"
+                  name="yearsExperience"
+                  value=(about.companyInfo ? about.companyInfo.yearsExperience : 0)
+                  min="0"
+                )
+              .col-md-4
+                label.form-label.fw-semibold Clientes atendidos
+                input.form-control(
+                  type="number"
+                  name="clientsCount"
+                  value=(about.companyInfo ? about.companyInfo.clientsCount : 0)
+                  min="0"
+                )
+              .col-md-4
+                label.form-label.fw-semibold Proyectos completados
+                input.form-control(
+                  type="number"
+                  name="projectsCount"
+                  value=(about.companyInfo ? about.companyInfo.projectsCount : 0)
+                  min="0"
+                )
+
+        .text-end.mb-4
+          button.btn.btn-primary.rounded-pill.px-4(type="submit")
+            i.fas.fa-save.me-2
+            | Guardar Información
+
+    //- ============================================
+    //- TAB: VALORES
+    //- ============================================
+    .tab-pane.fade#tab-valores
+      form(method="POST" action="/about/values")
+        .card.border-0.shadow-sm.rounded-3.mb-3
+          .card-header.bg-white.border-bottom.py-3.d-flex.justify-content-between.align-items-center
+            h6.mb-0.fw-bold
+              i.fas.fa-star.me-2.text-primary
+              | Valores de la Empresa
+            button.btn.btn-sm.btn-outline-primary.rounded-pill#addValueBtn(type="button")
+              i.fas.fa-plus.me-1
+              | Agregar valor
+
+          .card-body#valuesContainer
+            - const values = (about.companyInfo && about.companyInfo.values) ? about.companyInfo.values : []
+            if values.length
+              each val, i in values
+                .value-row.card.border.mb-3.rounded-3
+                  .card-body
+                    .row.g-3
+                      .col-md-3
+                        label.form-label.small.fw-semibold Icono (FontAwesome)
+                        input.form-control(name="valueIcon" value=val.icon placeholder="fa-star")
+                      .col-md-4
+                        label.form-label.small.fw-semibold Título
+                        input.form-control(name="valueTitle" value=val.title placeholder="Ej: Compromiso")
+                      .col-md-4
+                        label.form-label.small.fw-semibold Descripción
+                        input.form-control(name="valueDescription" value=val.description)
+                      .col-md-1.d-flex.align-items-end
+                        button.btn.btn-sm.btn-outline-danger.rounded-circle.remove-value(type="button")
+                          i.fas.fa-trash
+            else
+              .text-center.text-muted.py-3 Sin valores configurados
+
+        .text-end
+          button.btn.btn-primary.rounded-pill.px-4(type="submit")
+            i.fas.fa-save.me-2
+            | Guardar Valores
+
+    //- ============================================
+    //- TAB: SERVICIOS
+    //- ============================================
+    .tab-pane.fade#tab-servicios
+      .card.border-0.shadow-sm.rounded-3.mb-3
+        .card-header.bg-white.border-bottom.py-3.d-flex.justify-content-between.align-items-center
+          h6.mb-0.fw-bold
+            i.fas.fa-tools.me-2.text-primary
+            | Servicios que ofrecemos
+          button.btn.btn-sm.btn-primary.rounded-pill(type="button" data-bs-toggle="modal" data-bs-target="#modalNewService")
+            i.fas.fa-plus.me-1
+            | Nuevo Servicio
+
+        .card-body
+          if about.services && about.services.length
+            .row.g-3
+              each service in about.services
+                .col-md-6
+                  .card.border.rounded-3.h-100
+                    if service.image
+                      img.card-img-top(src=service.image style="height: 150px; object-fit: cover; border-radius: 0.75rem 0.75rem 0 0;")
+                    .card-body
+                      .d-flex.justify-content-between.align-items-start.mb-2
+                        .d-flex.align-items-center.gap-2
+                          .rounded-circle.bg-primary-subtle.text-primary.d-flex.align-items-center.justify-content-center(
+                            style="width: 40px; height: 40px;"
+                          )
+                            i.fas(class=service.icon)
+                          h6.fw-bold.mb-0= service.title
+                        if !service.isActive
+                          span.badge.bg-secondary Inactivo
+                      p.small.text-muted.mb-2= service.description
+                      if service.features && service.features.length
+                        ul.small.text-muted.mb-0
+                          each feat in service.features
+                            li= feat
+                    .card-footer.bg-transparent.d-flex.gap-2
+                      button.btn.btn-sm.btn-outline-primary.rounded-pill(
+                        type="button"
+                        data-bs-toggle="modal"
+                        data-bs-target=`#modalEditService${service._id}`
+                      )
+                        i.fas.fa-edit
+                      form.d-inline(
+                        method="POST"
+                        action=`/about/services/${service._id}/delete`
+                        onsubmit="return confirm('¿Eliminar este servicio?')"
+                      )
+                        button.btn.btn-sm.btn-outline-danger.rounded-pill(type="submit")
+                          i.fas.fa-trash
+
+                    //- Modal editar
+                    .modal.fade(id=`modalEditService${service._id}` tabindex="-1")
+                      .modal-dialog
+                        .modal-content
+                          form(method="POST" action=`/about/services/${service._id}`)
+                            .modal-header
+                              h5.modal-title Editar Servicio
+                              button.btn-close(type="button" data-bs-dismiss="modal")
+                            .modal-body
+                              .mb-2
+                                label.form-label.small Título
+                                input.form-control(name="title" value=service.title required)
+                              .mb-2
+                                label.form-label.small Descripción
+                                textarea.form-control(name="description" rows="3")= service.description
+                              .mb-2
+                                label.form-label.small Imagen (URL)
+                                input.form-control(name="image" value=service.image)
+                              .mb-2
+                                label.form-label.small Icono (FontAwesome)
+                                input.form-control(name="icon" value=service.icon)
+                              .mb-2
+                                label.form-label.small Características (una por línea)
+                                textarea.form-control(name="features" rows="3")= (service.features || []).join('\n')
+                              .form-check
+                                input.form-check-input(
+                                  type="checkbox"
+                                  name="isActive"
+                                  checked=service.isActive
+                                )
+                                label.form-check-label Activo
+                            .modal-footer
+                              button.btn.btn-secondary(type="button" data-bs-dismiss="modal") Cancelar
+                              button.btn.btn-primary(type="submit") Guardar
+          else
+            .text-center.py-5.text-muted
+              i.fas.fa-tools.fa-3x.mb-3.opacity-25.d-block
+              p.mb-0 No hay servicios configurados
+              p.small Agrega tu primer servicio
+
+    //- ============================================
+    //- TAB: PROYECTOS
+    //- ============================================
+    .tab-pane.fade#tab-proyectos
+      .card.border-0.shadow-sm.rounded-3.mb-3
+        .card-header.bg-white.border-bottom.py-3.d-flex.justify-content-between.align-items-center
+          h6.mb-0.fw-bold
+            i.fas.fa-hard-hat.me-2.text-primary
+            | Proyectos realizados
+          button.btn.btn-sm.btn-primary.rounded-pill(type="button" data-bs-toggle="modal" data-bs-target="#modalNewProject")
+            i.fas.fa-plus.me-1
+            | Nuevo Proyecto
+
+        .card-body
+          if about.projects && about.projects.length
+            .row.g-3
+              each project in about.projects
+                .col-md-6
+                  .card.border.rounded-3.h-100
+                    if project.images && project.images.length
+                      img.card-img-top(src=project.images[0] style="height: 150px; object-fit: cover;")
+                    .card-body
+                      .d-flex.justify-content-between.mb-2
+                        h6.fw-bold.mb-0= project.client
+                        if !project.isActive
+                          span.badge.bg-secondary Inactivo
+                      p.small.text-muted.mb-1
+                        i.fas.fa-map-marker-alt.me-1
+                        = project.address
+                      if project.serviceDate
+                        p.small.text-muted.mb-1
+                          i.fas.fa-calendar.me-1
+                          = new Date(project.serviceDate).toLocaleDateString('es-PE')
+                      if project.serviceType
+                        p.small.text-muted.mb-1
+                          i.fas.fa-tag.me-1
+                          = project.serviceType
+                      p.small.mb-0= project.description
+                    .card-footer.bg-transparent.d-flex.gap-2
+                      button.btn.btn-sm.btn-outline-primary.rounded-pill(
+                        type="button"
+                        data-bs-toggle="modal"
+                        data-bs-target=`#modalEditProject${project._id}`
+                      )
+                        i.fas.fa-edit
+                      form.d-inline(
+                        method="POST"
+                        action=`/about/projects/${project._id}/delete`
+                        onsubmit="return confirm('¿Eliminar este proyecto?')"
+                      )
+                        button.btn.btn-sm.btn-outline-danger.rounded-pill(type="submit")
+                          i.fas.fa-trash
+
+                    //- Modal editar
+                    .modal.fade(id=`modalEditProject${project._id}` tabindex="-1")
+                      .modal-dialog
+                        .modal-content
+                          form(method="POST" action=`/about/projects/${project._id}`)
+                            .modal-header
+                              h5.modal-title Editar Proyecto
+                              button.btn-close(type="button" data-bs-dismiss="modal")
+                            .modal-body
+                              .row.g-2
+                                .col-md-6
+                                  label.form-label.small Cliente
+                                  input.form-control(name="client" value=project.client required)
+                                .col-md-6
+                                  label.form-label.small Dirección
+                                  input.form-control(name="address" value=project.address required)
+                                .col-md-6
+                                  label.form-label.small Ciudad
+                                  input.form-control(name="city" value=project.city)
+                                .col-md-6
+                                  label.form-label.small Tipo de servicio
+                                  input.form-control(name="serviceType" value=project.serviceType)
+                                .col-md-6
+                                  label.form-label.small Fecha de servicio
+                                  input.form-control(
+                                    type="date"
+                                    name="serviceDate"
+                                    value=project.serviceDate ? new Date(project.serviceDate).toISOString().split('T')[0] : ''
+                                  )
+                                .col-12
+                                  label.form-label.small Descripción
+                                  textarea.form-control(name="description" rows="3")= project.description
+                                .col-12
+                                  label.form-label.small Fotos (una URL por línea)
+                                  textarea.form-control(name="images" rows="4")= (project.images || []).join('\n')
+                                .col-12
+                                  .form-check
+                                    input.form-check-input(
+                                      type="checkbox"
+                                      name="isActive"
+                                      checked=project.isActive
+                                    )
+                                    label.form-check-label Activo
+                            .modal-footer
+                              button.btn.btn-secondary(type="button" data-bs-dismiss="modal") Cancelar
+                              button.btn.btn-primary(type="submit") Guardar
+          else
+            .text-center.py-5.text-muted
+              i.fas.fa-hard-hat.fa-3x.mb-3.opacity-25.d-block
+              p.mb-0 No hay proyectos configurados
+
+  //- ============================================
+  //- MODALES DE CREACIÓN
+  //- ============================================
+
+  //- Nuevo Servicio
+  .modal.fade#modalNewService(tabindex="-1")
+    .modal-dialog
+      .modal-content
+        form(method="POST" action="/about/services")
+          .modal-header
+            h5.modal-title
+              i.fas.fa-plus.me-2
+              | Nuevo Servicio
+            button.btn-close(type="button" data-bs-dismiss="modal")
+          .modal-body
+            .mb-2
+              label.form-label.small.fw-semibold Título *
+              input.form-control(name="title" required placeholder="Ej: Instalación de cámaras")
+            .mb-2
+              label.form-label.small.fw-semibold Descripción
+              textarea.form-control(name="description" rows="3" placeholder="Describe el servicio...")
+            .mb-2
+              label.form-label.small.fw-semibold Imagen (URL)
+              input.form-control(name="image" placeholder="https://...")
+            .mb-2
+              label.form-label.small.fw-semibold Icono FontAwesome
+              input.form-control(name="icon" value="fa-tools" placeholder="fa-tools")
+            .mb-2
+              label.form-label.small.fw-semibold Características (una por línea)
+              textarea.form-control(name="features" rows="3" placeholder="Instalación profesional&#10;Garantía 12 meses")
+          .modal-footer
+            button.btn.btn-secondary(type="button" data-bs-dismiss="modal") Cancelar
+            button.btn.btn-primary(type="submit")
+              i.fas.fa-save.me-1
+              | Crear Servicio
+
+  //- Nuevo Proyecto
+  .modal.fade#modalNewProject(tabindex="-1")
+    .modal-dialog
+      .modal-content
+        form(method="POST" action="/about/projects")
+          .modal-header
+            h5.modal-title
+              i.fas.fa-plus.me-2
+              | Nuevo Proyecto
+            button.btn-close(type="button" data-bs-dismiss="modal")
+          .modal-body
+            .row.g-2
+              .col-md-6
+                label.form-label.small.fw-semibold Cliente *
+                input.form-control(name="client" required placeholder="Nombre del cliente")
+              .col-md-6
+                label.form-label.small.fw-semibold Dirección *
+                input.form-control(name="address" required placeholder="Av. Principal 123")
+              .col-md-6
+                label.form-label.small.fw-semibold Ciudad
+                input.form-control(name="city" placeholder="Lima")
+              .col-md-6
+                label.form-label.small.fw-semibold Tipo de servicio
+                input.form-control(name="serviceType" placeholder="Instalación / Mantenimiento")
+              .col-md-6
+                label.form-label.small.fw-semibold Fecha
+                input.form-control(type="date" name="serviceDate" value=new Date().toISOString().split('T')[0])
+              .col-12
+                label.form-label.small.fw-semibold Descripción
+                textarea.form-control(name="description" rows="3" placeholder="Descripción del trabajo realizado")
+              .col-12
+                label.form-label.small.fw-semibold Fotos de evidencia (una URL por línea)
+                textarea.form-control(name="images" rows="4" placeholder="https://foto1.jpg&#10;https://foto2.jpg")
+          .modal-footer
+            button.btn.btn-secondary(type="button" data-bs-dismiss="modal") Cancelar
+            button.btn.btn-primary(type="submit")
+              i.fas.fa-save.me-1
+              | Crear Proyecto
+
+  //- ============================================
+  //- SCRIPTS
+  //- ============================================
+  script.
+    document.addEventListener('DOMContentLoaded', function() {
+      // Agregar valor dinámico
+      const addValueBtn = document.getElementById('addValueBtn');
+      const valuesContainer = document.getElementById('valuesContainer');
+
+      if (addValueBtn && valuesContainer) {
+        addValueBtn.addEventListener('click', function() {
+          const div = document.createElement('div');
+          div.className = 'value-row card border mb-3 rounded-3';
+          div.innerHTML = `
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-3">
+                  <label class="form-label small fw-semibold">Icono (FontAwesome)</label>
+                  <input class="form-control" name="valueIcon" value="fa-star" placeholder="fa-star">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold">Título</label>
+                  <input class="form-control" name="valueTitle" placeholder="Ej: Compromiso">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold">Descripción</label>
+                  <input class="form-control" name="valueDescription">
+                </div>
+                <div class="col-md-1 d-flex align-items-end">
+                  <button class="btn btn-sm btn-outline-danger rounded-circle remove-value" type="button">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+          valuesContainer.appendChild(div);
+        });
+
+        // Eliminar valor (delegación)
+        valuesContainer.addEventListener('click', function(e) {
+          const btn = e.target.closest('.remove-value');
+          if (btn) {
+            btn.closest('.value-row').remove();
+          }
+        });
+      }
+    });
+
+  //- ============================================
+  //- ESTILOS
+  //- ============================================
+  style.
+    .about-tabs .nav-link {
+      border-radius: 50rem;
+      padding: 0.5rem 1.25rem;
+      color: #475569;
+      font-weight: 500;
+    }
+    .about-tabs .nav-link:hover { background: #f1f5f9; }
+    .about-tabs .nav-link.active {
+      background: var(--brand);
+      color: white;
+    }

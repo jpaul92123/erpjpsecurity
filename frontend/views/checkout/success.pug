@@ -1,0 +1,274 @@
+doctype html
+html(lang="es")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    title= title
+
+    link(rel="stylesheet" href="/bootstrap/css/bootstrap.min.css")
+    link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css")
+
+    - const brandPrimary = (setting && setting.colors && setting.colors.primary) ? setting.colors.primary : '#0d6efd'
+
+    style.
+      :root {
+        --brand: #{brandPrimary};
+      }
+      body {
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        background: #f8fafc;
+        color: #1f2937;
+        padding: 20px;
+      }
+      .print-wrapper {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 16px;
+        padding: 40px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      }
+      .success-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        margin: 0 auto 20px;
+      }
+      .order-header {
+        text-align: center;
+        padding-bottom: 24px;
+        border-bottom: 2px dashed #e5e7eb;
+        margin-bottom: 24px;
+      }
+      .order-number {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--brand);
+        margin: 8px 0;
+      }
+      .info-box {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+      .info-box h6 {
+        font-weight: 700;
+        margin-bottom: 12px;
+        color: var(--brand);
+      }
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+        font-size: 0.9rem;
+      }
+      .info-row strong {
+        color: #374151;
+        font-weight: 600;
+      }
+      .items-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+      .items-table th {
+        text-align: left;
+        padding: 10px;
+        background: #f1f5f9;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        color: #64748b;
+        font-weight: 700;
+        border-bottom: 2px solid #e5e7eb;
+      }
+      .items-table td {
+        padding: 12px 10px;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 0.9rem;
+      }
+      .items-table img {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+        background: #f8fafc;
+        border-radius: 6px;
+        padding: 2px;
+      }
+      .total-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        font-size: 0.95rem;
+      }
+      .total-row.grand-total {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: var(--brand);
+        border-top: 2px solid var(--brand);
+        padding-top: 12px;
+        margin-top: 8px;
+      }
+      .action-bar {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        display: flex;
+        gap: 8px;
+        z-index: 100;
+      }
+      @media print {
+        body { background: white; padding: 0; }
+        .print-wrapper { box-shadow: none; padding: 20px; }
+        .action-bar { display: none !important; }
+      }
+      @media (max-width: 576px) {
+        .print-wrapper { padding: 20px 16px; }
+      }
+
+  body
+
+    //- ============================================
+    //- BARRA DE ACCIONES (no se imprime)
+    //- ============================================
+    .action-bar
+      button.btn.btn-primary.rounded-pill(type="button" onclick="window.print()")
+        i.fas.fa-print.me-1
+        | Imprimir Pedido
+      a.btn.btn-outline-secondary.rounded-pill(href="/products")
+        i.fas.fa-shopping-bag.me-1
+        | Seguir comprando
+
+    //- ============================================
+    //- COMPROBANTE
+    //- ============================================
+    .print-wrapper
+
+      //- Encabezado con éxito
+      .order-header
+        .success-icon
+          i.fas.fa-check
+        h1.h4.fw-bold.mb-2 ¡Pedido registrado!
+        p.text-muted.mb-0 Gracias por tu compra. Nos pondremos en contacto pronto.
+
+        .order-number= order.orderNumber
+        small.text-muted
+          | Fecha: #{new Date(order.createdAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+
+      //- Datos del cliente
+      .info-box
+        h6
+          i.fas.fa-user.me-2
+          | Datos del cliente
+        .info-row
+          span.text-muted Nombre:
+          strong= order.customer.name
+        .info-row
+          span.text-muted Teléfono:
+          strong= order.customer.phone
+        if order.customer.email
+          .info-row
+            span.text-muted Email:
+            strong= order.customer.email
+        .info-row
+          span.text-muted Dirección:
+          strong= order.customer.address
+        .info-row
+          span.text-muted Distrito:
+          strong= order.customer.district
+        if order.customer.reference
+          .info-row
+            span.text-muted Referencia:
+            strong= order.customer.reference
+
+      //- Modo de pago
+      .info-box
+        h6
+          i.fas.fa-credit-card.me-2
+          | Modo de pago
+        .info-row
+          span.text-muted Método:
+          strong
+            case order.paymentMethod
+              when 'yape'
+                i.fas.fa-mobile-alt.me-1.text-purple
+                | Yape
+              when 'plin'
+                i.fas.fa-mobile-alt.me-1.text-teal
+                | Plin
+              when 'transferencia'
+                i.fas.fa-university.me-1.text-blue
+                | Transferencia bancaria
+              when 'efectivo'
+                i.fas.fa-money-bill-wave.me-1.text-success
+                | Efectivo (contra entrega)
+        if order.paymentReference
+          .info-row
+            span.text-muted Referencia:
+            strong= order.paymentReference
+
+      //- Items
+      h6.fw-bold.mb-3
+        i.fas.fa-box.me-2.text-primary
+        | Productos del pedido
+
+      table.items-table
+        thead
+          tr
+            th(style="width: 50px;") Imagen
+            th Producto
+            th(style="width: 80px; text-align: center;") Cant.
+            th(style="width: 100px; text-align: right;") Precio
+            th(style="width: 100px; text-align: right;") Subtotal
+        tbody
+          each item in order.items
+            tr
+              td
+                if item.image
+                  img(src=item.image alt=item.name)
+                else
+                  i.fas.fa-image.text-muted
+              td
+                div.fw-semibold= item.name
+              td.text-center= item.qty
+              td.text-end S/. #{item.price.toFixed(2)}
+              td.text-end.fw-semibold S/. #{item.subtotal.toFixed(2)}
+
+      //- Totales
+      .total-row
+        span.text-muted Subtotal
+        strong S/. #{order.subtotal.toFixed(2)}
+      .total-row
+        span.text-muted Envío
+        strong.text-success Gratis
+      .total-row.grand-total
+        span TOTAL
+        span S/. #{order.total.toFixed(2)}
+
+      //- Notas
+      if order.notes
+        .info-box.mt-3
+          h6
+            i.fas.fa-comment-alt.me-2
+            | Notas del cliente
+          p.mb-0.small= order.notes
+
+      //- Footer
+      .text-center.mt-4.pt-3(style="border-top: 2px dashed #e5e7eb;")
+        p.mb-1.fw-bold= setting && setting.siteName ? setting.siteName : 'JP Security'
+        if setting && setting.company && setting.company.phone
+          small.text-muted
+            i.fas.fa-phone.me-1
+            = setting.company.phone
+        if setting && setting.company && setting.company.email
+          small.text-muted.ms-3
+            i.fas.fa-envelope.me-1
+            = setting.company.email
+        p.mb-0.mt-2.small.text-muted
+          | ¡Gracias por confiar en nosotros!

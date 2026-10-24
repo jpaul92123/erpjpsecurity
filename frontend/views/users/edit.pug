@@ -1,0 +1,21 @@
+extends ../layouts/layout
+
+block content
+  h1 Editar Usuario
+  form(action=`/users/${user.id}?_method=PUT`, method="POST")
+    .mb-3
+      label.form-label Nombre
+      input.form-control(type="text", name="name", value=user.name, required)
+    .mb-3
+      label.form-label Email
+      input.form-control(type="email", name="email", value=user.email, required)
+    .mb-3
+      label.form-label Rol
+      select.form-control(name="role")
+        each role in roles
+          option(value=role.id, selected=role.id == user.role.id)= role.name
+    .mb-3.form-check
+      input.form-check-input(type="checkbox", name="isActive", checked=user.isActive)
+      label.form-check-label Activo
+    button.btn.btn-primary(type="submit") Actualizar
+    a.btn.btn-secondary(href="/users") Cancelar

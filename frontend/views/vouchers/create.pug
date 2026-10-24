@@ -1,0 +1,48 @@
+extends ../layouts/layout
+
+block content
+  .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pb-2.mb-3.border-bottom
+    h1.h2
+      i.fas.fa-plus-circle.me-2
+      | Emitir Comprobante
+    a.btn.btn-outline-secondary(href="/vouchers")
+      i.fas.fa-arrow-left.me-1
+      | Volver
+
+  .card.border-0.shadow-sm
+    .card-body
+      form(method="POST", action="/vouchers")
+        .row
+          .col-md-6
+            .mb-3
+              label.form-label Tipo *
+              select.form-control(name="type", required)
+                option(value="") Seleccionar...
+                option(value="Boleta") Boleta
+                option(value="Factura") Factura
+          .col-md-6
+            .mb-3
+              label.form-label Venta *
+              select.form-control(name="sale", required)
+                option(value="") Seleccionar...
+                each sale in sales || []
+                  option(value=sale._id) VEN-00#{sale.number} - #{sale.client ? sale.client.businessName : ''} (S/. #{sale.total.toFixed(2)})
+        .row
+          .col-md-6
+            .mb-3
+              label.form-label Cliente *
+              select.form-control(name="client", required)
+                option(value="") Seleccionar...
+                each client in clients || []
+                  option(value=client._id) #{client.businessName} - #{client.ruc}
+          .col-md-6
+            .mb-3
+              label.form-label RUC *
+              input.form-control(type="text", name="ruc", required)
+        .mb-3
+          label.form-label Razón Social *
+          input.form-control(type="text", name="businessName", required)
+        button.btn.btn-primary(type="submit")
+          i.fas.fa-save.me-1
+          | Emitir
+        a.btn.btn-outline-secondary.ms-2(href="/vouchers") Cancelar

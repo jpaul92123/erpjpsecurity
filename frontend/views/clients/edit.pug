@@ -1,0 +1,406 @@
+extends ../layouts/layout
+
+block content
+
+  //- ============================================
+  //- HEADER
+  //- ============================================
+  .d-flex.flex-wrap.flex-md-nowrap.align-items-center.justify-content-between.pb-3.mb-4.border-bottom
+    .d-flex.align-items-center
+      .bg-warning.bg-opacity-10.rounded-3.p-3.me-3
+        i.bi.bi-pencil-square.text-warning.fs-3
+      div
+        nav(aria-label="breadcrumb")
+          ol.breadcrumb.mb-1
+            li.breadcrumb-item
+              a.text-decoration-none(href="/clients") Clientes
+            li.breadcrumb-item
+              a.text-decoration-none(href=`/clients/${client._id}`)= client.businessName
+            li.breadcrumb-item.active Editar
+        h1.h2.mb-0.fw-bold Editar Cliente
+        p.text-muted.mb-0
+          i.bi.bi-info-circle.me-1
+          | Modifica los datos del cliente
+    div.d-flex.gap-2
+      a.btn.btn-outline-secondary.rounded-pill.px-4(href=`/clients/${client._id}`)
+        i.bi.bi-arrow-left.me-1
+        | Volver
+
+  //- ============================================
+  //- FORMULARIO
+  //- ============================================
+  .row
+    .col-lg-8.mx-auto
+      form(
+        action=`/clients/${client._id}?_method=PUT`
+        method="POST"
+        id="formEditClient"
+        novalidate
+      )
+
+        //- ============================================
+        //- TIPO DE CLIENTE (TARJETAS)
+        //- ============================================
+        .card.border-0.shadow-sm.rounded-3.mb-3
+          .card-body.p-4
+
+            h6.fw-bold.mb-3
+              i.bi.bi-tag.me-2.text-warning
+              | Tipo de Cliente
+
+            .row.g-3
+              .col-md-6
+                label.client-type-card.w-100(for="typeNatural")
+                  input.form-check-input.d-none(
+                    type="radio"
+                    name="type"
+                    id="typeNatural"
+                    value="Natural"
+                    checked=client.type === 'Natural'
+                  )
+                  .d-flex.align-items-center.gap-3
+                    .client-type-icon.bg-secondary.bg-opacity-10.rounded-3
+                      i.bi.bi-person.fs-4.text-secondary
+                    div
+                      div.fw-semibold Persona Natural
+                      small.text-muted DNI / Carnet
+              .col-md-6
+                label.client-type-card.w-100(for="typeJuridico")
+                  input.form-check-input.d-none(
+                    type="radio"
+                    name="type"
+                    id="typeJuridico"
+                    value="Jurídico"
+                    checked=client.type === 'Jurídico'
+                  )
+                  .d-flex.align-items-center.gap-3
+                    .client-type-icon.bg-info.bg-opacity-10.rounded-3
+                      i.bi.bi-building.fs-4.text-info
+                    div
+                      div.fw-semibold Persona Jurídica
+                      small.text-muted RUC / Empresa
+
+        //- ============================================
+        //- DATOS PRINCIPALES
+        //- ============================================
+        .card.border-0.shadow-sm.rounded-3.mb-3
+          .card-header.bg-white.border-bottom.py-3
+            h6.mb-0.fw-bold
+              i.bi.bi-person-vcard.me-2.text-warning
+              | Datos Principales
+          .card-body.p-4
+
+            .row.g-3
+              .col-md-12
+                label.form-label.fw-semibold
+                  | Razón Social / Nombre Completo
+                  span.text-danger.ms-1 *
+                .input-group
+                  span.input-group-text.bg-white
+                    i.bi.bi-building.text-muted
+                  input.form-control(
+                    type="text"
+                    name="businessName"
+                    id="businessName"
+                    value=client.businessName
+                    placeholder="Ej: Juan Pérez o Empresa S.A.C."
+                    required
+                    maxlength="200"
+                  )
+                .invalid-feedback Ingresa el nombre del cliente
+
+              .col-md-6
+                label.form-label.fw-semibold
+                  | RUC / DNI
+                  span.text-danger.ms-1 *
+                .input-group
+                  span.input-group-text.bg-white
+                    i.bi.bi-hash.text-muted
+                  input.form-control(
+                    type="text"
+                    name="ruc"
+                    id="ruc"
+                    value=client.ruc
+                    placeholder="20123456789"
+                    required
+                    maxlength="11"
+                    pattern="[0-9]{8,11}"
+                  )
+                small.text-muted 8 dígitos para DNI, 11 para RUC
+                .invalid-feedback Ingresa un RUC/DNI válido (8-11 dígitos)
+
+              .col-md-6
+                label.form-label.fw-semibold Teléfono
+                .input-group
+                  span.input-group-text.bg-white
+                    i.bi.bi-telephone.text-muted
+                  input.form-control(
+                    type="text"
+                    name="phone"
+                    id="phone"
+                    value=client.phone
+                    placeholder="987654321"
+                    maxlength="15"
+                  )
+
+        //- ============================================
+        //- CONTACTO
+        //- ============================================
+        .card.border-0.shadow-sm.rounded-3.mb-3
+          .card-header.bg-white.border-bottom.py-3
+            h6.mb-0.fw-bold
+              i.bi.bi-envelope.me-2.text-warning
+              | Información de Contacto
+          .card-body.p-4
+
+            .row.g-3
+              .col-md-6
+                label.form-label.fw-semibold Email
+                .input-group
+                  span.input-group-text.bg-white
+                    i.bi.bi-envelope-at.text-muted
+                  input.form-control(
+                    type="email"
+                    name="email"
+                    id="email"
+                    value=client.email
+                    placeholder="cliente@email.com"
+                  )
+                .invalid-feedback Ingresa un email válido
+
+              .col-md-6
+                label.form-label.fw-semibold Dirección
+                .input-group
+                  span.input-group-text.bg-white
+                    i.bi.bi-geo-alt.text-muted
+                  input.form-control(
+                    type="text"
+                    name="address"
+                    id="address"
+                    value=client.address
+                    placeholder="Av. Ejemplo 123, Lima"
+                    maxlength="200"
+                  )
+
+        //- ============================================
+        //- ESTADO
+        //- ============================================
+        .card.border-0.shadow-sm.rounded-3.mb-3
+          .card-header.bg-white.border-bottom.py-3
+            h6.mb-0.fw-bold
+              i.bi.bi-toggle-on.me-2.text-warning
+              | Estado del Cliente
+          .card-body.p-4
+
+            .form-check.form-switch
+              input.form-check-input(
+                type="checkbox"
+                name="isActive"
+                id="isActive"
+                checked=client.isActive
+              )
+              label.form-check-label.fw-semibold(for="isActive")
+                | Cliente Activo
+                small.text-muted.d-block.ms-0
+                  | Si está desactivado, no aparecerá en las listas de selección
+
+        //- ============================================
+        //- BOTONES
+        //- ============================================
+        .card.border-0.shadow-sm.rounded-3
+          .card-body.p-3
+            .d-flex.flex-wrap.justify-content-between.align-items-center.gap-2
+
+              //- Info de auditoría
+              if client.createdAt
+                small.text-muted
+                  i.bi.bi-clock-history.me-1
+                  | Creado el #{new Date(client.createdAt).toLocaleDateString('es-PE', { day: '2-digit', month: 'long', year: 'numeric' })}
+
+              div.d-flex.gap-2
+                a.btn.btn-outline-secondary.rounded-pill.px-4(href=`/clients/${client._id}`)
+                  i.bi.bi-x.me-1
+                  | Cancelar
+                button.btn.btn-warning.rounded-pill.px-4(
+                  type="submit"
+                  id="btnSubmit"
+                )
+                  i.bi.bi-check-lg.me-1
+                  | Guardar Cambios
+
+  //- ============================================
+  //- ESTILOS
+  //- ============================================
+  style.
+    .client-type-card {
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: block;
+      position: relative;
+    }
+    .client-type-card:hover {
+      border-color: #cbd5e1;
+      background: #f8fafc;
+    }
+    .client-type-card.selected {
+      border-color: #ffc107;
+      background: #fffbf0;
+      box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.15);
+    }
+    .client-type-icon {
+      width: 52px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .form-control, .form-select {
+      border-color: #e2e8f0;
+      padding: 0.65rem 0.9rem;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #ffc107;
+      box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.15);
+    }
+    .input-group-text {
+      border-color: #e2e8f0;
+    }
+    .input-group:focus-within .input-group-text {
+      border-color: #ffc107;
+    }
+    .form-label {
+      font-size: 0.9rem;
+      margin-bottom: 0.4rem;
+      color: #334155;
+    }
+
+    .form-check-input:checked {
+      background-color: #ffc107;
+      border-color: #ffc107;
+    }
+    .form-check-input:focus {
+      border-color: #ffc107;
+      box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.15);
+    }
+
+    @media (max-width: 768px) {
+      .client-type-icon {
+        width: 44px;
+        height: 44px;
+      }
+    }
+
+  //- ============================================
+  //- SCRIPT
+  //- ============================================
+  script.
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('formEditClient');
+      const btnSubmit = document.getElementById('btnSubmit');
+      const typeCards = document.querySelectorAll('.client-type-card');
+      const typeRadios = document.querySelectorAll('input[name="type"]');
+      const rucInput = document.getElementById('ruc');
+
+      // ============================================
+      // SELECCIÓN DE TIPO DE CLIENTE
+      // ============================================
+      function updateTypeSelection() {
+        typeCards.forEach(card => {
+          const radio = card.querySelector('input[type="radio"]');
+          if (radio && radio.checked) {
+            card.classList.add('selected');
+          } else {
+            card.classList.remove('selected');
+          }
+        });
+
+        // Actualizar placeholder del RUC según el tipo
+        const selectedType = document.querySelector('input[name="type"]:checked');
+        if (selectedType && rucInput) {
+          if (selectedType.value === 'Jurídico') {
+            rucInput.placeholder = '20123456789';
+            rucInput.maxLength = 11;
+          } else {
+            rucInput.placeholder = '12345678';
+            rucInput.maxLength = 8;
+          }
+        }
+      }
+
+      typeRadios.forEach(radio => {
+        radio.addEventListener('change', updateTypeSelection);
+      });
+      updateTypeSelection();
+
+      // Click en toda la tarjeta
+      typeCards.forEach(card => {
+        card.addEventListener('click', function(e) {
+          const radio = this.querySelector('input[type="radio"]');
+          if (radio) {
+            radio.checked = true;
+            updateTypeSelection();
+          }
+        });
+      });
+
+      // ============================================
+      // VALIDACIÓN Y ENVÍO
+      // ============================================
+      if (form) {
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+
+          // Validar campos requeridos
+          const businessName = document.getElementById('businessName');
+          const ruc = document.getElementById('ruc');
+
+          let hasError = false;
+
+          if (!businessName.value.trim()) {
+            businessName.classList.add('is-invalid');
+            hasError = true;
+          } else {
+            businessName.classList.remove('is-invalid');
+          }
+
+          if (!ruc.value.trim()) {
+            ruc.classList.add('is-invalid');
+            hasError = true;
+          } else if (!/^[0-9]{8,11}$/.test(ruc.value.trim())) {
+            ruc.classList.add('is-invalid');
+            hasError = true;
+          } else {
+            ruc.classList.remove('is-invalid');
+          }
+
+          if (hasError) {
+            const firstError = form.querySelector('.is-invalid');
+            if (firstError) {
+              firstError.focus();
+              firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            return false;
+          }
+
+          // Loading
+          btnSubmit.disabled = true;
+          btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
+
+          // Enviar
+          form.submit();
+        });
+
+        // Limpiar validación al escribir
+        form.querySelectorAll('.form-control').forEach(input => {
+          input.addEventListener('input', function() {
+            this.classList.remove('is-invalid');
+          });
+        });
+      }
+    });

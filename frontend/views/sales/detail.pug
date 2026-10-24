@@ -1,0 +1,214 @@
+extends ../layouts/layout
+
+block content
+
+  //- ============================================
+  //- HEADER
+  //- ============================================
+  .d-flex.flex-wrap.justify-content-between.align-items-center.pb-3.mb-4.border-bottom
+    div
+      nav(aria-label="breadcrumb")
+        ol.breadcrumb.mb-1
+          li.breadcrumb-item
+            a.text-decoration-none(href="/sales") Ventas
+          li.breadcrumb-item.active= sale.number || sale._id
+      h1.h2.mb-0
+        i.fas.fa-receipt.text-success.me-2
+        | Venta #{sale.number || sale._id}
+        if sale.status === 'Pagado'
+          span.badge.bg-success.ms-2 Pagado
+        else if sale.status === 'Anulado'
+          span.badge.bg-danger.ms-2 Anulado
+    .d-flex.gap-2
+      a.btn.btn-outline-secondary.rounded-pill.px-3(href="/sales")
+        i.fas.fa-arrow-left.me-1
+        | Volver
+      button.btn.btn-primary.rounded-pill.px-4(
+        type="button"
+        onclick="printSale(saleData)"
+      )
+        i.fas.fa-print.me-1
+        | Imprimir / PDF
+
+  //- ============================================
+  //- CONTENIDO
+  //- ============================================
+  .card.border-0.shadow-sm.rounded-3
+    .card-body.p-4
+
+      .text-center.mb-4
+        h3.fw-bold.mb-1 RECIBO DE VENTA
+        small.text-muted Documento de venta
+
+      //- INFO CLIENTE + VENTA
+      .row.g-4.mb-4
+        .col-md-6
+          .info-box
+            h6.info-box-title
+              i.fas.fa-user.me-2
+              | Datos del Cliente
+            .info-box-content
+              p.mb-1
+                strong Cliente:
+                span.ms-2= sale.client ? sale.client.businessName : 'Cliente Anónimo'
+              p.mb-1
+                strong RUC/DNI:
+                span.ms-2= sale.client && sale.client.ruc ? sale.client.ruc : 'No especificado'
+              p.mb-0
+                strong Teléfono:
+                span.ms-2= sale.client && sale.client.phone ? sale.client.phone : 'No especificado'
+
+        .col-md-6
+          .info-box
+            h6.info-box-title
+              i.fas.fa-receipt.me-2
+              | Detalles de la Venta
+            .info-box-content
+              p.mb-1
+                strong Fecha:
+                span.ms-2= new Date(sale.createdAt).toLocaleDateString('es-PE')
+              p.mb-1
+                strong Método de Pago:
+                span.ms-2= sale.paymentMethod || 'Efectivo'
+              p.mb-0
+                strong Estado:
+                span.ms-2= sale.status || 'Pagado'
+
+      //- TABLA DE PRODUCTOS
+      .table-responsive.mb-4
+        table.table.table-bordered.align-middle.mb-0
+          thead.table-dark
+            tr
+              th.text-center(style="width: 80px;") Imagen
+              th Descripción
+              th.text-center(style="width: 80px;") Cant.
+              th.text-end(style="width: 120px;") P. Unitario
+              th.text-end(style="width: 120px;") Total
+          tbody
+            each item in sale.items
+              tr
+                td.text-center
+                  if item.product && item.product.image
+                    img(
+                      src=item.product.image
+                      alt=item.description
+                      style="width: 50px; height: 50px; object-fit: contain; border-radius: 6px; background: #f8fafc; padding: 4px;"
+                    )
+                  else
+                    i.fas.fa-image.text-muted
+                td
+                  div.fw-semibold= item.description
+                  if item.product && item.product.model
+                    small.text-muted
+                      i.fas.fa-barcode.me-1
+                      = item.product.model
+                td.text-center= item.quantity
+                td.text-end S/ #{item.unitPrice.toFixed(2)}
+                td.text-end.fw-bold S/ #{item.total.toFixed(2)}
+
+      //- TOTALES
+      .row.mb-4
+        .col-md-7
+          if sale.notes
+            .alert.alert-light.border.rounded-3.mb-0
+              h6.fw-bold.mb-2
+                i.fas.fa-sticky-note.me-1
+                | Notas
+              p.mb-0.small= sale.notes
+
+        .col-md-5
+          .totals-box
+            .d-flex.justify-content-between.mb-2
+              span.text-muted Subtotal
+              strong S/ #{sale.subtotal.toFixed(2)}
+            if sale.igv > 0
+              .d-flex.justify-content-between.mb-2
+                span.text-muted IGV (18%)
+                strong S/ #{sale.igv.toFixed(2)}
+            if sale.discount > 0
+              .d-flex.justify-content-between.mb-2.text-danger
+                span Descuento
+                strong - S/ #{sale.discount.toFixed(2)}
+            .d-flex.justify-content-between.pt-2(style="border-top: 2px solid var(--brand);")
+              span.fw-bold.fs-5 TOTAL
+              span.fw-bold.fs-4.text-primary S/ #{sale.total.toFixed(2)}
+
+      //- Footer
+      .text-center.text-muted.small.pt-3(style="border-top: 1px dashed #e2e8f0;")
+        i.fas.fa-user-circle.me-1
+        | Creado por: 
+        strong= sale.createdBy ? sale.createdBy.name : '-'
+
+  //- ============================================
+  //- INCLUIR SETTING GLOBAL ⬅️ ESTO FALTABA
+  //- ============================================
+  include ../partials/setting-globals
+
+  //- ============================================
+  //- SCRIPTS
+  //- ============================================
+  script.
+    const saleData = !{JSON.stringify(sale).replace(/</g, '\\u003c')};
+
+  script(src="/js/sale-print.js")
+
+  //- ============================================
+  //- ESTILOS
+  //- ============================================
+  style.
+    .info-box {
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 16px;
+      border-left: 4px solid var(--brand);
+      height: 100%;
+    }
+    .info-box-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--brand);
+      margin-bottom: 12px;
+    }
+    .info-box-content p {
+      font-size: 0.9rem;
+      color: #334155;
+    }
+    .info-box-content strong {
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    .totals-box {
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .table thead.table-dark th {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+    .table tbody td {
+      vertical-align: middle;
+    }
+
+    @media print {
+      .btn, .btn-group, .no-print, nav[aria-label="breadcrumb"] {
+        display: none !important;
+      }
+      .card {
+        border: none !important;
+        box-shadow: none !important;
+      }
+      .container {
+        max-width: 100% !important;
+      }
+      body {
+        padding: 20px;
+      }
+    }

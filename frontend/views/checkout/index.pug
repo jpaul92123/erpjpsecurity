@@ -1,0 +1,419 @@
+extends ../layouts/layout-public
+
+block content
+  .container.py-5
+
+    //- ============================================
+    //- BREADCRUMB
+    //- ============================================
+    nav(aria-label="breadcrumb").mb-3
+      ol.breadcrumb.mb-1
+        li.breadcrumb-item
+          a.text-decoration-none(href="/") Inicio
+        li.breadcrumb-item
+          a.text-decoration-none(href="/products") Catálogo
+        li.breadcrumb-item.active Finalizar Compra
+
+    //- ============================================
+    //- TÍTULO
+    //- ============================================
+    .text-center.mb-5
+      h1.h3.fw-bold.mb-2
+        i.fas.fa-shopping-bag.me-2.text-primary
+        | Finalizar Compra
+      p.text-muted.mb-0 Completa tus datos para confirmar el pedido
+
+    //- ============================================
+    //- FORMULARIO
+    //- ============================================
+    form#checkoutForm(method="POST" action="/checkout")
+      input(type="hidden" name="cartData" id="cartData")
+
+      .row.g-4
+
+        //- ========== COLUMNA IZQUIERDA: DATOS ==========
+        .col-lg-7
+
+          //- -------- Datos del cliente --------
+          .card.border-0.shadow-sm.rounded-3.mb-4
+            .card-header.bg-transparent.border-0.py-3
+              h6.mb-0.fw-bold
+                i.fas.fa-user.me-2.text-primary
+                | Datos de contacto
+            .card-body.pt-0
+              .row.g-3
+                .col-md-6
+                  label.form-label.fw-semibold
+                    | Nombre completo
+                    span.text-danger *
+                  input.form-control(
+                    type="text"
+                    name="customerName"
+                    required
+                    placeholder="Ej: Juan Pérez"
+                  )
+                .col-md-6
+                  label.form-label.fw-semibold
+                    | Teléfono / WhatsApp
+                    span.text-danger *
+                  input.form-control(
+                    type="tel"
+                    name="customerPhone"
+                    required
+                    placeholder="Ej: 987654321"
+                    pattern="[0-9+\\s\\-()]{6,20}"
+                  )
+                .col-md-12
+                  label.form-label.fw-semibold Correo electrónico
+                  input.form-control(
+                    type="email"
+                    name="customerEmail"
+                    placeholder="Opcional: correo@ejemplo.com"
+                  )
+                .col-md-12
+                  label.form-label.fw-semibold
+                    | Dirección de entrega
+                    span.text-danger *
+                  input.form-control(
+                    type="text"
+                    name="customerAddress"
+                    required
+                    placeholder="Ej: Av. Principal 123, Dpto 501"
+                  )
+                .col-md-6
+                  label.form-label.fw-semibold
+                    | Distrito
+                    span.text-danger *
+                  input.form-control(
+                    type="text"
+                    name="customerDistrict"
+                    required
+                    placeholder="Ej: Miraflores"
+                  )
+                .col-md-6
+                  label.form-label.fw-semibold Referencia
+                  input.form-control(
+                    type="text"
+                    name="customerReference"
+                    placeholder="Ej: Frente al parque"
+                  )
+
+          //- -------- Modo de pago --------
+          .card.border-0.shadow-sm.rounded-3.mb-4
+            .card-header.bg-transparent.border-0.py-3
+              h6.mb-0.fw-bold
+                i.fas.fa-credit-card.me-2.text-primary
+                | Modo de pago
+            .card-body.pt-0
+
+              .row.g-3
+                //- Yape
+                .col-md-6
+                  label.payment-option
+                    input(
+                      type="radio"
+                      name="paymentMethod"
+                      value="yape"
+                      required
+                    )
+                    .payment-option-content
+                      .payment-icon.bg-purple
+                        i.fas.fa-mobile-alt
+                      .payment-info
+                        div.fw-bold Yape
+                        small.text-muted Pago móvil instantáneo
+
+                //- Plin
+                .col-md-6
+                  label.payment-option
+                    input(
+                      type="radio"
+                      name="paymentMethod"
+                      value="plin"
+                      required
+                    )
+                    .payment-option-content
+                      .payment-icon.bg-teal
+                        i.fas.fa-mobile-alt
+                      .payment-info
+                        div.fw-bold Plin
+                        small.text-muted Pago móvil instantáneo
+
+                //- Transferencia
+                .col-md-6
+                  label.payment-option
+                    input(
+                      type="radio"
+                      name="paymentMethod"
+                      value="transferencia"
+                      required
+                    )
+                    .payment-option-content
+                      .payment-icon.bg-blue
+                        i.fas.fa-university
+                      .payment-info
+                        div.fw-bold Transferencia
+                        small.text-muted BCP, Interbank, BBVA
+
+                //- Efectivo
+                .col-md-6
+                  label.payment-option
+                    input(
+                      type="radio"
+                      name="paymentMethod"
+                      value="efectivo"
+                      required
+                      checked
+                    )
+                    .payment-option-content
+                      .payment-icon.bg-green
+                        i.fas.fa-money-bill-wave
+                      .payment-info
+                        div.fw-bold Efectivo
+                        small.text-muted Pago contra entrega
+
+              //- Referencia de pago (opcional)
+              .mt-3
+                label.form-label.fw-semibold Número de operación (opcional)
+                input.form-control(
+                  type="text"
+                  name="paymentReference"
+                  placeholder="Ej: 12345678 (si ya pagaste)"
+                )
+                small.text-muted Si ya realizaste el pago, pega aquí el número de operación
+
+          //- -------- Notas adicionales --------
+          .card.border-0.shadow-sm.rounded-3.mb-4
+            .card-header.bg-transparent.border-0.py-3
+              h6.mb-0.fw-bold
+                i.fas.fa-comment-alt.me-2.text-primary
+                | Notas adicionales (opcional)
+            .card-body.pt-0
+              textarea.form-control(
+                name="notes"
+                rows="3"
+                placeholder="Ej: Entregar en horario de tarde, timbre azul, etc."
+              )
+
+        //- ========== COLUMNA DERECHA: RESUMEN ==========
+        .col-lg-5
+
+          .card.border-0.shadow-sm.rounded-3.sticky-top(style="top: 100px;")
+            .card-header.bg-transparent.border-0.py-3
+              h6.mb-0.fw-bold
+                i.fas.fa-receipt.me-2.text-primary
+                | Resumen del pedido
+
+            .card-body.pt-0
+              //- Lista de items (se llena con JS)
+              #checkoutItems
+                .text-center.py-4.text-muted
+                  i.fas.fa-spinner.fa-spin.me-2
+                  | Cargando...
+
+            .card-footer.bg-transparent.border-top.pt-3
+              .d-flex.justify-content-between.mb-2
+                span.text-muted Subtotal
+                strong#checkoutSubtotal S/. 0.00
+
+              .d-flex.justify-content-between.mb-3
+                span.text-muted Envío
+                strong.text-success Gratis
+
+              .d-flex.justify-content-between.mb-3.fs-5
+                span.fw-bold Total
+                strong.text-primary#checkoutTotal S/. 0.00
+
+              button.btn.btn-primary.btn-lg.w-100.rounded-pill.py-3.fw-bold.mt-2(
+                type="submit"
+              )
+                i.fas.fa-check-circle.me-2
+                | Confirmar Pedido
+
+              a.btn.btn-outline-secondary.w-100.rounded-pill.py-2.mt-2(
+                href="/products"
+              )
+                i.fas.fa-arrow-left.me-1
+                | Seguir comprando
+
+              .alert.alert-info.mt-3.mb-0.small
+                i.fas.fa-info-circle.me-1
+                | Al confirmar, nos pondremos en contacto para coordinar la entrega.
+
+  //- ============================================
+  //- ESTILOS
+  //- ============================================
+  style.
+    /* ================================================
+       OPCIONES DE PAGO
+       ================================================ */
+    .payment-option {
+      cursor: pointer;
+      display: block;
+      margin: 0;
+    }
+    .payment-option input[type="radio"] {
+      display: none;
+    }
+    .payment-option-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      background: white;
+      transition: all 0.2s;
+    }
+    .payment-option:hover .payment-option-content {
+      border-color: var(--brand);
+      background: #f8fafc;
+    }
+    .payment-option input[type="radio"]:checked + .payment-option-content {
+      border-color: var(--brand);
+      background: rgba(13, 110, 253, 0.05);
+      box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
+    }
+    .payment-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    .payment-icon.bg-purple { background: linear-gradient(135deg, #7c3aed, #5b21b6); }
+    .payment-icon.bg-teal   { background: linear-gradient(135deg, #0d9488, #0f766e); }
+    .payment-icon.bg-blue   { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+    .payment-icon.bg-green  { background: linear-gradient(135deg, #10b981, #059669); }
+
+    .payment-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* ================================================
+       ITEMS DEL RESUMEN
+       ================================================ */
+    .checkout-item {
+      display: flex;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid #f1f5f9;
+      align-items: flex-start;
+    }
+    .checkout-item:last-child {
+      border-bottom: none;
+    }
+    .checkout-item img {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 4px;
+      flex-shrink: 0;
+    }
+    .checkout-item-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .checkout-item-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      line-height: 1.3;
+    }
+    .checkout-item-price {
+      font-size: 0.75rem;
+      color: #64748b;
+      margin-top: 2px;
+    }
+    .checkout-item-subtotal {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--brand);
+      white-space: nowrap;
+    }
+
+  //- ============================================
+  //- SCRIPTS
+  //- ============================================
+  script.
+    document.addEventListener('DOMContentLoaded', function() {
+      const CART_KEY = 'jp_cart';
+
+      function getCart() {
+        try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; }
+        catch(e) { return []; }
+      }
+
+      function renderCheckoutItems() {
+        const cart = getCart();
+        const container = document.getElementById('checkoutItems');
+        const cartDataInput = document.getElementById('cartData');
+
+        if (!container) return;
+
+        if (cart.length === 0) {
+          container.innerHTML = `
+            <div class="text-center py-4">
+              <i class="fas fa-shopping-cart fa-3x text-muted mb-3 opacity-50"></i>
+              <p class="text-muted mb-0">Tu carrito está vacío</p>
+              <a href="/products" class="btn btn-primary rounded-pill mt-3">
+                Ver productos
+              </a>
+            </div>
+          `;
+          return;
+        }
+
+        // Render items
+        let html = '';
+        let subtotal = 0;
+
+        cart.forEach(item => {
+          const itemTotal = item.price * item.qty;
+          subtotal += itemTotal;
+
+          html += `
+            <div class="checkout-item">
+              <img src="${item.image || 'https://via.placeholder.com/50'}" alt="${item.name}">
+              <div class="checkout-item-info">
+                <div class="checkout-item-name">${item.name}</div>
+                <div class="checkout-item-price">S/. ${item.price.toFixed(2)} × ${item.qty}</div>
+              </div>
+              <div class="checkout-item-subtotal">S/. ${itemTotal.toFixed(2)}</div>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+
+        // Actualizar totales
+        document.getElementById('checkoutSubtotal').textContent = 'S/. ' + subtotal.toFixed(2);
+        document.getElementById('checkoutTotal').textContent = 'S/. ' + subtotal.toFixed(2);
+
+        // Guardar carrito en input hidden (para enviar al backend)
+        cartDataInput.value = JSON.stringify(cart);
+      }
+
+      renderCheckoutItems();
+
+      // Al enviar el formulario, asegurar que el cartData esté actualizado
+      document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+        const cart = getCart();
+        if (cart.length === 0) {
+          e.preventDefault();
+          alert('Tu carrito está vacío');
+          return;
+        }
+        document.getElementById('cartData').value = JSON.stringify(cart);
+      });
+    });

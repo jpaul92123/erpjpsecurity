@@ -1,0 +1,98 @@
+extends ../layouts/layout
+
+block content
+  .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pb-2.mb-3.border-bottom
+    h1.h2
+      i.fas.fa-plus-circle.me-2
+      | Nuevo Pedido
+    a.btn.btn-outline-secondary(href="/orders")
+      i.fas.fa-arrow-left.me-1
+      | Volver
+
+  .card.border-0.shadow-sm
+    .card-body
+      form(method="POST", action="/orders")
+        .row
+          .col-md-6
+            .mb-3
+              label.form-label Cliente *
+              select.form-control(name="client", required)
+                option(value="") Seleccionar...
+                each client in clients || []
+                  option(value=client._id) #{client.businessName}
+          .col-md-6
+            .mb-3
+              label.form-label Cotización (opcional)
+              select.form-control(name="quotation")
+                option(value="") Ninguna
+                each quotation in quotations || []
+                  option(value=quotation._id) #{quotation.number} - #{quotation.client ? quotation.client.businessName : ''}
+        .row
+          .col-md-6
+            .mb-3
+              label.form-label Fecha de Entrega
+              input.form-control(type="date", name="deliveryDate")
+          .col-md-6
+            .mb-3
+              label.form-label Estado
+              select.form-control(name="status")
+                option(value="Pendiente") Pendiente
+                option(value="Aprobado") Aprobado
+                option(value="En Proceso") En Proceso
+                option(value="Completado") Completado
+        h5.mt-4 Productos
+        #items-container
+          .row.mb-2
+            .col-md-5
+              input.form-control(type="text", name="items[0][description]", placeholder="Descripción", required)
+            .col-md-2
+              input.form-control(type="number", name="items[0][quantity]", placeholder="Cant.", min="1", required)
+            .col-md-2
+              input.form-control(type="number", name="items[0][unitPrice]", placeholder="P. Unit", step="0.01", min="0", required)
+            .col-md-3
+              button.btn.btn-danger.btn-remove-item(type="button") 
+                i.fas.fa-trash
+        button.btn.btn-secondary.btn-sm.mt-2(type="button", id="add-item")
+          i.fas.fa-plus-circle.me-1
+          | Agregar Producto
+        .mb-3.mt-3
+          label.form-label Notas
+          textarea.form-control(name="notes", rows="2")
+        button.btn.btn-primary(type="submit")
+          i.fas.fa-save.me-1
+          | Guardar
+        a.btn.btn-outline-secondary.ms-2(href="/orders") Cancelar
+
+  script.
+    let itemIndex = 1;
+    document.getElementById('add-item').addEventListener('click', function() {
+      const container = document.getElementById('items-container');
+      const row = document.createElement('div');
+      row.className = 'row mb-2';
+      row.innerHTML = `
+        <div class="col-md-5">
+          <input class="form-control" type="text" name="items[${itemIndex}][description]" placeholder="Descripción" required>
+        </div>
+        <div class="col-md-2">
+          <input class="form-control" type="number" name="items[${itemIndex}][quantity]" placeholder="Cant." min="1" required>
+        </div>
+        <div class="col-md-2">
+          <input class="form-control" type="number" name="items[${itemIndex}][unitPrice]" placeholder="P. Unit" step="0.01" min="0" required>
+        </div>
+        <div class="col-md-3">
+          <button class="btn btn-danger btn-remove-item" type="button"><i class="fas fa-trash"></i></button>
+        </div>
+      `;
+      container.appendChild(row);
+      itemIndex++;
+      // Asignar evento de eliminar a los nuevos botones
+      row.querySelector('.btn-remove-item').addEventListener('click', function() {
+        row.remove();
+      });
+    });
+    // Evento para los botones existentes
+    document.querySelectorAll('.btn-remove-item').forEach(btn => {
+      btn.addEventListener('click', function() {
+        this.closest('.row').remove();
+      });
+    });

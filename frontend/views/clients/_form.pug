@@ -1,0 +1,25 @@
+.mb-3
+  label.form-label(for="businessName") Razón Social *
+  input.form-control(type="text", id="businessName", name="businessName", value=client ? client.businessName : '', required)
+
+.mb-3
+  label.form-label(for="ruc") RUC *
+  input.form-control(type="text", id="ruc", name="ruc", value=client ? client.ruc : '', required)
+
+.mb-3
+  label.form-label(for="email") Email
+  input.form-control(type="email", id="email", name="email", value=client ? client.email : '')
+
+.mb-3
+  label.form-label(for="phone") Teléfono
+  input.form-control(type="text", id="phone", name="phone", value=client ? client.phone : '')
+
+.mb-3
+  label.form-label(for="type") Tipo de Cliente
+  select.form-control(id="type", name="type")
+    option(value="Jurídico", selected=client && client.type === 'Jurídico') Jurídico
+    option(value="Natural", selected=client && client.type === 'Natural') Natural
+
+.mb-3.form-check
+  input.form-check-input(type="checkbox", id="isActive", name="isActive", checked=client ? client.isActive : true)
+  label.form-check-label(for="isActive") Activo
