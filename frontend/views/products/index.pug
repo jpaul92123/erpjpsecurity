@@ -19,7 +19,7 @@ block content
         div
           h1.h3.fw-bold.mb-1.text-white
             i.fas.fa-cubes.me-2
-            | Catálogo de Productos-
+            | Catálogo de Productos
           p.mb-0.text-white-50.small
             i.fas.fa-box.me-1
             | #{products ? products.length : 0} productos disponibles
@@ -109,19 +109,31 @@ block content
                 span.category-count #{products ? products.length : 0}
 
               each cat in categoriesTree
-                .category-parent
-                  a.category-item(
-                    href=`/products?category=${cat._id}`
-                    class=(categoryFilter && categoryFilter.toString() === cat._id.toString() ? 'active' : '')
-                  )
-                    .category-icon.bg-primary-subtle.text-primary
-                      i.fas.fa-folder-open
-                    .category-info
-                      span.category-name= cat.name
-                    if cat.subcategories && cat.subcategories.length
-                      span.category-count #{cat.subcategories.length}
+                - const hasSubs = cat.subcategories && cat.subcategories.length > 0
+                - const isCatActive = categoryFilter && categoryFilter.toString() === cat._id.toString()
+                - const isSubActive = hasSubs && cat.subcategories.some(s => categoryFilter && categoryFilter.toString() === s._id.toString())
+                - const shouldOpen = isCatActive || isSubActive
 
-                  if cat.subcategories && cat.subcategories.length
+                .category-group(class=(shouldOpen ? 'is-open' : ''))
+                  .category-parent-wrapper
+                    a.category-item(
+                      href=`/products?category=${cat._id}`
+                      class=(isCatActive ? 'active' : '')
+                    )
+                      .category-icon.bg-primary-subtle.text-primary
+                        i.fas.fa-folder-open
+                      .category-info
+                        span.category-name= cat.name
+                    if hasSubs
+                      button.category-toggle(
+                        type="button"
+                        aria-label="Mostrar subcategorías"
+                        aria-expanded=(shouldOpen ? 'true' : 'false')
+                        data-category-toggle
+                      )
+                        i.fas.fa-chevron-down
+
+                  if hasSubs
                     .category-children
                       each sub in cat.subcategories
                         a.category-child(
@@ -137,9 +149,11 @@ block content
               h6.fw-bold.mb-2 ¿Necesitas ayuda?
               p.small.mb-3.opacity-90 Te asesoramos para elegir el mejor producto
               if setting && setting.social && setting.social.whatsapp
+                - const waRaw = String(setting.social.whatsapp).replace(/\D/g, '')
                 a.btn.btn-light.btn-sm.rounded-pill.w-100(
-                  href=`https://wa.me/${setting.social.whatsapp}`
+                  href=`https://wa.me/${waRaw}`
                   target="_blank"
+                  rel="noopener noreferrer"
                 )
                   i.fab.fa-whatsapp.me-1.text-success
                   | Contactar
@@ -176,6 +190,7 @@ block content
                   placeholder="S/ mín"
                   value=(minPrice || '')
                   min="0"
+                  inputmode="decimal"
                 )
 
               .filter-price
@@ -185,6 +200,7 @@ block content
                   placeholder="S/ máx"
                   value=(maxPrice || '')
                   min="0"
+                  inputmode="decimal"
                 )
 
               .filter-sort
@@ -417,7 +433,7 @@ block content
     //- ============================================
     if categoryFilter && products && products.length >= 4
       section.related-products.mt-5
-        .d-flex.justify-content-between.align-items-end.mb-4
+        .d-flex.flex-wrap.justify-content-between.align-items-end.gap-2.mb-4
           div
             h4.fw-bold.mb-1
               i.fas.fa-star.me-2.text-warning
@@ -469,34 +485,62 @@ block content
           span.category-name Todos los productos
 
       each cat in categoriesTree
-        a.category-item(
-          href=`/products?category=${cat._id}`
-          class=(categoryFilter && categoryFilter.toString() === cat._id.toString() ? 'active' : '')
-        )
-          .category-icon.bg-primary-subtle.text-primary
-            i.fas.fa-folder-open
-          .category-info
-            span.category-name= cat.name
-          if cat.subcategories && cat.subcategories.length
-            span.category-count #{cat.subcategories.length}
+        - const hasSubs = cat.subcategories && cat.subcategories.length > 0
+        - const isCatActive = categoryFilter && categoryFilter.toString() === cat._id.toString()
+        - const isSubActive = hasSubs && cat.subcategories.some(s => categoryFilter && categoryFilter.toString() === s._id.toString())
+        - const shouldOpen = isCatActive || isSubActive
 
-        if cat.subcategories && cat.subcategories.length
-          .category-children
-            each sub in cat.subcategories
-              a.category-child(
-                href=`/products?category=${sub._id}`
-                class=(categoryFilter && categoryFilter.toString() === sub._id.toString() ? 'active' : '')
+        .category-group(class=(shouldOpen ? 'is-open' : ''))
+          .category-parent-wrapper
+            a.category-item(
+              href=`/products?category=${cat._id}`
+              class=(isCatActive ? 'active' : '')
+            )
+              .category-icon.bg-primary-subtle.text-primary
+                i.fas.fa-folder-open
+              .category-info
+                span.category-name= cat.name
+            if hasSubs
+              button.category-toggle(
+                type="button"
+                aria-label="Mostrar subcategorías"
+                aria-expanded=(shouldOpen ? 'true' : 'false')
+                data-category-toggle
               )
-                i.fas.fa-tag
-                span= sub.name
+                i.fas.fa-chevron-down
+
+          if hasSubs
+            .category-children
+              each sub in cat.subcategories
+                a.category-child(
+                  href=`/products?category=${sub._id}`
+                  class=(categoryFilter && categoryFilter.toString() === sub._id.toString() ? 'active' : '')
+                )
+                  i.fas.fa-tag
+                  span= sub.name
 
   //- ============================================
   //- ESTILOS
   //- ============================================
   style.
     /* ================================================
+       BASE / PREVENCIÓN DE DESBORDAMIENTO
+       ================================================ */
+    html, body {
+      overflow-x: hidden;
+      max-width: 100%;
+    }
+
+    .container {
+      max-width: 100%;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    img { max-width: 100%; height: auto; }
+
+    /* ================================================
        HEADER DEL CATÁLOGO
-       — FIX: sin overflow hidden para que el dropdown funcione
        ================================================ */
     .catalog-header {
       background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f172a 100%);
@@ -504,6 +548,7 @@ block content
       position: relative;
       z-index: 10;
       isolation: isolate;
+      overflow: hidden;
     }
 
     .catalog-header > .container {
@@ -511,7 +556,6 @@ block content
       z-index: 2;
     }
 
-    /* Círculos decorativos (detrás del contenido, no se salen) */
     .catalog-header::before {
       content: '';
       position: absolute;
@@ -552,37 +596,32 @@ block content
       color: rgba(255, 255, 255, 0.4);
     }
 
-    /* ================================================
-       FIX: DROPDOWN DE DESCARGAR CATÁLOGO
-       — Asegurar que aparezca encima de todo
-       ================================================ */
+    /* Fix dropdown descargar */
     .catalog-actions-dropdown {
       position: relative;
       z-index: 1055;
     }
-
     .catalog-actions-dropdown .dropdown-toggle {
       position: relative;
       z-index: 1055;
     }
-
     .catalog-actions-dropdown .dropdown-menu {
       z-index: 1060 !important;
-      min-width: 280px;
+      min-width: 260px;
+      max-width: calc(100vw - 2rem);
       border: 1px solid #e2e8f0;
       box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15) !important;
     }
-
     .catalog-actions-dropdown .dropdown-item {
       border-radius: 0.5rem;
       padding: 0.65rem 0.9rem;
       transition: all 0.15s;
+      white-space: normal;
     }
     .catalog-actions-dropdown .dropdown-item:hover {
       background: #f1f5f9;
       transform: translateX(2px);
     }
-
     .catalog-actions-dropdown .dropdown-header {
       padding: 0.5rem 0.9rem;
       font-size: 0.75rem;
@@ -611,6 +650,7 @@ block content
       color: #1f2937;
       transition: all 0.2s;
       border: 1px solid transparent;
+      min-width: 0;
     }
     .category-item:hover {
       background: #f8fafc;
@@ -667,12 +707,65 @@ block content
       transition: all 0.2s;
     }
 
+    /* ================================================
+       CATEGORÍAS DESPLEGABLES
+       ================================================ */
+    .category-group {
+      margin-bottom: 2px;
+    }
+
+    .category-parent-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .category-parent-wrapper .category-item {
+      flex: 1;
+      min-width: 0;
+      margin-bottom: 0;
+    }
+
+    .category-toggle {
+      width: 32px;
+      height: 32px;
+      border-radius: 0.5rem;
+      border: 1px solid #e2e8f0;
+      background: white;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.75rem;
+    }
+    .category-toggle:hover {
+      background: #f1f5f9;
+      color: var(--brand);
+      border-color: var(--brand);
+    }
+    .category-toggle i {
+      transition: transform 0.25s ease;
+    }
+
     .category-children {
       padding-left: 1rem;
-      margin-bottom: 6px;
+      margin: 4px 0 6px 1.25rem;
       border-left: 2px solid #f1f5f9;
-      margin-left: 1.25rem;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
     }
+
+    .category-group.is-open .category-children {
+      max-height: 1000px;
+    }
+
+    .category-group.is-open .category-toggle i {
+      transform: rotate(180deg);
+    }
+
     .category-child {
       display: flex;
       align-items: center;
@@ -684,6 +777,12 @@ block content
       color: #64748b;
       font-size: 0.82rem;
       transition: all 0.15s;
+      min-width: 0;
+    }
+    .category-child span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .category-child:hover {
       background: #f8fafc;
@@ -697,6 +796,7 @@ block content
     .category-child i {
       font-size: 0.7rem;
       opacity: 0.6;
+      flex-shrink: 0;
     }
 
     .bg-gradient-primary {
@@ -722,6 +822,10 @@ block content
       align-items: center;
     }
 
+    .filter-search { min-width: 0; }
+    .filter-price { min-width: 0; }
+    .filter-sort { min-width: 0; }
+
     .filter-search .input-group-text,
     .filter-search .form-control {
       background: #f8fafc;
@@ -738,6 +842,7 @@ block content
       background: #f8fafc;
       border-color: #e2e8f0;
       font-size: 0.9rem;
+      width: 100%;
     }
     .filter-price .form-control:focus,
     .filter-sort .form-select:focus {
@@ -751,19 +856,6 @@ block content
       padding: 0.5rem 1.25rem;
       font-weight: 600;
       white-space: nowrap;
-    }
-
-    @media (max-width: 991px) {
-      .filter-row {
-        grid-template-columns: 1fr 1fr;
-        gap: 0.5rem;
-      }
-      .filter-search {
-        grid-column: 1 / -1;
-      }
-      .filter-apply {
-        grid-column: 1 / -1;
-      }
     }
 
     /* ================================================
@@ -794,6 +886,9 @@ block content
       border-radius: 50rem;
       font-size: 0.8rem;
       font-weight: 600;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .filter-chip-primary {
       background: rgba(13, 110, 253, 0.12);
@@ -843,6 +938,7 @@ block content
       font-weight: 700;
       margin: 0;
       color: #1f2937;
+      word-break: break-word;
     }
 
     .subcategory-section {
@@ -889,6 +985,7 @@ block content
       border: 1px solid #f1f5f9;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
+      min-width: 0;
     }
     .product-tile:hover {
       transform: translateY(-6px);
@@ -978,6 +1075,7 @@ block content
       flex: 1;
       display: flex;
       flex-direction: column;
+      min-width: 0;
     }
 
     .product-tile-category {
@@ -987,6 +1085,9 @@ block content
       color: #94a3b8;
       font-weight: 700;
       margin-bottom: 0.35rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .product-tile-title {
@@ -1002,6 +1103,7 @@ block content
       overflow: hidden;
       min-height: 2.2rem;
       transition: color 0.2s;
+      word-break: break-word;
     }
     .product-tile-title:hover {
       color: var(--brand);
@@ -1011,6 +1113,9 @@ block content
       font-size: 0.7rem;
       color: #64748b;
       margin-bottom: 0.5rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .product-tile-price {
@@ -1133,6 +1238,7 @@ block content
       overflow-x: auto;
       padding-bottom: 1rem;
       scrollbar-width: thin;
+      -webkit-overflow-scrolling: touch;
     }
     .related-scroll::-webkit-scrollbar {
       height: 6px;
@@ -1209,12 +1315,77 @@ block content
       display: flex;
       align-items: baseline;
       font-size: 0.85rem;
+      flex-wrap: wrap;
     }
 
     /* ================================================
        RESPONSIVE
        ================================================ */
+
+    /* Tablets y móviles grandes: filtros en 2 columnas */
+    @media (max-width: 991px) {
+      .filter-row {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+      }
+      .filter-search {
+        grid-column: 1 / -1;
+      }
+      .filter-sort {
+        grid-column: 1 / -1;
+      }
+      .filter-apply {
+        grid-column: 1 / -1;
+      }
+    }
+
+    /* Móviles pequeños */
     @media (max-width: 575px) {
+      .catalog-header {
+        padding: 1.5rem 0 2rem;
+      }
+      .catalog-header h1 {
+        font-size: 1.25rem;
+      }
+
+      .filter-bar {
+        padding: 0.9rem;
+      }
+
+      .filter-row {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+      }
+      .filter-search {
+        grid-column: 1 / -1;
+      }
+      .filter-sort {
+        grid-column: 1 / -1;
+      }
+      .filter-apply {
+        grid-column: 1 / -1;
+      }
+
+      .active-filters {
+        padding: 0.6rem 0.75rem;
+      }
+      .filters-label {
+        width: 100%;
+        margin-bottom: 0.25rem;
+      }
+
+      .category-section-header {
+        padding: 0.75rem 1rem;
+      }
+      .category-section-title {
+        font-size: 1rem;
+      }
+      .category-section-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 0.95rem;
+      }
+
       .product-tile-image {
         height: 140px;
         padding: 0.5rem;
@@ -1245,5 +1416,23 @@ block content
       }
       .product-tile-category {
         display: none;
+      }
+
+      .related-card {
+        width: 150px;
+      }
+
+      .empty-state {
+        padding: 3rem 1.25rem;
+      }
+    }
+
+    /* Pantallas muy pequeñas */
+    @media (max-width: 360px) {
+      .filter-row {
+        grid-template-columns: 1fr;
+      }
+      .product-tile-image {
+        height: 120px;
       }
     }
