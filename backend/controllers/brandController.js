@@ -3,31 +3,16 @@
 // ============================================================
 const Brand = require('../models/Brand');
 const Product = require('../models/Product');
-const fs = require('fs');
-const path = require('path');
+// Ya no necesitamos fs ni path para manejar archivos locales
 
 // ============================================================
-// Helper: eliminar imagen
+// Helper: eliminar imagen (DESHABILITADO PARA CLOUDINARY)
 // ============================================================
 function deleteImage(imagePath) {
-  if (!imagePath) return;
-  if (imagePath.includes('default')) return;
-
-  // ✅ RUTA CORRECTA: backend/../frontend/public/uploads/...
-  const fullPath = path.join(__dirname, '..', '..', 'frontend', 'public', imagePath);
-
-  console.log('🔍 Intentando eliminar:', fullPath);
-
-  if (fs.existsSync(fullPath)) {
-    try {
-      fs.unlinkSync(fullPath);
-      console.log('🗑️ Imagen eliminada:', imagePath);
-    } catch (err) {
-      console.error('❌ Error al eliminar imagen:', err);
-    }
-  } else {
-    console.log('⚠️ Imagen no encontrada en disco:', fullPath);
-  }
+  // Como las imágenes ahora están en Cloudinary, no podemos borrarlas con fs.
+  // Para borrarlas de Cloudinary, se requeriría usar su API, pero por ahora
+  // es seguro no hacer nada para evitar errores.
+  console.log('🗑️ Solicitud de eliminación (ignorada, la imagen está en Cloudinary):', imagePath);
 }
 
 // ============================================================
@@ -67,24 +52,25 @@ exports.create = (req, res) => {
 // GUARDAR
 // ============================================================
 exports.store = async (req, res) => {
-  let logoPath = '/img/brand-default.png';  // ✅ Declarar fuera del try
+  let logoPath = '/img/brand-default.png'; 
 
   try {
     const { name, description } = req.body;
 
     console.log('\n🆕 [brandController.store] Creando marca...');
     console.log('   name:', name);
-    console.log('   req.file:', req.file ? req.file.filename : 'sin archivo');
+    // Ahora mostramos el path (URL) que nos da Cloudinary
+    console.log('   req.file:', req.file ? req.file.path : 'sin archivo');
 
     if (!name || !name.trim()) {
       req.flash('error', 'El nombre de la marca es obligatorio');
       return res.redirect('/brands/create');
     }
 
-    // ✅ Si se subió imagen, usar su ruta
+    // ✅ Si se subió imagen, usar la URL de Cloudinary
     if (req.file) {
-      logoPath = `/uploads/brands/${req.file.filename}`;
-      console.log('   logoPath:', logoPath);
+      logoPath = req.file.path; // Cloudinary devuelve la URL completa aquí
+      console.log('   logoPath (Cloudinary):', logoPath);
     }
 
     const brand = await Brand.create({
@@ -105,17 +91,10 @@ exports.store = async (req, res) => {
     console.error('   Código:', error.code);
     console.error('   Mensaje:', error.message);
 
-    // ✅ Solo eliminar si el error NO es de duplicado (así conservas la imagen)
-    // Si el error es 11000 (duplicado), la imagen ya se subió pero no se usó
     if (error.code === 11000) {
-      // Eliminar la imagen que se subió pero no se usó
-      if (req.file) {
-        deleteImage(`/uploads/brands/${req.file.filename}`);
-      }
+      // Si hay duplicado, la imagen ya se subió a Cloudinary (quedará huérfana allí, pero no rompe la app)
       req.flash('error', 'Ya existe una marca con ese nombre');
     } else {
-      // Para otros errores, NO eliminar la imagen (así puedes revisar)
-      console.error('⚠️ Imagen NO eliminada para diagnóstico:', logoPath);
       req.flash('error', 'Error al crear marca: ' + error.message);
     }
 
@@ -182,7 +161,7 @@ exports.update = async (req, res) => {
 
     console.log('\n✏️ [brandController.update] Actualizando marca...');
     console.log('   ID:', brandId);
-    console.log('   req.file:', req.file ? req.file.filename : 'sin archivo');
+    console.log('   req.file:', req.file ? req.file.path : 'sin archivo');
     console.log('   removeLogo:', removeLogo);
 
     const brand = await Brand.findById(brandId);
@@ -199,9 +178,11 @@ exports.update = async (req, res) => {
 
     // ✅ Si subieron nueva imagen
     if (req.file) {
-      deleteImage(brand.logo);
-      updateData.logo = `/uploads/brands/${req.file.filename}`;
-      console.log('   Nuevo logo:', updateData.logo);
+      // (Opcional) Aquí podrías llamar a la API de Cloudinary para borrar la imagen vieja
+      deleteImage(brand.logo); 
+      
+      updateData.logo = req.file.path; // Guarda la URL de Cloudinary
+      console.log('   Nuevo logo (Cloudinary):', updateData.logo);
     } else if (removeLogo === 'on') {
       deleteImage(brand.logo);
       updateData.logo = '/img/brand-default.png';
@@ -219,11 +200,7 @@ exports.update = async (req, res) => {
   } catch (error) {
     console.error('❌ Error al actualizar marca:', error);
 
-    // ✅ Solo eliminar si el error es de duplicado
     if (error.code === 11000) {
-      if (req.file) {
-        deleteImage(`/uploads/brands/${req.file.filename}`);
-      }
       req.flash('error', 'Ya existe una marca con ese nombre');
     } else {
       req.flash('error', 'Error al actualizar marca: ' + error.message);
