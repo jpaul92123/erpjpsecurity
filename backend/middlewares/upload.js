@@ -11,16 +11,16 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// 2. Filtro de imágenes (se mantiene igual)
+// 2. Filtro de imágenes
 function imageFilter(req, file, cb) {
-  const allowed = /jpeg|jpg|png|gif|webp|svg/;
+  const allowed = /jpeg|jpg|png|gif|webp|svg|ico/; // Agregué 'ico' por si subes un favicon
   const ext = allowed.test(path.extname(file.originalname).toLowerCase());
   const mime = allowed.test(file.mimetype);
 
   if (ext && mime) {
     cb(null, true);
   } else {
-    cb(new Error('Solo se permiten imágenes (jpg, png, gif, webp, svg)'));
+    cb(new Error('Solo se permiten imágenes (jpg, png, gif, webp, svg, ico)'));
   }
 }
 
@@ -29,16 +29,15 @@ function createCloudinaryStorage(folder) {
   return new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
-      folder: `erp_jpsecurity/${folder}`, // Se guardará en esta carpeta en Cloudinary
-      allowed_formats: ['jpg', 'png', 'jpeg', 'gif', 'webp', 'svg'],
-      // Opcional: Transformar la imagen para que no pese tanto
+      folder: `erp_jpsecurity/${folder}`,
+      allowed_formats: ['jpg', 'png', 'jpeg', 'gif', 'webp', 'svg', 'ico'],
       transformation: [{ width: 1000, crop: 'limit' }] 
     }
   });
 }
 
 // ============================================================
-// UPLOADS ESPECÍFICOS (Configurados para Cloudinary)
+// UPLOADS ESPECÍFICOS
 // ============================================================
 
 // Logo de marcas
@@ -73,32 +72,16 @@ const uploadSlideImages = multer({
   { name: 'slideImage2', maxCount: 1 }
 ]);
 
-// Upload completo de settings (logo + favicon + slides)
-const uploadSettings = multer({
-  storage: multer.diskStorage({
-    // ⚠️ NOTA: Multer-storage-cloudinary no soporta diferentes carpetas dinámicas fácilmente.
-    // Usaremos una carpeta general para settings.
-    destination: function(req, file, cb) {
-      cb(null, 'settings'); 
-    },
-    filename: function(req, file, cb) {
-      cb(null, file.originalname); 
-    }
-  }),
-  // Para settings, usamos CloudinaryStorage directamente apuntando a una carpeta
-  limits: { fileSize: 5 * 1024 * 1024 },
-  fileFilter: imageFilter
-});
+// ============================================================
+// SETTINGS (Logo + Favicon + Slides)
+// ============================================================
 
-// ⚠️ CORRECCIÓN PARA SETTINGS: 
-// Como necesitamos guardar logo, favicon y slides, creamos un storage específico.
 const settingsStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'erp_jpsecurity/settings', // Todo va a la misma carpeta
+    folder: 'erp_jpsecurity/settings',
     allowed_formats: ['jpg', 'png', 'jpeg', 'gif', 'webp', 'svg', 'ico'],
     public_id: (req, file) => {
-      // Usamos el nombre del campo para que se distingan (logo, favicon, slideImage0...)
       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
       return `${file.fieldname}-${uniqueSuffix}`;
     }
@@ -122,5 +105,5 @@ module.exports = {
   uploadProductImage,
   uploadCompanyLogo,
   uploadSlideImages,
-  uploadSettings: uploadSettingsCloud // Exportamos la versión de Cloudinary
+  uploadSettings: uploadSettingsCloud // Exportamos directamente la configuración en la nube
 };

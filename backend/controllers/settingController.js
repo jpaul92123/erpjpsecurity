@@ -3,25 +3,14 @@
 // ============================================================
 const Setting = require('../models/Setting');
 const Category = require('../models/Category');
-const fs = require('fs');
-const path = require('path');
+// Ya no necesitamos fs ni path para borrar archivos locales
 
 // ============================================================
-// Helper: eliminar imagen del disco
+// Helper: eliminar imagen (DESHABILITADO PARA CLOUDINARY)
 // ============================================================
 function deleteImage(imagePath) {
-  if (!imagePath) return;
-  if (imagePath.startsWith('http')) return; // no borrar URLs externas
-
-  const fullPath = path.join(__dirname, '..', '..', 'frontend', 'public', imagePath);
-  if (fs.existsSync(fullPath)) {
-    try {
-      fs.unlinkSync(fullPath);
-      console.log('🗑️ Imagen eliminada:', imagePath);
-    } catch (err) {
-      console.error('Error al eliminar imagen:', err);
-    }
-  }
+  // Como las imágenes están en Cloudinary, no se pueden borrar con fs
+  console.log('🗑️ Solicitud de eliminación (ignorada, imagen en Cloudinary):', imagePath);
 }
 
 // ============================================
@@ -60,12 +49,9 @@ exports.updateSettings = async (req, res) => {
     // LOGO
     // ==========================================
     if (files.logo && files.logo[0]) {
-      // Eliminar logo anterior si era local
-      if (setting.logo && !setting.logo.startsWith('http')) {
-        deleteImage(setting.logo);
-      }
-      setting.logo = `/uploads/company/${files.logo[0].filename}`;
-      console.log('✅ Nuevo logo:', setting.logo);
+      // ✅ AHORA GUARDAMOS LA URL DE CLOUDINARY
+      setting.logo = files.logo[0].path;
+      console.log('✅ Nuevo logo (Cloudinary):', setting.logo);
     } else if (req.body.logo && req.body.logo.trim()) {
       setting.logo = req.body.logo.trim();
     }
@@ -74,11 +60,9 @@ exports.updateSettings = async (req, res) => {
     // FAVICON
     // ==========================================
     if (files.favicon && files.favicon[0]) {
-      if (setting.favicon && !setting.favicon.startsWith('http')) {
-        deleteImage(setting.favicon);
-      }
-      setting.favicon = `/uploads/company/${files.favicon[0].filename}`;
-      console.log('✅ Nuevo favicon:', setting.favicon);
+      // ✅ AHORA GUARDAMOS LA URL DE CLOUDINARY
+      setting.favicon = files.favicon[0].path;
+      console.log('✅ Nuevo favicon (Cloudinary):', setting.favicon);
     } else if (req.body.favicon && req.body.favicon.trim()) {
       setting.favicon = req.body.favicon.trim();
     }
@@ -167,16 +151,9 @@ exports.updateSettings = async (req, res) => {
       let finalImage = imageUrl;
 
       if (uploadedFile) {
-        // Eliminar imagen anterior si era local
-        if (
-          setting.heroSlides[i] &&
-          setting.heroSlides[i].image &&
-          !setting.heroSlides[i].image.startsWith('http')
-        ) {
-          deleteImage(setting.heroSlides[i].image);
-        }
-        finalImage = `/uploads/slides/${uploadedFile.filename}`;
-        console.log(`  ✅ Slide ${i + 1} - Imagen subida:`, finalImage);
+        // AHORA GUARDAMOS LA URL DE CLOUDINARY
+        finalImage = uploadedFile.path;
+        console.log(`  ✅ Slide ${i + 1} - Imagen subida (Cloudinary):`, finalImage);
       }
 
       // Saltar si el slide está vacío
