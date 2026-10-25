@@ -114,24 +114,20 @@ block content
                 - const isSubActive = hasSubs && cat.subcategories.some(s => categoryFilter && categoryFilter.toString() === s._id.toString())
                 - const shouldOpen = isCatActive || isSubActive
 
-                .category-group(class=(shouldOpen ? 'is-open' : ''))
-                  .category-parent-wrapper
-                    a.category-item(
-                      href=`/products?category=${cat._id}`
-                      class=(isCatActive ? 'active' : '')
-                    )
-                      .category-icon.bg-primary-subtle.text-primary
-                        i.fas.fa-folder-open
-                      .category-info
-                        span.category-name= cat.name
+                .category-group(
+                  class=(shouldOpen ? 'is-open' : '')
+                  class=(hasSubs ? 'has-children' : '')
+                )
+                  a.category-item(
+                    href=`/products?category=${cat._id}`
+                    class=(isCatActive ? 'active' : '')
+                  )
+                    .category-icon.bg-primary-subtle.text-primary
+                      i.fas.fa-folder-open
+                    .category-info
+                      span.category-name= cat.name
                     if hasSubs
-                      button.category-toggle(
-                        type="button"
-                        aria-label="Mostrar subcategorías"
-                        aria-expanded=(shouldOpen ? 'true' : 'false')
-                        data-category-toggle
-                      )
-                        i.fas.fa-chevron-down
+                      i.fas.fa-chevron-down.category-chevron
 
                   if hasSubs
                     .category-children
@@ -490,7 +486,10 @@ block content
         - const isSubActive = hasSubs && cat.subcategories.some(s => categoryFilter && categoryFilter.toString() === s._id.toString())
         - const shouldOpen = isCatActive || isSubActive
 
-        .category-group(class=(shouldOpen ? 'is-open' : ''))
+        .category-group(
+          class=(shouldOpen ? 'is-open' : '')
+          class=(hasSubs ? 'has-children' : '')
+        )
           .category-parent-wrapper
             a.category-item(
               href=`/products?category=${cat._id}`
@@ -708,12 +707,83 @@ block content
     }
 
     /* ================================================
-       CATEGORÍAS DESPLEGABLES
+       CATEGORÍAS DESPLEGABLES (hover en desktop)
        ================================================ */
     .category-group {
       margin-bottom: 2px;
+      position: relative;
     }
 
+    .category-group .category-item {
+      margin-bottom: 0;
+    }
+
+    /* Chevron indicador dentro del item padre (solo desktop) */
+    .category-chevron {
+      font-size: 0.7rem;
+      color: #94a3b8;
+      flex-shrink: 0;
+      margin-left: auto;
+      transition: transform 0.25s ease;
+    }
+    .category-group.has-children:hover .category-chevron {
+      transform: rotate(180deg);
+      color: var(--brand);
+    }
+    .category-group.is-open .category-chevron {
+      transform: rotate(180deg);
+      color: var(--brand);
+    }
+
+    /* Contenedor de subcategorías: cerrado por defecto */
+    .category-children {
+      padding-left: 1rem;
+      margin: 0 0 4px 1.25rem;
+      border-left: 2px solid #f1f5f9;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.3s ease, opacity 0.2s ease, margin 0.3s ease;
+    }
+
+    /* Abierto por estado activo (URL) */
+    .category-group.is-open > .category-children {
+      max-height: 1000px;
+      opacity: 1;
+      margin-top: 4px;
+      margin-bottom: 6px;
+    }
+
+    /* Abierto por HOVER (solo desktop) */
+    @media (hover: hover) and (pointer: fine) {
+      .category-group.has-children:hover > .category-children {
+        max-height: 1000px;
+        opacity: 1;
+        margin-top: 4px;
+        margin-bottom: 6px;
+      }
+      .category-group.has-children:hover > .category-item {
+        background: #f8fafc;
+        color: var(--brand);
+        border-color: #e2e8f0;
+      }
+    }
+
+    /* En desktop ocultamos el botón de toggle (no hace falta) */
+    @media (min-width: 992px) {
+      .category-toggle {
+        display: none;
+      }
+    }
+
+    /* En móvil ocultamos el chevron dentro del item (usamos botón) */
+    @media (max-width: 991px) {
+      .category-chevron {
+        display: none;
+      }
+    }
+
+    /* Wrapper para móvil (item + botón toggle) */
     .category-parent-wrapper {
       display: flex;
       align-items: center;
@@ -722,7 +792,6 @@ block content
     .category-parent-wrapper .category-item {
       flex: 1;
       min-width: 0;
-      margin-bottom: 0;
     }
 
     .category-toggle {
@@ -748,20 +817,6 @@ block content
     .category-toggle i {
       transition: transform 0.25s ease;
     }
-
-    .category-children {
-      padding-left: 1rem;
-      margin: 4px 0 6px 1.25rem;
-      border-left: 2px solid #f1f5f9;
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease;
-    }
-
-    .category-group.is-open .category-children {
-      max-height: 1000px;
-    }
-
     .category-group.is-open .category-toggle i {
       transform: rotate(180deg);
     }
@@ -1436,3 +1491,20 @@ block content
         height: 120px;
       }
     }
+
+  //- ============================================
+  //- SCRIPT: toggle de subcategorías (móvil)
+  //- ============================================
+  script.
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('[data-category-toggle]').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var group = btn.closest('.category-group');
+          if (!group) return;
+          var isOpen = group.classList.toggle('is-open');
+          btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+      });
+    });
