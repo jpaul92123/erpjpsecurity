@@ -278,7 +278,7 @@ block content
                       span.fw-semibold= product.model
 
         //- ================================================
-        //- DESCRIPCIÓN (CON FORMATO DE TÍTULO Y PUNTOS)
+        //- DESCRIPCIÓN (CON FORMATO INTELIGENTE Y LISTAS)
         //- ================================================
         if product.description
           .product-info-card
@@ -286,16 +286,51 @@ block content
               i.fas.fa-align-left
               | Descripción
             .product-info-body
-              //- Extraemos la primera línea o frase para usarla como subtítulo
-              - const descLines = product.description.split('\n');
-              - const firstLine = descLines[0] || '';
-              - const restOfDescription = descLines.slice(1).join('\n') || product.description;
+              - 
+                // 1. Dividimos el texto por saltos de línea
+                const lines = product.description.split('\n').map(l => l.trim()).filter(l => l !== '');
+              -
+                // 2. Si hay texto, la primera línea es el subtítulo
+                const subtitle = lines.length > 0 ? lines[0] : '';
+                const restLines = lines.slice(1);
 
               //- Mostramos el subtítulo (Primera línea)
-              h5.fw-bold.text-dark.mb-3(style="line-height: 1.4;")= firstLine
+              if subtitle
+                h5.fw-bold.text-dark.mb-3(style="line-height: 1.4;")= subtitle
               
-              //- Mostramos el resto con recorte de puntos suspensivos (line-clamp)
-              div.product-description-clamp= restOfDescription
+              //- Procesamos el resto del texto
+              if restLines.length > 0
+                - 
+                  let inList = false;
+                  let htmlContent = '';
+                  
+                  // 3. Recorremos el texto para armar párrafos o listas
+                  restLines.forEach(line => {
+                    // Detecta si la línea empieza con guion, asterisco o número
+                    const isListItem = /^[-*•]|\d+\./.test(line);
+                    
+                    if (isListItem) {
+                      if (!inList) {
+                        htmlContent += '<ul class="product-feature-list">';
+                        inList = true;
+                      }
+                      // Limpiamos el guion o asterisco del inicio
+                      const cleanLine = line.replace(/^[-*•]\s*|\d+\.\s*/, '');
+                      htmlContent += `<li>${cleanLine}</li>`;
+                    } else {
+                      if (inList) {
+                        htmlContent += '</ul>';
+                        inList = false;
+                      }
+                      // Si es un párrafo normal
+                      htmlContent += `<p class="mb-3">${line}</p>`;
+                    }
+                  });
+                  
+                  if (inList) htmlContent += '</ul>';
+
+                //- Imprimimos el HTML resultante (Safe string)
+                div(style="line-height: 1.7; color: #475569;")!= htmlContent
 
         //- ================================================
         //- FICHA TÉCNICA
@@ -730,18 +765,19 @@ block content
     }
 
     /* ================================================
-       DESCRIPCIÓN DEL PRODUCTO (LINE-CLAMP)
+       LISTA DE CARACTERÍSTICAS (NUEVO)
        ================================================ */
-    .product-description-clamp {
-      display: -webkit-box;
-      -webkit-line-clamp: 4; /* Muestra 4 líneas y pone "..." */
-      -webkit-box-orient: vertical;
-      overflow: hidden;
+    .product-feature-list {
+      padding-left: 1.2rem;
+      margin-bottom: 1rem;
+    }
+    .product-feature-list li {
+      margin-bottom: 0.4rem;
       color: #475569;
-      line-height: 1.7;
-      font-size: 0.95rem;
-      /* Respetamos los saltos de línea del texto original */
-      white-space: pre-line; 
+      line-height: 1.6;
+    }
+    .product-feature-list li::marker {
+      color: var(--brand); /* Color de las viñetas */
     }
 
     .info-item {
