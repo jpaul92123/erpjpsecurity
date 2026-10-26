@@ -33,7 +33,6 @@ block content
 
           //- ============================================
           //- DROPDOWN: DESCARGAR CATÁLOGO (solo admin)
-          //- ============================================
           if user
             .dropdown.catalog-actions-dropdown
               button.btn.btn-light.rounded-pill.px-4.dropdown-toggle(
@@ -46,7 +45,10 @@ block content
                 i.fas.fa-file-pdf.me-1
                 | Descargar
 
-              ul.dropdown-menu.dropdown-menu-end.shadow-lg.rounded-3.border-0
+              //- Agregamos la clase 'shadow-lg' y un z-index alto en el style
+              ul.dropdown-menu.dropdown-menu-end.shadow-lg.rounded-3.border-0(
+                style="z-index: 1055;" 
+              )
                 li
                   h6.dropdown-header.mb-0
                     i.fas.fa-download.me-1
@@ -72,14 +74,6 @@ block content
                     )
                       i.fas.fa-file-pdf.me-2.text-danger
                       | Descargar categoría actual
-
-          //- ============================================
-          //- BOTÓN: NUEVO PRODUCTO (solo admin)
-          //- ============================================
-          if user
-            a.btn.btn-light.rounded-pill.px-4(href="/products/create")
-              i.fas.fa-plus-circle.me-1.text-primary
-              | Nuevo Producto
 
   //- ============================================
   //- LAYOUT: SIDEBAR + CONTENIDO
