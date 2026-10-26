@@ -237,12 +237,12 @@ exports.edit = async (req, res) => {
 };
 
 // ============================================
-// ACTUALIZAR PRODUCTO (✅ CORREGIDO)
+// ACTUALIZAR PRODUCTO
 // ============================================
 exports.update = async (req, res) => {
   try {
     const {
-      name, model, image, category, subcategory, brand,   // ⬅️ AGREGADO brand
+      name, model, image, category, subcategory, brand,
       supplierPrice, customerPrice, discount,
       description, techSheet, isActive
     } = req.body;
@@ -253,7 +253,7 @@ exports.update = async (req, res) => {
       image: image || '',
       category,
       subcategory: subcategory || null,
-      brand: brand || null,                                // ⬅️ Ahora sí existe
+      brand: brand || null,
       supplierPrice: parseFloat(supplierPrice) || 0,
       customerPrice: parseFloat(customerPrice) || 0,
       discount: parseFloat(discount) || 0,
@@ -289,7 +289,7 @@ exports.destroy = async (req, res) => {
 };
 
 // ============================================
-// DETALLE DE PRODUCTO
+// DETALLE DE PRODUCTO (ACTUALIZADO CON RELACIONADOS)
 // ============================================
 exports.detail = async (req, res) => {
   try {
@@ -306,11 +306,28 @@ exports.detail = async (req, res) => {
     // Normalizar con finalPrice
     const normalizedProduct = normalizeProduct(product);
 
+    // ✅ BUSCAR PRODUCTOS RELACIONADOS (misma categoría, excluyendo el actual)
+    let relatedProducts = [];
+    if (product.category) {
+      const related = await Product.find({
+        category: product.category._id,
+        _id: { $ne: product._id }, // Que no sea el mismo producto
+        isActive: true
+      })
+      .limit(6) // Traemos hasta 6 productos
+      .populate('category', 'name')
+      .populate('brand', 'name');
+
+      relatedProducts = related.map(normalizeProduct);
+    }
+
     res.render('products/detail', {
       title: product.name,
-      product: normalizedProduct
+      product: normalizedProduct,
+      relatedProducts // <-- Enviamos los relacionados a la vista
     });
   } catch (error) {
+    console.error('Error en detalle:', error);
     req.flash('error', 'Error al cargar producto');
     res.redirect('/products');
   }
@@ -330,8 +347,6 @@ exports.getSubcategories = async (req, res) => {
     res.status(500).json({ error: 'Error al cargar subcategorías' });
   }
 };
-
-
 
 // ============================================
 // DESCARGAR CATÁLOGO (HTML imprimible)
@@ -405,7 +420,6 @@ exports.downloadCatalog = async (req, res) => {
     res.redirect('/products');
   }
 };
-
 
 // ============================================
 // API: BÚSQUEDA EN TIEMPO REAL
