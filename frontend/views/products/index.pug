@@ -18,7 +18,7 @@ block content
       .d-flex.flex-wrap.justify-content-between.align-items-center.gap-3
         div
           h1.h3.fw-bold.mb-1.text-white
-            i.fas.fa-cubes.me-2
+            i.fas.fa-cubes.me-2.text-primary
             | Catálogo de Productos
           p.mb-0.text-white-50.small
             i.fas.fa-box.me-1
@@ -29,37 +29,42 @@ block content
                 strong= query
                 | "
 
-        .d-flex.flex-wrap.gap-2
+        //- ============================================
+        //- BARRA DE ACCIONES (Nuevo producto y Descargar)
+        //- ============================================
+        if user
+          .d-flex.flex-wrap.gap-2.align-items-center
+            //- Botón Nuevo Producto (Destacado)
+            a.btn.btn-primary.rounded-pill.px-4.shadow-sm(href="/products/create")
+              i.fas.fa-plus-circle.me-2
+              | Nuevo Producto
 
-          //- ============================================
-          //- DROPDOWN: DESCARGAR CATÁLOGO (solo admin)
-          if user
+            //- Dropdown de Descargar Catálogo (CORREGIDO)
             .dropdown.catalog-actions-dropdown
-              button.btn.btn-light.rounded-pill.px-4.dropdown-toggle(
+              button.btn.btn-dark.rounded-pill.px-4.dropdown-toggle.shadow-sm(
                 type="button"
                 data-bs-toggle="dropdown"
                 data-bs-auto-close="outside"
                 data-bs-strategy="fixed"
                 aria-expanded="false"
               )
-                i.fas.fa-file-pdf.me-1
-                | Descargar
+                i.fas.fa-file-pdf.me-2.text-danger
+                | Generar Catálogo
 
-              //- Agregamos la clase 'shadow-lg' y un z-index alto en el style
-              ul.dropdown-menu.dropdown-menu-end.shadow-lg.rounded-3.border-0(
-                style="z-index: 1055;" 
-              )
+              ul.dropdown-menu.dropdown-menu-end.shadow-lg.rounded-3.border-0.mt-2
                 li
                   h6.dropdown-header.mb-0
                     i.fas.fa-download.me-1
-                    | Generar catálogo
+                    | Opciones de descarga
                 li: hr.dropdown-divider
 
                 li
-                  a.dropdown-item(href="/products/catalog/download" target="_blank")
-                    i.fas.fa-boxes-stacked.me-2.text-primary
-                    | Todo el catálogo
-                    small.d-block.text-muted.ps-4 Los #{products ? products.length : 0} productos
+                  a.dropdown-item.d-flex.align-items-center(href="/products/catalog/download" target="_blank")
+                    .bg-primary-subtle.text-primary.rounded.p-2.me-3
+                      i.fas.fa-boxes-stacked
+                    div
+                      span.fw-bold Todo el catálogo
+                      small.d-block.text-muted Los #{products ? products.length : 0} productos
 
                 if categoryFilter
                   li: hr.dropdown-divider
@@ -68,12 +73,16 @@ block content
                       i.fas.fa-folder-open.me-1
                       | Solo esta categoría
                   li
-                    a.dropdown-item(
+                    a.dropdown-item.d-flex.align-items-center(
                       href=`/products/catalog/download?category=${categoryFilter}`
                       target="_blank"
                     )
-                      i.fas.fa-file-pdf.me-2.text-danger
-                      | Descargar categoría actual
+                      .bg-danger-subtle.text-danger.rounded.p-2.me-3
+                        i.fas.fa-file-pdf
+                      div
+                        span.fw-bold Categoría actual
+                        small.d-block.text-muted Descargar filtro aplicado
+
 
   //- ============================================
   //- LAYOUT: SIDEBAR + CONTENIDO
@@ -542,6 +551,7 @@ block content
       z-index: 10;
       isolation: isolate;
       overflow: hidden;
+      border-bottom: 3px solid var(--brand);
     }
 
     .catalog-header > .container {
@@ -589,34 +599,35 @@ block content
       color: rgba(255, 255, 255, 0.4);
     }
 
-    /* Fix dropdown descargar */
+    /* ================================================
+       FIX DROPDOWN DE DESCARGA
+       ================================================ */
     .catalog-actions-dropdown {
       position: relative;
-      z-index: 1055;
     }
-    .catalog-actions-dropdown .dropdown-toggle {
-      position: relative;
-      z-index: 1055;
-    }
+
+    /* Forzamos al menú a estar por encima de cualquier tarjeta o imagen */
     .catalog-actions-dropdown .dropdown-menu {
-      z-index: 1060 !important;
-      min-width: 260px;
-      max-width: calc(100vw - 2rem);
+      z-index: 9999 !important;
+      min-width: 280px;
       border: 1px solid #e2e8f0;
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15) !important;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+      padding: 0.5rem;
     }
+
     .catalog-actions-dropdown .dropdown-item {
       border-radius: 0.5rem;
-      padding: 0.65rem 0.9rem;
-      transition: all 0.15s;
+      padding: 0.75rem 1rem;
+      transition: all 0.2s;
       white-space: normal;
     }
     .catalog-actions-dropdown .dropdown-item:hover {
-      background: #f1f5f9;
-      transform: translateX(2px);
+      background: #f8fafc;
+      transform: translateY(-1px);
     }
+    
     .catalog-actions-dropdown .dropdown-header {
-      padding: 0.5rem 0.9rem;
+      padding: 0.5rem 1rem;
       font-size: 0.75rem;
       font-weight: 700;
       text-transform: uppercase;
@@ -712,7 +723,6 @@ block content
       margin-bottom: 0;
     }
 
-    /* Chevron indicador dentro del item padre (solo desktop) */
     .category-chevron {
       font-size: 0.7rem;
       color: #94a3b8;
@@ -729,7 +739,6 @@ block content
       color: var(--brand);
     }
 
-    /* Contenedor de subcategorías: cerrado por defecto */
     .category-children {
       padding-left: 1rem;
       margin: 0 0 4px 1.25rem;
@@ -740,7 +749,6 @@ block content
       transition: max-height 0.3s ease, opacity 0.2s ease, margin 0.3s ease;
     }
 
-    /* Abierto por estado activo (URL) */
     .category-group.is-open > .category-children {
       max-height: 1000px;
       opacity: 1;
@@ -748,7 +756,6 @@ block content
       margin-bottom: 6px;
     }
 
-    /* Abierto por HOVER (solo desktop) */
     @media (hover: hover) and (pointer: fine) {
       .category-group.has-children:hover > .category-children {
         max-height: 1000px;
@@ -763,21 +770,18 @@ block content
       }
     }
 
-    /* En desktop ocultamos el botón de toggle (no hace falta) */
     @media (min-width: 992px) {
       .category-toggle {
         display: none;
       }
     }
 
-    /* En móvil ocultamos el chevron dentro del item (usamos botón) */
     @media (max-width: 991px) {
       .category-chevron {
         display: none;
       }
     }
 
-    /* Wrapper para móvil (item + botón toggle) */
     .category-parent-wrapper {
       display: flex;
       align-items: center;
@@ -1371,7 +1375,6 @@ block content
        RESPONSIVE
        ================================================ */
 
-    /* Tablets y móviles grandes: filtros en 2 columnas */
     @media (max-width: 991px) {
       .filter-row {
         grid-template-columns: 1fr 1fr;
@@ -1388,7 +1391,6 @@ block content
       }
     }
 
-    /* Móviles pequeños */
     @media (max-width: 575px) {
       .catalog-header {
         padding: 1.5rem 0 2rem;
@@ -1476,7 +1478,6 @@ block content
       }
     }
 
-    /* Pantallas muy pequeñas */
     @media (max-width: 360px) {
       .filter-row {
         grid-template-columns: 1fr;
