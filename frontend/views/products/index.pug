@@ -30,28 +30,28 @@ block content
                 | "
 
         //- ============================================
-        //- BARRA DE ACCIONES (Nuevo producto y Descargar)
+        //- BARRA DE ACCIONES
         //- ============================================
         if user
           .d-flex.flex-wrap.gap-2.align-items-center
-            //- Botón Nuevo Producto (Destacado)
+            //- Botón Nuevo Producto
             a.btn.btn-primary.rounded-pill.px-4.shadow-sm(href="/products/create")
               i.fas.fa-plus-circle.me-2
               | Nuevo Producto
 
-            //- Dropdown de Descargar Catálogo (CORREGIDO)
-            .dropdown.catalog-actions-dropdown
+            //- Dropdown de Descargar Catálogo (Nativo Bootstrap)
+            div
               button.btn.btn-dark.rounded-pill.px-4.dropdown-toggle.shadow-sm(
                 type="button"
                 data-bs-toggle="dropdown"
                 data-bs-auto-close="outside"
-                data-bs-strategy="fixed"
                 aria-expanded="false"
               )
                 i.fas.fa-file-pdf.me-2.text-danger
                 | Generar Catálogo
 
-              ul.dropdown-menu.dropdown-menu-end.shadow-lg.rounded-3.border-0.mt-2
+              //- Menú desplegable (Bootstrap lo posiciona automáticamente)
+              ul.dropdown-menu.shadow-lg.rounded-3.border-0.mt-2(style="min-width: 280px; z-index: 9999;")
                 li
                   h6.dropdown-header.mb-0
                     i.fas.fa-download.me-1
@@ -542,16 +542,15 @@ block content
     img { max-width: 100%; height: auto; }
 
     /* ================================================
-       HEADER DEL CATÁLOGO
+       HEADER DEL CATÁLOGO (Ajustado para no romper dropdowns)
        ================================================ */
     .catalog-header {
       background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f172a 100%);
       padding: 2rem 0 2.5rem;
       position: relative;
       z-index: 10;
-      isolation: isolate;
-      overflow: hidden;
       border-bottom: 3px solid var(--brand);
+      /* NOTA: Se eliminó isolation: isolate y overflow: hidden para que el dropdown fluya */
     }
 
     .catalog-header > .container {
@@ -597,42 +596,6 @@ block content
     }
     .catalog-header .breadcrumb-item + .breadcrumb-item::before {
       color: rgba(255, 255, 255, 0.4);
-    }
-
-    /* ================================================
-       FIX DROPDOWN DE DESCARGA
-       ================================================ */
-    .catalog-actions-dropdown {
-      position: relative;
-    }
-
-    /* Forzamos al menú a estar por encima de cualquier tarjeta o imagen */
-    .catalog-actions-dropdown .dropdown-menu {
-      z-index: 9999 !important;
-      min-width: 280px;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
-      padding: 0.5rem;
-    }
-
-    .catalog-actions-dropdown .dropdown-item {
-      border-radius: 0.5rem;
-      padding: 0.75rem 1rem;
-      transition: all 0.2s;
-      white-space: normal;
-    }
-    .catalog-actions-dropdown .dropdown-item:hover {
-      background: #f8fafc;
-      transform: translateY(-1px);
-    }
-    
-    .catalog-actions-dropdown .dropdown-header {
-      padding: 0.5rem 1rem;
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #64748b;
     }
 
     /* ================================================
@@ -712,7 +675,7 @@ block content
     }
 
     /* ================================================
-       CATEGORÍAS DESPLEGABLES (hover en desktop)
+       CATEGORÍAS DESPLEGABLES
        ================================================ */
     .category-group {
       margin-bottom: 2px;
