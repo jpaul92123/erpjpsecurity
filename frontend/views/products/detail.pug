@@ -278,7 +278,7 @@ block content
                       span.fw-semibold= product.model
 
         //- ================================================
-        //- DESCRIPCIÓN
+        //- DESCRIPCIÓN (CON FORMATO DE TÍTULO Y PUNTOS)
         //- ================================================
         if product.description
           .product-info-card
@@ -286,7 +286,16 @@ block content
               i.fas.fa-align-left
               | Descripción
             .product-info-body
-              p.mb-0(style="white-space: pre-line; line-height: 1.7; color: #475569;")= product.description
+              //- Extraemos la primera línea o frase para usarla como subtítulo
+              - const descLines = product.description.split('\n');
+              - const firstLine = descLines[0] || '';
+              - const restOfDescription = descLines.slice(1).join('\n') || product.description;
+
+              //- Mostramos el subtítulo (Primera línea)
+              h5.fw-bold.text-dark.mb-3(style="line-height: 1.4;")= firstLine
+              
+              //- Mostramos el resto con recorte de puntos suspensivos (line-clamp)
+              div.product-description-clamp= restOfDescription
 
         //- ================================================
         //- FICHA TÉCNICA
@@ -718,6 +727,21 @@ block content
 
     .product-info-body {
       padding: 1rem 1.25rem;
+    }
+
+    /* ================================================
+       DESCRIPCIÓN DEL PRODUCTO (LINE-CLAMP)
+       ================================================ */
+    .product-description-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 4; /* Muestra 4 líneas y pone "..." */
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      color: #475569;
+      line-height: 1.7;
+      font-size: 0.95rem;
+      /* Respetamos los saltos de línea del texto original */
+      white-space: pre-line; 
     }
 
     .info-item {
