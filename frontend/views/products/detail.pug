@@ -350,6 +350,46 @@ block content
             div.fw-bold Pago Seguro
             small.text-muted Múltiples métodos
 
+    //- ================================================
+    //- PRODUCTOS RELACIONADOS (TAMBIÉN TE PUEDE INTERESAR)
+    //- ================================================
+    if relatedProducts && relatedProducts.length > 0
+      section.related-products.mt-5.pt-4
+        .d-flex.flex-wrap.justify-content-between.align-items-end.gap-2.mb-4
+          div
+            h4.fw-bold.mb-1
+              i.fas.fa-star.me-2.text-warning
+              | También te puede interesar
+            p.text-muted.small.mb-0 Productos similares que podrían interesarte
+          a.btn.btn-outline-primary.rounded-pill.px-4(href=`/products?category=${product.category ? product.category._id : ''}`)
+            | Ver más
+            i.fas.fa-arrow-right.ms-2
+
+        .related-scroll
+          each related in relatedProducts
+            .related-card
+              .related-card-image
+                if related.image
+                  img(src=related.image alt=related.name loading="lazy")
+                else
+                  i.fas.fa-image.fa-3x.text-muted.opacity-25
+
+                if related.discount && related.discount > 0
+                  span.related-badge= '-' + related.discount + '%'
+
+              .related-card-body
+                a.related-card-title(href=`/products/${related._id}` title=related.name)= related.name
+                .related-card-price
+                  if related.discount && related.discount > 0
+                    span.text-danger.fw-bold S/. #{related.finalPrice.toFixed(2)}
+                    small.text-muted.text-decoration-line-through.ms-1 S/. #{related.customerPrice.toFixed(2)}
+                  else
+                    span.text-primary.fw-bold S/. #{related.finalPrice.toFixed(2)}
+              .related-card-footer
+                a.btn.btn-sm.btn-outline-primary.w-100.rounded-pill(href=`/products/${related._id}`)
+                  i.fas.fa-eye.me-1
+                  | Ver producto
+
   //- ============================================
   //- ESTILOS
   //- ============================================
@@ -768,6 +808,113 @@ block content
     }
 
     /* ================================================
+       PRODUCTOS RELACIONADOS (CARRUSEL)
+       ================================================ */
+    .related-products {
+      border-top: 2px dashed #e2e8f0;
+    }
+
+    .related-scroll {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+      padding-bottom: 1rem;
+      scrollbar-width: thin;
+      -webkit-overflow-scrolling: touch;
+    }
+    .related-scroll::-webkit-scrollbar {
+      height: 6px;
+    }
+    .related-scroll::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+
+    .related-card {
+      flex: 0 0 auto;
+      width: 200px;
+      background: white;
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      border: 1px solid #f1f5f9;
+      transition: all 0.3s;
+      display: flex;
+      flex-direction: column;
+    }
+    .related-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .related-card-image {
+      position: relative;
+      height: 160px;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .related-card-image img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      transition: transform 0.3s;
+    }
+    .related-card:hover .related-card-image img {
+      transform: scale(1.05);
+    }
+
+    .related-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #dc3545;
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 50rem;
+    }
+
+    .related-card-body {
+      padding: 1rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .related-card-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #1f2937;
+      text-decoration: none;
+      line-height: 1.35;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      min-height: 2.2rem;
+      margin-bottom: 0.5rem;
+    }
+    .related-card-title:hover {
+      color: var(--brand);
+    }
+
+    .related-card-price {
+      display: flex;
+      align-items: baseline;
+      font-size: 0.95rem;
+      flex-wrap: wrap;
+      margin-top: auto;
+    }
+
+    .related-card-footer {
+      padding: 0 1rem 1rem;
+    }
+
+    /* ================================================
        RESPONSIVE
        ================================================ */
     @media (max-width: 991px) {
@@ -799,5 +946,12 @@ block content
       }
       .tech-sheet-card .btn {
         width: 100%;
+      }
+      .related-card {
+        width: 160px;
+      }
+      .related-card-image {
+        height: 130px;
+        padding: 0.75rem;
       }
     }
