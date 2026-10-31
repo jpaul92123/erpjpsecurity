@@ -7,7 +7,83 @@ html(lang="es")
     link(rel="stylesheet", href="/bootstrap/css/bootstrap.min.css")
     link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css")
     link(rel="stylesheet", href="/css/styles.css")
-  body
+    style.
+      /* Ajustes finos para las tarjetas de producto */
+      .product-card {
+        transition: transform .25s ease, box-shadow .25s ease;
+        border: 1px solid #eef0f3 !important;
+      }
+      .product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px rgba(0,0,0,.10) !important;
+      }
+      .product-img-link {
+        display: block;
+        height: 200px;
+        background: #f7f8fa;
+        padding: 1rem;
+        cursor: pointer;
+      }
+      .product-img-link img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        transition: transform .3s ease;
+      }
+      .product-card:hover .product-img-link img {
+        transform: scale(1.05);
+      }
+      .price-final {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: #dc3545;
+        line-height: 1;
+      }
+      .price-old {
+        font-size: .85rem;
+        color: #9aa0a6;
+        text-decoration: line-through;
+        margin-left: .4rem;
+      }
+      .badge-discount {
+        position: absolute;
+        top: .6rem;
+        left: .6rem;
+        font-size: .78rem;
+        font-weight: 600;
+        padding: .35rem .55rem;
+        border-radius: .4rem;
+        z-index: 2;
+      }
+      .product-title {
+        font-size: .95rem;
+        font-weight: 600;
+        color: #1f2937;
+        line-height: 1.35;
+        min-height: 2.6rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .product-brand {
+        font-size: .75rem;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        color: #6b7280;
+        font-weight: 600;
+      }
+      .product-model {
+        font-size: .78rem;
+        color: #9aa0a6;
+      }
+      .btn-add-cart {
+        border-radius: .5rem;
+        font-weight: 600;
+        font-size: .88rem;
+      }
+
+  body.bg-white
     //- ============================================================
     //- NAVBAR CON CATEGORÍAS DESPLEGABLES
     //- ============================================================
@@ -20,7 +96,6 @@ html(lang="es")
           span.navbar-toggler-icon
         .collapse.navbar-collapse#navbarMain
           ul.navbar-nav.me-auto.mb-2.mb-lg-0
-            //- Menú desplegable de categorías
             li.nav-item.dropdown
               a.nav-link.dropdown-toggle(href="#", role="button", data-bs-toggle="dropdown")
                 i.fas.fa-list.me-1
@@ -62,7 +137,7 @@ html(lang="es")
                   | Registrarse
 
     //- ============================================================
-    //- HERO CON CARRUSEL
+    //- HERO
     //- ============================================================
     section.hero.py-5.bg-gradient-primary
       .container
@@ -95,55 +170,65 @@ html(lang="es")
     section.py-5
       .container
         .d-flex.justify-content-between.align-items-center.mb-4
-          h2
+          h2.mb-0
             i.fas.fa-box-open.me-2.text-primary
             | Últimos Productos
           a.btn.btn-outline-primary(href="/products")
-            Ver todos
+            | Ver todos
             i.fas.fa-arrow-right.ms-1
+
         if latestProducts && latestProducts.length
           .row.row-cols-1.row-cols-sm-2.row-cols-md-3.row-cols-lg-4.g-4
             each product in latestProducts
+              -
+                // Cálculo de precio final con fallback
+                const hasDiscount = product.discount && Number(product.discount) > 0;
+                const basePrice = Number(product.customerPrice) || 0;
+                const finalPrice = product.finalPrice !== undefined && product.finalPrice !== null
+                  ? Number(product.finalPrice)
+                  : (hasDiscount ? basePrice * (1 - Number(product.discount) / 100) : basePrice);
+                const discountPct = hasDiscount ? Math.round(Number(product.discount)) : 0;
+                const productUrl = `/products/${product._id}`;
+
               .col
-                .card.h-100.shadow-sm.hover-lift.border-0.rounded-3.overflow-hidden
+                .card.h-100.product-card.rounded-3.overflow-hidden
 
-                  //- Imagen clickeable (enlace al detalle)
-                  a.card-img-top.text-center.bg-light.d-block.position-relative.text-decoration-none(
-                    href=`/products/${product._id}`,
-                    style="height: 180px; overflow: hidden; padding: 0.75rem;"
-                  )
+                  //- Imagen 100% clickeable
+                  a.product-img-link.position-relative.text-decoration-none(href=productUrl)
                     if product.image
-                      img(src=product.image, alt=product.name, style="height: 100%; width: 100%; object-fit: contain;")
+                      img(src=product.image, alt=product.name)
                     else
-                      i.fas.fa-image.fa-4x.text-muted(style="line-height: 160px;")
-                    if product.discount && product.discount > 0
-                      span.badge.bg-danger.position-absolute.top-0.start-0.m-2
-                        | -#{product.discount}%
+                      .d-flex.align-items-center.justify-content-center.h-100
+                        i.fas.fa-image.fa-4x.text-muted
+                    if hasDiscount
+                      span.badge.bg-danger.badge-discount
+                        | -#{discountPct}%
 
-                  .card-body.d-flex.flex-column
-                    //- Título clickeable también
-                    a.text-decoration-none.text-dark(href=`/products/${product._id}`)
-                      h6.card-title.text-truncate(title=product.name) #{product.name}
+                  .card-body.d-flex.flex-column.p-3
+                    if product.brand
+                      span.product-brand.mb-1 #{product.brand}
+
+                    a.text-decoration-none(href=productUrl)
+                      h6.product-title.mb-1(title=product.name) #{product.name}
 
                     if product.model
-                      p.card-text.text-muted.small.mb-2
+                      p.product-model.mb-2
                         i.fas.fa-tag.me-1
                         | #{product.model}
 
-                    //- Precios
-                    .mt-auto
-                      if product.discount && product.discount > 0
-                        .d-flex.align-items-baseline.gap-2.mb-2
-                          span.text-danger.fw-bold.fs-5 S/. #{product.finalPrice.toFixed(2)}
-                          small.text-muted.text-decoration-line-through S/. #{product.customerPrice.toFixed(2)}
+                    //- Precios (siempre visibles)
+                    .mt-auto.pt-2
+                      if hasDiscount
+                        .d-flex.align-items-baseline.flex-wrap
+                          span.price-final S/. #{finalPrice.toFixed(2)}
+                          span.price-old S/. #{basePrice.toFixed(2)}
                       else
-                        .mb-2
-                          span.text-primary.fw-bold.fs-5 S/. #{product.finalPrice.toFixed(2)}
+                        span.price-final.text-primary S/. #{finalPrice.toFixed(2)}
 
-                    //- Botón de detalle
-                    a.btn.btn-sm.btn-primary.w-100.mt-2(href=`/products/${product._id}`)
-                      i.fas.fa-eye.me-1
-                      | Ver Detalle
+                    //- Botón agregar / ver detalle
+                    a.btn.btn-primary.btn-add-cart.w-100.mt-3(href=productUrl)
+                      i.fas.fa-cart-plus.me-1
+                      | Agregar
         else
           .text-center.py-5
             i.fas.fa-box-open.fa-4x.text-muted.mb-3
@@ -201,7 +286,6 @@ html(lang="es")
     //- ============================================================
     script(src="/bootstrap/js/bootstrap.bundle.min.js")
     script.
-      // Activar el dropdown al pasar el mouse (mejora UX)
       document.querySelectorAll('.dropdown').forEach(dropdown => {
         dropdown.addEventListener('mouseenter', function() {
           this.querySelector('.dropdown-toggle')?.click();
