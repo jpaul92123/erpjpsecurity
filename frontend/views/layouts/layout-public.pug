@@ -36,11 +36,10 @@ html(lang="es")
         --brand-dark: #{brandSecondary};
         --navbar-height: 64px;
         --sidebar-width: 400px;
+        --drawer-width: 320px;
       }
 
-      html, body {
-        height: 100%;
-      }
+      html, body { height: 100%; }
 
       body {
         font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -65,38 +64,84 @@ html(lang="es")
         height: var(--navbar-height);
         padding: 0;
         background: #0f172a !important;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+        z-index: 1040;
       }
-      .navbar-public .container {
+      .navbar-public .container-fluid {
         height: 100%;
         display: flex;
         align-items: center;
+        gap: 0.75rem;
       }
       .navbar-public .navbar-brand {
         font-weight: 700;
         font-size: 1.15rem;
         letter-spacing: -0.3px;
         padding: 0;
-        margin-right: 1.5rem;
+        margin: 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #fff !important;
       }
       .navbar-public .navbar-brand img {
-        max-height: 70px;
+        max-height: 42px;
         width: auto;
       }
-      .navbar-public .nav-link {
-        font-weight: 500;
-        font-size: 0.9rem;
-        padding: 0.5rem 0.85rem !important;
-        color: rgba(255,255,255,0.85);
-        transition: color 0.15s;
+      .navbar-public .brand-name {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 200px;
       }
-      .navbar-public .nav-link:hover { color: #fff !important; }
-      .navbar-public .nav-link.active { color: var(--brand) !important; }
+
+      /* Botón hamburguesa */
+      .btn-hamburger {
+        width: 42px; height: 42px;
+        border-radius: 10px;
+        background: rgba(255,255,255,0.08);
+        border: none;
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        transition: all 0.2s;
+        flex-shrink: 0;
+      }
+      .btn-hamburger:hover,
+      .btn-hamburger:focus { background: var(--brand); color: #fff; }
+
+      /* Acciones navbar */
+      .navbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-left: auto;
+        flex-shrink: 0;
+      }
+      .btn-nav-ghost {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        height: 40px;
+        padding: 0 0.9rem;
+        border-radius: 10px;
+        background: rgba(255,255,255,0.08);
+        border: none;
+        color: #fff;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+        white-space: nowrap;
+      }
+      .btn-nav-ghost:hover { background: var(--brand); color: #fff; }
 
       /* Carrito */
       .btn-cart-public {
         position: relative;
-        width: 42px;
-        height: 42px;
+        width: 42px; height: 42px;
         border-radius: 50%;
         background: rgba(255,255,255,0.1);
         border: none;
@@ -110,21 +155,264 @@ html(lang="es")
 
       .cart-badge-count {
         position: absolute;
-        top: -2px;
-        right: -2px;
+        top: -2px; right: -2px;
         background: #dc3545;
         color: white;
         font-size: 0.65rem;
-        min-width: 20px;
-        height: 20px;
+        min-width: 20px; height: 20px;
         border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 700; padding: 0 5px;
+        border: 2px solid #0f172a;
+      }
+
+      /* ================================================
+         DRAWER LATERAL (IZQUIERDA)
+         ================================================ */
+      .drawer-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(15,23,42,0.55);
+        backdrop-filter: blur(3px);
+        -webkit-backdrop-filter: blur(3px);
+        z-index: 1050;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+      }
+      .drawer-backdrop.show { opacity: 1; visibility: visible; }
+
+      .side-drawer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: var(--drawer-width);
+        max-width: 88vw;
+        height: 100vh;
+        height: 100dvh;
+        background: #0f172a;
+        color: #e2e8f0;
+        z-index: 1055;
+        transform: translateX(-100%);
+        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         display: flex;
+        flex-direction: column;
+        box-shadow: 8px 0 32px rgba(0,0,0,0.35);
+        overflow: hidden;
+      }
+      .side-drawer.open { transform: translateX(0); }
+
+      .drawer-header {
+        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+        flex-shrink: 0;
+        background: #0f172a;
+      }
+      .drawer-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #fff;
+        font-weight: 700;
+        font-size: 1.05rem;
+        text-decoration: none;
+      }
+      .drawer-brand:hover { color: #fff; }
+      .drawer-brand img { max-height: 34px; }
+
+      .drawer-close {
+        width: 36px; height: 36px;
+        border-radius: 10px;
+        background: rgba(255,255,255,0.08);
+        border: none;
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+      }
+      .drawer-close:hover { background: #dc3545; }
+
+      .drawer-body {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 0.5rem 0;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+      }
+      .drawer-body::-webkit-scrollbar { width: 6px; }
+      .drawer-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+
+      .drawer-nav {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .drawer-nav li { list-style: none; }
+
+      .drawer-link {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.85rem 1.25rem;
+        color: #cbd5e1;
+        text-decoration: none;
+        font-size: 0.925rem;
+        font-weight: 500;
+        border: none;
+        background: transparent;
+        width: 100%;
+        text-align: left;
+        transition: all 0.2s;
+        cursor: pointer;
+        position: relative;
+      }
+      .drawer-link:hover,
+      .drawer-link:focus {
+        background: rgba(255,255,255,0.06);
+        color: #fff;
+        padding-left: 1.5rem;
+      }
+      .drawer-link i.drawer-icon {
+        width: 22px;
+        text-align: center;
+        font-size: 1rem;
+        color: var(--brand);
+        flex-shrink: 0;
+      }
+      .drawer-link .drawer-label {
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .drawer-link .drawer-chevron {
+        font-size: 0.7rem;
+        transition: transform 0.25s;
+        color: #64748b;
+      }
+      .drawer-link[aria-expanded="true"] .drawer-chevron { transform: rotate(90deg); }
+
+      .drawer-section-label {
+        padding: 1rem 1.25rem 0.5rem;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        font-weight: 700;
+        color: #64748b;
+      }
+
+      /* Submenú */
+      .drawer-submenu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        background: rgba(0,0,0,0.25);
+        overflow: hidden;
+      }
+      .drawer-submenu .drawer-sub-link {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.65rem 1.25rem 0.65rem 3.25rem;
+        color: #94a3b8;
+        text-decoration: none;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+      }
+      .drawer-submenu .drawer-sub-link:hover {
+        background: rgba(255,255,255,0.05);
+        color: #fff;
+        padding-left: 3.5rem;
+      }
+      .drawer-submenu .drawer-sub-link i {
+        font-size: 0.75rem;
+        color: #64748b;
+        width: 14px;
+        text-align: center;
+      }
+
+      /* Footer del drawer */
+      .drawer-footer {
+        flex-shrink: 0;
+        border-top: 1px solid rgba(255,255,255,0.08);
+        padding: 1rem 1.25rem;
+        background: #0b1220;
+      }
+      .drawer-footer .drawer-user {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+      }
+      .drawer-footer .drawer-avatar {
+        width: 40px; height: 40px;
+        border-radius: 50%;
+        background: var(--brand);
+        color: #fff;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
         font-weight: 700;
-        padding: 0 5px;
-        border: 2px solid #0f172a;
+        flex-shrink: 0;
       }
+      .drawer-footer .drawer-user-info {
+        min-width: 0;
+        flex: 1;
+      }
+      .drawer-footer .drawer-user-name {
+        font-weight: 700;
+        color: #fff;
+        font-size: 0.9rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .drawer-footer .drawer-user-email {
+        font-size: 0.75rem;
+        color: #94a3b8;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .drawer-footer .btn-drawer-primary {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        width: 100%;
+        padding: 0.7rem;
+        border-radius: 10px;
+        background: var(--brand);
+        border: none;
+        color: #fff;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      .drawer-footer .btn-drawer-primary:hover { background: var(--brand-dark); color: #fff; }
+      .drawer-footer .btn-drawer-outline {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        width: 100%;
+        padding: 0.7rem;
+        border-radius: 10px;
+        background: rgba(255,255,255,0.08);
+        border: none;
+        color: #fff;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      .drawer-footer .btn-drawer-outline:hover { background: rgba(255,255,255,0.16); color: #fff; }
 
       /* ================================================
          BOTÓN AGREGAR AL CARRITO
@@ -169,7 +457,6 @@ html(lang="es")
         flex-shrink: 0;
         background: white;
       }
-
       .cart-body {
         flex: 1 1 auto;
         overflow-y: auto;
@@ -177,14 +464,12 @@ html(lang="es")
         padding: 1rem;
         -webkit-overflow-scrolling: touch;
       }
-
       .cart-footer {
         padding: 1rem 1.25rem;
         border-top: 1px solid #e5e7eb;
         background: #f8fafc;
         flex-shrink: 0;
       }
-
       .cart-item {
         display: flex;
         gap: 0.75rem;
@@ -195,8 +480,7 @@ html(lang="es")
         align-items: flex-start;
       }
       .cart-item img {
-        width: 60px;
-        height: 60px;
+        width: 60px; height: 60px;
         object-fit: contain;
         background: white;
         border-radius: 0.5rem;
@@ -251,20 +535,9 @@ html(lang="es")
         margin-bottom: 0.75rem;
       }
       .footer-public .footer-brand img { max-height: 32px; }
-      .footer-public p {
-        font-size: 0.88rem;
-        line-height: 1.6;
-        margin-bottom: 0.75rem;
-      }
-      .footer-public ul {
-        padding: 0;
-        margin: 0;
-        list-style: none;
-      }
-      .footer-public ul li {
-        margin-bottom: 0.5rem;
-        font-size: 0.88rem;
-      }
+      .footer-public p { font-size: 0.88rem; line-height: 1.6; margin-bottom: 0.75rem; }
+      .footer-public ul { padding: 0; margin: 0; list-style: none; }
+      .footer-public ul li { margin-bottom: 0.5rem; font-size: 0.88rem; }
       .footer-public a {
         color: #94a3b8;
         text-decoration: none;
@@ -282,8 +555,7 @@ html(lang="es")
         margin-top: 0.75rem;
       }
       .footer-social a {
-        width: 38px;
-        height: 38px;
+        width: 38px; height: 38px;
         border-radius: 50%;
         background: rgba(255,255,255,0.08);
         display: inline-flex;
@@ -310,16 +582,12 @@ html(lang="es")
          ================================================ */
       .whatsapp-float {
         position: fixed;
-        bottom: 24px;
-        left: 24px;
-        width: 52px;
-        height: 52px;
+        bottom: 24px; left: 24px;
+        width: 52px; height: 52px;
         border-radius: 50%;
         background: #25d366;
         color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display: flex; align-items: center; justify-content: center;
         font-size: 1.6rem;
         box-shadow: 0 4px 16px rgba(37,211,102,0.45);
         z-index: 1040;
@@ -369,158 +637,234 @@ html(lang="es")
       /* ================================================
          FLASH MESSAGES
          ================================================ */
-      .flash-wrapper {
-        padding-top: calc(var(--navbar-height) + 16px);
-      }
+      .flash-wrapper { padding-top: calc(var(--navbar-height) + 16px); }
 
       /* ================================================
          RESPONSIVE
          ================================================ */
       @media (max-width: 991px) {
-        .navbar-public .navbar-collapse {
-          background: #0f172a;
-          padding: 1rem;
-          margin: 0 -1rem;
-          border-top: 1px solid rgba(255,255,255,0.08);
-        }
-        .navbar-public .navbar-nav {
-          padding-top: 0.5rem;
-        }
-        .navbar-public .nav-link {
-          padding: 0.75rem 0.5rem !important;
-        }
+        .navbar-public .brand-name { max-width: 140px; }
       }
-
       @media (max-width: 576px) {
         :root {
           --navbar-height: 60px;
           --sidebar-width: 100vw;
+          --drawer-width: 300px;
         }
         .footer-public { padding: 2rem 0 1rem; }
         .footer-public h6 { margin-bottom: 0.75rem; margin-top: 0.5rem; }
         .whatsapp-float {
-          width: 48px;
-          height: 48px;
+          width: 48px; height: 48px;
           font-size: 1.4rem;
-          bottom: 16px;
-          left: 16px;
+          bottom: 16px; left: 16px;
         }
         .toast-container-jp {
           top: calc(var(--navbar-height) + 12px);
-          right: 12px;
-          left: 12px;
+          right: 12px; left: 12px;
         }
-        .toast-jp {
-          min-width: auto;
-          width: 100%;
-        }
+        .toast-jp { min-width: auto; width: 100%; }
+        .btn-nav-ghost .btn-label { display: none; }
+        .navbar-public .brand-name { max-width: 120px; }
       }
 
   body
 
     //- ============================================
-    //- NAVBAR PÚBLICO
+    //- NAVBAR PÚBLICO (limpio)
     //- ============================================
-    nav.navbar.navbar-expand-lg.navbar-dark.navbar-public.fixed-top
-      .container
+    nav.navbar.navbar-dark.navbar-public.fixed-top
+      .container-fluid.px-2.px-md-3
 
-        a.navbar-brand.d-flex.align-items-center(href="/")
+        //- Hamburguesa
+        button.btn-hamburger#drawerToggle(
+          type="button"
+          aria-label="Abrir menú"
+          aria-controls="sideDrawer"
+          aria-expanded="false"
+        )
+          i.fas.fa-bars
+
+        //- Logo
+        a.navbar-brand.ms-2(href="/")
           if setting && setting.logo
-            img.me-2(src=setting.logo alt=(setting.siteName || 'Logo'))
+            img(src=setting.logo alt=(setting.siteName || 'Logo'))
           else
             i.fas.fa-shield-alt.me-2
+          span.brand-name.d-none.d-sm-inline= setting && setting.siteName ? setting.siteName : 'JP Security'
+
+        //- Acciones
+        .navbar-actions
+
+          button.btn-cart-public#cartBtn(
+            type="button"
+            title="Mi carrito"
+            aria-label="Mi carrito"
+          )
+            i.fas.fa-shopping-cart
+            span.cart-badge-count#cartCount 0
+
+          if user
+            a.btn-nav-ghost(href="/")
+              i.fas.fa-tachometer-alt
+              span.btn-label.d-none.d-md-inline Dashboard
+          else
+            a.btn-nav-ghost(href="/login")
+              i.fas.fa-sign-in-alt
+              span.btn-label.d-none.d-md-inline Ingresar
+
+    //- ============================================
+    //- DRAWER LATERAL (IZQUIERDA)
+    //- ============================================
+    .drawer-backdrop#drawerBackdrop
+    aside.side-drawer#sideDrawer(aria-hidden="true" role="navigation")
+
+      //- Header del drawer
+      .drawer-header
+        a.drawer-brand(href="/")
+          if setting && setting.logo
+            img(src=setting.logo alt=(setting.siteName || 'Logo'))
+          else
+            i.fas.fa-shield-alt
           span= setting && setting.siteName ? setting.siteName : 'JP Security'
 
-        button.navbar-toggler(type="button" data-bs-toggle="collapse" data-bs-target="#navbarPublic" aria-controls="navbarPublic" aria-expanded="false" aria-label="Menú")
-          span.navbar-toggler-icon
+        button.drawer-close#drawerClose(type="button" aria-label="Cerrar menú")
+          i.fas.fa-times
 
-        .collapse.navbar-collapse#navbarPublic
+      //- Body scrolleable
+      .drawer-body
 
-          //- ============================================
-          //- Navegación principal
-          //- ============================================
-          ul.navbar-nav.me-auto.mb-2.mb-lg-0
-            li.nav-item
-              a.nav-link(href="/products")
-                i.fas.fa-cubes.me-1
-                | Catálogo
+        .drawer-section-label Principal
+        ul.drawer-nav
+          li
+            a.drawer-link(href="/")
+              i.fas.fa-home.drawer-icon
+              span.drawer-label Inicio
 
-            li.nav-item
-              a.nav-link(href="/checkout/track")
-                i.fas.fa-search-location.me-1
-                | Seguir pedido
+          li
+            a.drawer-link(href="/products")
+              i.fas.fa-cubes.drawer-icon
+              span.drawer-label Catálogo
 
-            //- Nosotros
-            li.nav-item
-              a.nav-link(href="/about")
-                i.fas.fa-building.me-1
-                | Nosotros
+          li
+            a.drawer-link(href="/products?filter=new")
+              i.fas.fa-star.drawer-icon
+              span.drawer-label Novedades
 
-            if categories && categories.length
-              li.nav-item.dropdown
-                a.nav-link.dropdown-toggle(href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false")
-                  i.fas.fa-list.me-1
-                  | Categorías
-                ul.dropdown-menu.shadow-lg.rounded-3.border-0
-                  each cat in categories
-                    li
-                      a.dropdown-item(href=`/products?category=${cat._id}`)
-                        i.fas.fa-folder-open.me-2.text-primary
-                        = cat.name
-                    if cat.subcategories && cat.subcategories.length
+          li
+            a.drawer-link(href="/checkout/track")
+              i.fas.fa-search-location.drawer-icon
+              span.drawer-label Seguir pedido
+
+          li
+            a.drawer-link(href="/about")
+              i.fas.fa-building.drawer-icon
+              span.drawer-label Nosotros
+
+        //- Categorías con subcategorías colapsables
+        if categories && categories.length
+          .drawer-section-label Categorías
+          ul.drawer-nav
+            each cat, idx in categories
+              li
+                if cat.subcategories && cat.subcategories.length
+                  button.drawer-link(
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target=`#drawerCat${idx}`
+                    aria-expanded="false"
+                    aria-controls=`drawerCat${idx}`
+                  )
+                    i.fas.fa-folder-open.drawer-icon
+                    span.drawer-label= cat.name
+                    i.fas.fa-chevron-right.drawer-chevron
+
+                  .collapse(id=`drawerCat${idx}`)
+                    ul.drawer-submenu
+                      li
+                        a.drawer-sub-link(href=`/products?category=${cat._id}`)
+                          i.fas.fa-layer-group
+                          span Todos en #{cat.name}
                       each sub in cat.subcategories
                         li
-                          a.dropdown-item.ps-4(href=`/products?category=${sub._id}`)
-                            i.fas.fa-tag.me-2.text-muted
-                            = sub.name
-                      li: hr.dropdown-divider
+                          a.drawer-sub-link(href=`/products?category=${sub._id}`)
+                            i.fas.fa-tag
+                            span= sub.name
+                else
+                  a.drawer-link(href=`/products?category=${cat._id}`)
+                    i.fas.fa-folder.drawer-icon
+                    span.drawer-label= cat.name
 
-          //- ============================================
-          //- Acciones
-          //- ============================================
-          ul.navbar-nav.align-items-lg-center.gap-lg-2
-            li.nav-item
-              button.btn.btn-cart-public#cartBtn(type="button" title="Mi carrito" aria-label="Mi carrito")
-                i.fas.fa-shopping-cart
-                span.cart-badge-count#cartCount 0
+        //- Sección de cuenta
+        .drawer-section-label Cuenta
+        ul.drawer-nav
+          if user
+            li
+              a.drawer-link(href="/")
+                i.fas.fa-tachometer-alt.drawer-icon
+                span.drawer-label Dashboard
 
-            if user
-              li.nav-item
-                a.nav-link(href="/")
-                  i.fas.fa-tachometer-alt.me-1
-                  | Dashboard
-              li.nav-item.dropdown
-                a.nav-link.dropdown-toggle(href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false")
-                  i.fas.fa-user-circle.me-1
-                  span.d-none.d-sm-inline= user.name
-                ul.dropdown-menu.dropdown-menu-end.shadow-lg.rounded-3.border-0
-                  li
-                    h6.dropdown-header.mb-0
-                      div.fw-bold= user.name
-                      small.text-muted= user.email || ''
-                  li: hr.dropdown-divider
-                  li
-                    a.dropdown-item(href="/profile")
-                      i.fas.fa-id-card.me-2.text-primary
-                      | Mi Perfil
-                  li
-                    a.dropdown-item(href="/")
-                      i.fas.fa-gauge.me-2.text-primary
-                      | Dashboard
-                  li
-                    a.dropdown-item(href="/settings")
-                      i.fas.fa-cog.me-2.text-primary
-                      | Configuración
-                  li: hr.dropdown-divider
-                  li
-                    a.dropdown-item.text-danger(href="/logout")
-                      i.fas.fa-sign-out-alt.me-2
-                      | Cerrar Sesión
-            else
-              li.nav-item
-                a.nav-link(href="/login")
-                  i.fas.fa-sign-in-alt.me-1
-                  | Ingresar
+            li
+              a.drawer-link(href="/profile")
+                i.fas.fa-id-card.drawer-icon
+                span.drawer-label Mi Perfil
+
+            li
+              a.drawer-link(href="/orders")
+                i.fas.fa-clipboard-list.drawer-icon
+                span.drawer-label Mis Pedidos
+
+            li
+              a.drawer-link(href="/settings")
+                i.fas.fa-cog.drawer-icon
+                span.drawer-label Configuración
+          else
+            li
+              a.drawer-link(href="/login")
+                i.fas.fa-sign-in-alt.drawer-icon
+                span.drawer-label Ingresar
+
+            li
+              a.drawer-link(href="/register")
+                i.fas.fa-user-plus.drawer-icon
+                span.drawer-label Crear cuenta
+
+      //- Footer del drawer
+      .drawer-footer
+        if user
+          .drawer-user
+            .drawer-avatar= (user.name || 'U').charAt(0).toUpperCase()
+            .drawer-user-info
+              .drawer-user-name= user.name
+              .drawer-user-email= user.email || ''
+          a.btn-drawer-outline(href="/logout")
+            i.fas.fa-sign-out-alt
+            | Cerrar Sesión
+        else
+          a.btn-drawer-primary.mb-2(href="/login")
+            i.fas.fa-sign-in-alt
+            | Iniciar Sesión
+          a.btn-drawer-outline(href="/register")
+            i.fas.fa-user-plus
+            | Crear cuenta
+
+        //- Redes sociales en footer drawer
+        if setting && setting.social
+          .footer-social.mt-3.justify-content-center
+            if setting.social.facebook
+              a(href=setting.social.facebook target="_blank" rel="noopener" title="Facebook")
+                i.fab.fa-facebook-f
+            if setting.social.instagram
+              a(href=setting.social.instagram target="_blank" rel="noopener" title="Instagram")
+                i.fab.fa-instagram
+            if setting.social.youtube
+              a(href=setting.social.youtube target="_blank" rel="noopener" title="YouTube")
+                i.fab.fa-youtube
+            if setting.social.tiktok
+              a(href=setting.social.tiktok target="_blank" rel="noopener" title="TikTok")
+                i.fab.fa-tiktok
+            if setting.social.whatsapp
+              a(href=`https://wa.me/${setting.social.whatsapp}` target="_blank" rel="noopener" title="WhatsApp")
+                i.fab.fa-whatsapp
 
     //- ============================================
     //- FLASH MESSAGES
@@ -551,9 +895,6 @@ html(lang="es")
       .container
         .row.g-4
 
-          //- ============================================
-          //- Columna 1: Marca + Redes
-          //- ============================================
           .col-lg-4.col-md-6
             .footer-brand
               if setting && setting.logo
@@ -583,9 +924,6 @@ html(lang="es")
                 a(href=`https://wa.me/${setting.social.whatsapp}` target="_blank" rel="noopener" title="WhatsApp")
                   i.fab.fa-whatsapp
 
-          //- ============================================
-          //- Columna 2: Enlaces
-          //- ============================================
           .col-lg-2.col-md-6.col-6
             h6 Enlaces
             ul
@@ -601,14 +939,10 @@ html(lang="es")
               li: a(href="/checkout/track")
                 i.fas.fa-search-location.me-1
                 | Seguir pedido
-              //- Nosotros
               li: a(href="/about")
                 i.fas.fa-building.me-1
                 | Nosotros
 
-          //- ============================================
-          //- Columna 3: Cuenta
-          //- ============================================
           .col-lg-2.col-md-6.col-6
             h6 Cuenta
             ul
@@ -619,7 +953,7 @@ html(lang="es")
                 li: a(href="/profile")
                   i.fas.fa-id-card.me-1
                   | Mi Perfil
-                li: a(href="/logout")
+                                li: a(href="/logout")
                   i.fas.fa-sign-out-alt.me-1
                   | Salir
               else
@@ -630,9 +964,6 @@ html(lang="es")
                   i.fas.fa-search-location.me-1
                   | Seguir pedido
 
-          //- ============================================
-          //- Columna 4: Contacto
-          //- ============================================
           .col-lg-4.col-md-6
             h6 Contacto
             ul
@@ -732,6 +1063,56 @@ html(lang="es")
     script(src="/js/main.js")
 
     script.
+      // ================================================
+      // DRAWER LATERAL (IZQUIERDA)
+      // ================================================
+      (function() {
+        const drawer     = document.getElementById('sideDrawer');
+        const backdrop   = document.getElementById('drawerBackdrop');
+        const toggleBtn  = document.getElementById('drawerToggle');
+        const closeBtn   = document.getElementById('drawerClose');
+
+        function openDrawer() {
+          if (!drawer) return;
+          drawer.classList.add('open');
+          backdrop.classList.add('show');
+          drawer.setAttribute('aria-hidden', 'false');
+          if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'true');
+          document.body.style.overflow = 'hidden';
+        }
+
+        function closeDrawer() {
+          if (!drawer) return;
+          drawer.classList.remove('open');
+          backdrop.classList.remove('show');
+          drawer.setAttribute('aria-hidden', 'true');
+          if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'false');
+          document.body.style.overflow = '';
+        }
+
+        if (toggleBtn) toggleBtn.addEventListener('click', openDrawer);
+        if (closeBtn)  closeBtn.addEventListener('click', closeDrawer);
+        if (backdrop)  backdrop.addEventListener('click', closeDrawer);
+
+        // Cerrar con tecla ESC
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape' && drawer && drawer.classList.contains('open')) {
+            closeDrawer();
+          }
+        });
+
+        // Cerrar al hacer clic en un enlace de navegación
+        if (drawer) {
+          drawer.querySelectorAll('a.drawer-link, a.drawer-sub-link, a.btn-drawer-primary, a.btn-drawer-outline')
+            .forEach(function(link) {
+              link.addEventListener('click', function() {
+                // pequeño delay para que se vea la transición
+                setTimeout(closeDrawer, 120);
+              });
+            });
+        }
+      })();
+
       // ================================================
       // CARRITO CON LOCALSTORAGE
       // ================================================
@@ -889,7 +1270,6 @@ html(lang="es")
       // EVENT DELEGATION PARA EL CARRITO
       // ================================================
       document.addEventListener('click', function(e) {
-        // Botón de disminuir / aumentar
         const qtyBtn = e.target.closest('.cart-qty-btn');
         if (qtyBtn) {
           e.preventDefault();
@@ -899,7 +1279,6 @@ html(lang="es")
           return;
         }
 
-        // Botón de eliminar
         const removeBtn = e.target.closest('.cart-remove-btn');
         if (removeBtn) {
           e.preventDefault();
@@ -923,7 +1302,6 @@ html(lang="es")
         const cartOverlay = document.getElementById('cartOverlay');
         if (cartOverlay) cartOverlay.addEventListener('click', closeCart);
 
-        // Botones "Agregar al carrito"
         document.querySelectorAll('.btn-add-cart').forEach(btn => {
           btn.addEventListener('click', function() {
             addToCart({
@@ -935,17 +1313,6 @@ html(lang="es")
           });
         });
 
-        // Dropdown hover (desktop)
-        if (window.innerWidth >= 992) {
-          document.querySelectorAll('.dropdown').forEach(function(dropdown) {
-            dropdown.addEventListener('mouseenter', function() {
-              const toggle = this.querySelector('.dropdown-toggle');
-              if (toggle) bootstrap.Dropdown.getOrCreateInstance(toggle).show();
-            });
-            dropdown.addEventListener('mouseleave', function() {
-              const toggle = this.querySelector('.dropdown-toggle');
-              if (toggle) bootstrap.Dropdown.getOrCreateInstance(toggle).hide();
-            });
-          });
-        }
+        // Abrir submenú de categorías del drawer si tiene la clase active
+        // (opcional: marcar categoría activa según URL)
       });
