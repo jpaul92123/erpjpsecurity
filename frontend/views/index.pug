@@ -39,6 +39,7 @@ html(lang="es")
                         a.dropdown-item.ps-4(href=`/products?category=${sub._id}`)
                           i.fas.fa-tag.me-2
                           | #{sub.name}
+                          
                     li
                       hr.dropdown-divider
           ul.navbar-nav
@@ -124,15 +125,12 @@ html(lang="es")
                       .d-flex.justify-content-between.align-items-center
                         div
                           if product.discount && product.discount > 0
-                            small.text-muted.text-decoration-line-through.me-2 S/. #{ (product.customerPrice || 0).toFixed(2) }
-                            span.text-danger.fw-bold S/. #{ ((product.customerPrice || 0) * (1 - (product.discount || 0)/100)).toFixed(2) }
+                            span.text-danger.fw-bold S/. #{product.finalPrice.toFixed(2)}
+                            small.text-muted.text-decoration-line-through.ms-1 S/. #{product.customerPrice.toFixed(2)}
                           else
-                            span.text-primary.fw-bold S/. #{ (product.customerPrice || 0).toFixed(2) }
-                        small.text-muted
-                          i.fas.fa-arrow-up.text-success.me-1
-                          | +#{ ((product.customerPrice || 0) - (product.supplierPrice || 0)).toFixed(2) }
-                  .card-footer.bg-transparent.border-0
-                    a.btn.btn-sm.btn-outline-primary.w-100(href=`/products/${product._id}`)
+                            span.text-primary.fw-bold S/. #{product.finalPrice.toFixed(2)
+                          .card-footer.bg-transparent.border-0
+                            a.btn.btn-sm.btn-outline-primary.w-100(href=`/products/${product._id}`)
                       i.fas.fa-eye.me-1
                       | Ver Detalle
         else
