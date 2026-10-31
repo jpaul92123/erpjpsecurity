@@ -647,32 +647,78 @@ html(lang="es")
       /* ================================================
          PRODUCTOS
          ================================================ */
+            /* ================================================
+        PRODUCTOS (ACTUALIZADO)
+        ================================================ */
+
+      /* Card base — limpia, sombra suave, hover sutil, tipografía consistente */
       .product-card {
-        border-radius: 1rem;
+        border-radius: 0.75rem;
         overflow: hidden;
-        background: white;
+        background: #ffffff;
         display: flex;
         flex-direction: column;
         height: 100%;
         position: relative;
+        border: 1px solid #eef2f7 !important;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04) !important;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
       }
+
+      .product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.10) !important;
+        border-color: #dbeafe !important;
+      }
+
+      /* ================================================
+        IMAGEN CLICKEABLE (display:block, altura fija, cursor:pointer, hover zoom)
+        ================================================ */
+      .product-img-link {
+        display: block;
+        text-decoration: none;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #f8fafc, #eef2f7);
+      }
+
+      .product-img-link:hover {
+        text-decoration: none;
+      }
+
       .product-img-wrap {
         position: relative;
         height: 220px;
-        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        width: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
         padding: 1rem;
         overflow: hidden;
       }
+
       .product-img-wrap img {
         max-height: 100%;
         max-width: 100%;
         object-fit: contain;
-        transition: transform 0.4s;
+        transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        display: block;
       }
-      .product-card:hover .product-img-wrap img { transform: scale(1.08); }
+
+      .product-img-link:hover .product-img-wrap img {
+        transform: scale(1.1);
+      }
+
+      /* Placeholder icon cuando no hay imagen */
+      .product-img-wrap i.fas.fa-image {
+        opacity: 0.35;
+      }
+
+      /* ================================================
+        BADGE DE DESCUENTO (arriba izquierda, z-index alto)
+        ================================================ */
       .product-badge {
         position: absolute;
         top: 12px;
@@ -683,10 +729,29 @@ html(lang="es")
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.5px;
+        z-index: 10;
+        line-height: 1;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
       }
-      .badge-new { background: #10b981; color: white; }
-      .badge-sale { background: #dc3545; color: white; }
-      .badge-hot { background: #f59e0b; color: white; }
+
+      .badge-new {
+        background: #10b981;
+        color: white;
+      }
+
+      .badge-sale {
+        background: #dc3545;
+        color: white;
+      }
+
+      .badge-hot {
+        background: #f59e0b;
+        color: white;
+      }
+
+      /* ================================================
+        ACCIONES SOBRE LA IMAGEN (favoritos / ver)
+        ================================================ */
       .product-actions {
         position: absolute;
         top: 12px;
@@ -696,63 +761,248 @@ html(lang="es")
         gap: 0.5rem;
         opacity: 0;
         transform: translateX(10px);
-        transition: all 0.3s;
+        transition: all 0.3s ease;
+        z-index: 10;
       }
+
       .product-card:hover .product-actions {
         opacity: 1;
         transform: translateX(0);
       }
+
       .product-actions .icon-btn {
         width: 36px;
         height: 36px;
         background: white;
         color: #1f2937;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
       }
-      .product-actions .icon-btn:hover { background: var(--brand); color: white; }
-      .product-info { padding: 1rem; flex: 1; display: flex; flex-direction: column; }
+
+      .product-actions .icon-btn:hover {
+        background: var(--brand);
+        color: white;
+        transform: scale(1.05);
+      }
+
+      /* ================================================
+        INFO DEL PRODUCTO
+        ================================================ */
+      .product-info {
+        padding: 1rem 1rem 1.1rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
       .product-cat {
-        font-size: 0.7rem;
+        font-size: 0.68rem;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.6px;
         color: #6b7280;
-        font-weight: 600;
+        font-weight: 700;
         margin-bottom: 0.35rem;
       }
+
       .product-title {
-        font-size: 0.95rem;
+        font-size: 0.92rem;
         font-weight: 600;
         color: #1f2937;
-        margin-bottom: 0.35rem;
+        margin-bottom: 0.3rem;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
-        min-height: 2.5rem;
+        min-height: 2.4rem;
+        line-height: 1.3;
+        transition: color 0.2s ease;
       }
-      .product-title:hover { color: var(--brand); }
+
+      .product-title:hover {
+        color: var(--brand);
+      }
+
+      .product-model {
+        font-size: 0.75rem;
+        color: #9ca3af;
+        margin-bottom: 0.75rem;
+        display: block;
+      }
+
+      /* ================================================
+        PRECIO (final rojo grande + tachado, baseline)
+        ================================================ */
       .product-price {
         display: flex;
         align-items: baseline;
+        flex-wrap: wrap;
         gap: 0.5rem;
         margin-top: auto;
-        margin-bottom: 0.75rem;
+        margin-bottom: 0.85rem;
+        min-height: 1.6rem;
       }
-      .price-current { font-size: 1.15rem; font-weight: 700; color: var(--brand); }
-      .price-old { font-size: 0.85rem; color: #9ca3af; text-decoration: line-through; }
+
+      .price-current {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #dc3545;
+        line-height: 1;
+        letter-spacing: -0.5px;
+      }
+
+      .price-old {
+        font-size: 0.85rem;
+        color: #9ca3af;
+        text-decoration: line-through;
+        font-weight: 500;
+      }
+
+      /* ================================================
+        BOTÓN AGREGAR (profesional, bien separado)
+        ================================================ */
       .btn-add-cart {
         width: 100%;
-        border-radius: 50rem;
-        padding: 0.55rem;
+        border-radius: 0.5rem;
+        padding: 0.6rem 0.75rem;
         font-weight: 600;
         font-size: 0.85rem;
         background: var(--brand);
         color: white;
         border: none;
-        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        transition: all 0.2s ease;
+        margin-top: 0.25rem;
+        cursor: pointer;
       }
-      .btn-add-cart:hover { background: var(--brand-dark); transform: translateY(-2px); }
 
+      .btn-add-cart:hover {
+        background: var(--brand-dark);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(13, 110, 253, 0.3);
+      }
+
+      .btn-add-cart:active {
+        transform: translateY(0);
+        box-shadow: none;
+      }
+
+      .btn-add-cart i {
+        font-size: 0.8rem;
+      }
+
+      /* ================================================
+        RESPONSIVE — PRODUCTOS
+        ================================================ */
+      @media (max-width: 768px) {
+        .product-img-wrap {
+          height: 180px;
+          padding: 0.75rem;
+        }
+        .product-info {
+          padding: 0.85rem;
+        }
+        .product-title {
+          font-size: 0.88rem;
+          min-height: 2.3rem;
+        }
+        .price-current {
+          font-size: 1.15rem;
+        }
+        .btn-add-cart {
+          padding: 0.55rem;
+          font-size: 0.82rem;
+        }
+      }
+
+      @media (max-width: 576px) {
+        /* Grid 2 columnas */
+        #productos .row.g-4 > [class*="col-"] {
+          flex: 0 0 50%;
+          max-width: 50%;
+          padding-left: 6px;
+          padding-right: 6px;
+        }
+        #productos .row.g-4 {
+          --bs-gutter-x: 12px;
+        }
+
+        .product-img-wrap {
+          height: 140px;
+          padding: 0.5rem;
+        }
+        .product-info {
+          padding: 0.7rem;
+        }
+        .product-cat {
+          font-size: 0.62rem;
+          margin-bottom: 0.25rem;
+        }
+        .product-title {
+          font-size: 0.82rem;
+          min-height: 2.2rem;
+          margin-bottom: 0.25rem;
+        }
+        .product-model {
+          font-size: 0.7rem;
+          margin-bottom: 0.5rem;
+        }
+        .product-price {
+          gap: 0.35rem;
+          margin-bottom: 0.6rem;
+          min-height: 1.3rem;
+        }
+        .price-current {
+          font-size: 1.02rem;
+        }
+        .price-old {
+          font-size: 0.72rem;
+        }
+        .btn-add-cart {
+          padding: 0.45rem;
+          font-size: 0.78rem;
+          border-radius: 0.4rem;
+        }
+        .btn-add-cart i {
+          display: none;
+        }
+        .product-badge {
+          top: 8px;
+          left: 8px;
+          font-size: 0.62rem;
+          padding: 0.25rem 0.55rem;
+        }
+        .product-actions {
+          top: 8px;
+          right: 8px;
+          gap: 0.35rem;
+        }
+        .product-actions .icon-btn {
+          width: 30px;
+          height: 30px;
+          font-size: 0.75rem;
+        }
+      }
+
+      /* ================================================
+        ACCESIBILIDAD — REDUCED MOTION
+        ================================================ */
+      @media (prefers-reduced-motion: reduce) {
+        .product-card,
+        .product-img-wrap img,
+        .product-actions,
+        .btn-add-cart {
+          transition: none;
+        }
+        .product-card:hover {
+          transform: none;
+        }
+        .product-img-link:hover .product-img-wrap img {
+          transform: none;
+        }
+      }
       /* ================================================
          SERVICIOS
          ================================================ */
@@ -1438,17 +1688,28 @@ html(lang="es")
         if latestProducts && latestProducts.length
           .row.g-4
             each product in latestProducts
+              //- Cálculo de precio con fallback: finalPrice o customerPrice * (1 - discount/100)
+              - const hasDiscount = product.discount && product.discount > 0
+              - const basePrice = Number(product.customerPrice) || 0
+              - const computedFinal = hasDiscount ? (basePrice * (1 - product.discount / 100)) : basePrice
+              - const finalPrice = (product.finalPrice != null && !isNaN(product.finalPrice)) ? Number(product.finalPrice) : computedFinal
+              - const displayFinal = finalPrice.toFixed(2)
+              - const displayOld = basePrice.toFixed(2)
+              - const showOld = hasDiscount && basePrice > finalPrice
               .col-6.col-md-4.col-lg-3
-                .product-card.card.border-0.shadow-sm.hover-lift
-                  .product-img-wrap
-                    if product.discount && product.discount > 0
-                      span.product-badge.badge-sale= '-' + product.discount + '%'
-                    else if product.isNew
-                      span.product-badge.badge-new Nuevo
-                    if product.image
-                      img(src=product.image, alt=product.name)
-                    else
-                      i.fas.fa-image.fa-4x.text-muted
+                .product-card.card.border-0.shadow-sm
+                  //- Imagen clickeable con display:block, altura fija, cursor:pointer y hover con zoom
+                  a.product-img-link(href="/products/" + product._id title=product.name)
+                    .product-img-wrap
+                      if hasDiscount
+                        span.product-badge.badge-sale= '-' + product.discount + '%'
+                      else if product.isNew
+                        span.product-badge.badge-new Nuevo
+                      if product.image
+                        img(src=product.image, alt=product.name)
+                      else
+                        i.fas.fa-image.fa-4x.text-muted
+                    //- Acciones sobre la imagen (favoritos / ver)
                     .product-actions
                       button.icon-btn(type="button" title="Favoritos")
                         i.fas.fa-heart
@@ -1459,20 +1720,19 @@ html(lang="es")
                       .product-cat= product.category.name
                     a.product-title.text-decoration-none(href="/products/" + product._id)= product.name
                     if product.model
-                      small.text-muted.d-block.mb-2
+                      small.product-model
                         i.fas.fa-tag.me-1
                         = product.model
+                    //- Precio final grande + tachado (align-items: baseline)
                     .product-price
-                      if product.discount && product.discount > 0
-                        span.price-current S/. #{product.finalPrice}
-                        span.price-old S/. #{product.customerPrice}
-                      else
-                        span.price-current S/. #{product.customerPrice}
+                      span.price-current S/. #{displayFinal}
+                      if showOld
+                        span.price-old S/. #{displayOld}
                     button.btn-add-cart(
                       type="button"
                       data-id=product._id
                       data-name=product.name
-                      data-price=(product.finalPrice || product.customerPrice)
+                      data-price=displayFinal
                       data-image=(product.image || '')
                     )
                       i.fas.fa-cart-plus.me-1
@@ -1481,7 +1741,6 @@ html(lang="es")
           .text-center.py-5
             i.fas.fa-box-open.fa-4x.text-muted.mb-3
             p.text-muted No hay productos disponibles.
-
     //- ============================================
     //- OFERTA ESPECIAL
     //- ============================================
