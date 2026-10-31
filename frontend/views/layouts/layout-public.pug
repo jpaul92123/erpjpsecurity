@@ -970,7 +970,7 @@ html(lang="es")
             ul
               if setting && setting.company && setting.company.phone
                 li
-                                    a(href=`tel:${setting.company.phone}`)
+                  a(href=`tel:${setting.company.phone}`)
                     i.fas.fa-phone
                     = setting.company.phone
               if setting && setting.company && setting.company.email
