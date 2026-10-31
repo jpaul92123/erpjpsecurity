@@ -39,9 +39,8 @@ html(lang="es")
                         a.dropdown-item.ps-4(href=`/products?category=${sub._id}`)
                           i.fas.fa-tag.me-2
                           | #{sub.name}
-                          
-                    li
-                      hr.dropdown-divider
+                  li
+                    hr.dropdown-divider
           ul.navbar-nav
             if user
               li.nav-item
@@ -106,31 +105,43 @@ html(lang="es")
           .row.row-cols-1.row-cols-sm-2.row-cols-md-3.row-cols-lg-4.g-4
             each product in latestProducts
               .col
-                .card.h-100.shadow-sm.hover-lift.border-0.rounded-3
-                  .card-img-top.text-center.bg-light.p-3(style="height: 180px; overflow: hidden; position: relative;")
+                .card.h-100.shadow-sm.hover-lift.border-0.rounded-3.overflow-hidden
+
+                  //- Imagen clickeable (enlace al detalle)
+                  a.card-img-top.text-center.bg-light.d-block.position-relative.text-decoration-none(
+                    href=`/products/${product._id}`,
+                    style="height: 180px; overflow: hidden; padding: 0.75rem;"
+                  )
                     if product.image
                       img(src=product.image, alt=product.name, style="height: 100%; width: 100%; object-fit: contain;")
                     else
                       i.fas.fa-image.fa-4x.text-muted(style="line-height: 160px;")
                     if product.discount && product.discount > 0
-                      span.badge.bg-danger.position-absolute.top-0.end-0.m-2
-                        -#{product.discount}%
+                      span.badge.bg-danger.position-absolute.top-0.start-0.m-2
+                        | -#{product.discount}%
+
                   .card-body.d-flex.flex-column
-                    h6.card-title.text-truncate(title=product.name) #{product.name}
+                    //- Título clickeable también
+                    a.text-decoration-none.text-dark(href=`/products/${product._id}`)
+                      h6.card-title.text-truncate(title=product.name) #{product.name}
+
                     if product.model
-                      p.card-text.text-muted.small
+                      p.card-text.text-muted.small.mb-2
                         i.fas.fa-tag.me-1
                         | #{product.model}
+
+                    //- Precios
                     .mt-auto
-                      .d-flex.justify-content-between.align-items-center
-                        div
-                          if product.discount && product.discount > 0
-                            span.text-danger.fw-bold S/. #{product.finalPrice.toFixed(2)}
-                            small.text-muted.text-decoration-line-through.ms-1 S/. #{product.customerPrice.toFixed(2)}
-                          else
-                            span.text-primary.fw-bold S/. #{product.finalPrice.toFixed(2)
-                          .card-footer.bg-transparent.border-0
-                            a.btn.btn-sm.btn-outline-primary.w-100(href=`/products/${product._id}`)
+                      if product.discount && product.discount > 0
+                        .d-flex.align-items-baseline.gap-2.mb-2
+                          span.text-danger.fw-bold.fs-5 S/. #{product.finalPrice.toFixed(2)}
+                          small.text-muted.text-decoration-line-through S/. #{product.customerPrice.toFixed(2)}
+                      else
+                        .mb-2
+                          span.text-primary.fw-bold.fs-5 S/. #{product.finalPrice.toFixed(2)}
+
+                    //- Botón de detalle
+                    a.btn.btn-sm.btn-primary.w-100.mt-2(href=`/products/${product._id}`)
                       i.fas.fa-eye.me-1
                       | Ver Detalle
         else
@@ -176,7 +187,7 @@ html(lang="es")
       .container
         .row
           .col-md-6
-            p.mb-0 &copy; 2026 JP Security - Todos los derechos reservados2
+            p.mb-0 &copy; 2026 JP Security - Todos los derechos reservados
           .col-md-6.text-md-end
             a.text-white-50.me-3(href="#")
               i.fab.fa-facebook-f
