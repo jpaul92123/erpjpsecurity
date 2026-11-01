@@ -20,6 +20,7 @@ html(lang="es")
     if setting && setting.favicon
       link(rel="icon" href=setting.favicon)
 
+    link(rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin)
     link(rel="stylesheet" href="/bootstrap/css/bootstrap.min.css")
     link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css")
     link(rel="stylesheet" href="/css/styles.css")
@@ -329,6 +330,7 @@ html(lang="es")
         transform: translateY(-50%);
         z-index: 1;
       }
+      #hero-slider .carousel-inner { border-radius: 1.25rem; overflow: hidden; }
 
       /* ================================================
          SECCIONES
@@ -404,6 +406,7 @@ html(lang="es")
       .category-slide-image {
         position: absolute;
         inset: 0;
+        background-color: var(--brand);
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -586,6 +589,14 @@ html(lang="es")
       .brands-marquee:hover .brands-marquee-inner {
         animation-play-state: paused;
       }
+      /* Corrección: se duplica el grupo completo (2 pasadas idénticas) y
+         cada chip lleva margin-right en lugar de gap para que el 50% sea exacto */
+      .brands-group {
+        display: flex;
+        gap: 14px;
+        padding-right: 14px;
+        flex-shrink: 0;
+      }
       @keyframes brands-scroll {
         0% { transform: translate3d(0, 0, 0); }
         100% { transform: translate3d(-50%, 0, 0); }
@@ -603,7 +614,7 @@ html(lang="es")
         flex-shrink: 0;
         min-width: 120px;
         max-width: 180px;
-      }
+      }  
       .brand-chip:hover {
         border-color: var(--brand);
         background: #f0f7ff;
@@ -1072,6 +1083,31 @@ html(lang="es")
       .whatsapp-float:hover { color: white; transform: scale(1.1); }
 
       /* ================================================
+         TOAST (feedback favoritos)
+         ================================================ */
+      .app-toast {
+        position: fixed;
+        bottom: 90px;
+        left: 50%;
+        transform: translateX(-50%) translateY(20px);
+        background: #0f172a;
+        color: white;
+        padding: 0.65rem 1.25rem;
+        border-radius: 50rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.25s ease;
+        z-index: 1070;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .app-toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+
+      /* ================================================
          RESPONSIVE
          ================================================ */
       @media (max-width: 991px) {
@@ -1172,7 +1208,8 @@ html(lang="es")
         .product-card,
         .product-img-wrap img,
         .product-actions,
-        .btn-add-cart { transition: none; animation: none; }
+        .btn-add-cart,
+        .app-toast { transition: none; animation: none; }
         .product-card:hover,
         .product-img-link:hover .product-img-wrap img { transform: none; }
       }
@@ -1228,7 +1265,7 @@ html(lang="es")
         .collapse.navbar-collapse#navbarMain
 
           .search-wrapper.ms-lg-3.me-lg-3.my-2.my-lg-0
-            form.search-bar(action="/products" method="GET")
+            form.search-bar(action="/products" method="GET" role="search")
               i.fas.fa-search.text-muted
               input#liveSearch(
                 type="text"
@@ -1236,11 +1273,13 @@ html(lang="es")
                 placeholder="Buscar productos, marcas..."
                 autocomplete="off"
                 aria-label="Buscar productos"
+                aria-autocomplete="list"
+                aria-controls="searchResults"
               )
               button.btn.btn-primary(type="submit")
                 i.fas.fa-search.d-lg-none
                 span.d-none.d-lg-inline Buscar
-            .search-results#searchResults
+            .search-results#searchResults(role="listbox" aria-live="polite")
               .search-loading.d-none.text-center.py-3
                 .spinner-border.spinner-border-sm.text-primary
                 span.ms-2.text-muted Buscando...
@@ -1293,8 +1332,9 @@ html(lang="es")
 
           ul.navbar-nav.actions-nav.align-items-center.ms-lg-3
             li.nav-item
-              button.icon-btn(type="button" title="Favoritos" aria-label="Favoritos")
+              button.icon-btn(type="button" title="Favoritos" aria-label="Ver favoritos" id="favBtn")
                 i.fas.fa-heart
+                span.badge-count#favCount.d-none 0
 
             li.nav-item
               button.icon-btn#cartBtn(type="button" title="Carrito" aria-label="Abrir carrito")
@@ -1339,7 +1379,7 @@ html(lang="es")
     - const slides = (setting && setting.heroSlides && setting.heroSlides.length) ? setting.heroSlides.filter(s => s.isActive !== false && (s.title || s.subtitle || s.image)) : []
 
     if slides.length
-      section#hero-slider.carousel.slide.mb-5.mt-3(data-bs-ride="carousel")
+      section#hero-slider.carousel.slide.mb-5.mt-3(data-bs-ride="carousel" aria-roledescription="carrusel")
         .container.position-relative
           if slides.length > 1
             .carousel-indicators
@@ -1365,16 +1405,16 @@ html(lang="es")
                   .hero-content.w-100
                     .row.align-items-center
                       .col-lg-8
-                        if slide.category
+                        if slide.category && slide.category.name
                           span.badge.bg-white.text-primary.rounded-pill.mb-3.px-3.py-2
                             i.fas.fa-folder-open.me-1
-                            = slide.category.name || 'Categoría'
+                            = slide.category.name
                         h1.display-4.fw-bold.mb-3= slide.title || ''
                         p.lead.mb-4= slide.subtitle || ''
                         if slide.buttonText
                           .d-flex.flex-wrap.gap-2
                             a.btn.btn-light.btn-lg.rounded-pill.px-4(
-                              href=slide.buttonLink || (slide.category ? '/products?category=' + slide.category._id : '/products')
+                              href=slide.buttonLink || (slide.category && slide.category._id ? '/products?category=' + slide.category._id : '/products')
                             )
                               i.fas.fa-arrow-right.me-2
                               = slide.buttonText
@@ -1454,6 +1494,7 @@ html(lang="es")
                     style=(cat.image
                       ? `background-image: url('${cat.image}');`
                       : `background: linear-gradient(135deg, var(--brand), var(--brand-dark));`)
+                    data-cat-name=cat.name
                   )
                     if !cat.image
                       i.fas.fa-folder-open.category-slide-icon
@@ -1494,27 +1535,28 @@ html(lang="es")
 
             .brands-marquee
               .brands-marquee-inner
-                //- Se repite la lista dos veces para el bucle infinito (la segunda es decorativa)
+                //- Se repite el grupo completo dos veces para el bucle infinito exacto
                 each pass in [0, 1]
-                  each brand in brands
-                    a.brand-chip(
-                      href=`/brands/${brand._id}`
-                      title=brand.name
-                      aria-hidden=(pass === 1 ? 'true' : null)
-                      tabindex=(pass === 1 ? '-1' : null)
-                    )
-                      .brand-chip-logo
-                        if brand.logo && !brand.logo.includes('default')
-                          img(
-                            src=brand.logo
-                            alt=brand.name
-                            loading="lazy"
-                            onerror="this.parentElement.innerHTML='<i class=\"fas fa-trademark\"></i>';"
-                          )
-                        else
-                          i.fas.fa-trademark
-                      .brand-chip-info
-                        span.brand-chip-name= brand.name
+                  .brands-group(aria-hidden=(pass === 1 ? 'true' : null))
+                    each brand in brands
+                      a.brand-chip(
+                        href=`/brands/${brand._id}`
+                        title=brand.name
+                        tabindex=(pass === 1 ? '-1' : null)
+                      )
+                        .brand-chip-logo
+                          if brand.logo && !brand.logo.includes('default')
+                            img(
+                              src=brand.logo
+                              alt=brand.name
+                              loading="lazy"
+                              decoding="async"
+                              data-brand-logo="true"
+                            )
+                          else
+                            i.fas.fa-trademark
+                        .brand-chip-info
+                          span.brand-chip-name= brand.name
 
     //- ============================================
     //- PRODUCTOS DESTACADOS
@@ -1545,7 +1587,12 @@ html(lang="es")
                     a.product-img-link(href="/products/" + product._id title=product.name)
                       .product-img-wrap
                         if product.image
-                          img(src=product.image alt=product.name loading="lazy")
+                          img(
+                            src=product.image
+                            alt=product.name
+                            loading="lazy"
+                            decoding="async"
+                          )
                         else
                           i.fas.fa-image.fa-4x.text-muted
                     //- Badge y acciones FUERA del <a> para no anidar enlaces
@@ -1554,12 +1601,20 @@ html(lang="es")
                     else if product.isNew
                       span.product-badge.badge-new Nuevo
                     .product-actions
-                      button.icon-btn(type="button" title="Favoritos" aria-label="Agregar a favoritos")
+                      button.icon-btn.fav-btn(
+                        type="button"
+                        title="Favoritos"
+                        aria-label="Agregar a favoritos"
+                        data-id=product._id
+                        data-name=product.name
+                        data-price=displayFinal
+                        data-image=(product.image || '')
+                      )
                         i.fas.fa-heart
                       a.icon-btn(href="/products/" + product._id title="Ver detalle" aria-label="Ver detalle")
                         i.fas.fa-eye
                   .product-info
-                    if product.category
+                    if product.category && product.category.name
                       .product-cat= product.category.name
                     a.product-title.text-decoration-none(href="/products/" + product._id)= product.name
                     if product.model
@@ -1696,7 +1751,7 @@ html(lang="es")
           .col-md-4
             .testimonial-card.shadow-sm
               .d-flex.align-items-center.mb-3
-                img.rounded-circle.me-3(src="https://ui-avatars.com/api/?name=Carlos+Mendoza&size=50&background=0D6EFD&color=fff" alt="Carlos Mendoza" width="50" height="50" loading="lazy")
+                img.rounded-circle.me-3(src="https://ui-avatars.com/api/?name=Carlos+Mendoza&size=50&background=0D6EFD&color=fff" alt="Carlos Mendoza" width="50" height="50" loading="lazy" decoding="async")
                 div
                   h6.mb-0.fw-bold Carlos Mendoza
                   small.text-muted Cliente desde 2023
@@ -1710,7 +1765,7 @@ html(lang="es")
           .col-md-4
             .testimonial-card.shadow-sm
               .d-flex.align-items-center.mb-3
-                img.rounded-circle.me-3(src="https://ui-avatars.com/api/?name=Maria+Gonzalez&size=50&background=198754&color=fff" alt="Maria Gonzalez" width="50" height="50" loading="lazy")
+                img.rounded-circle.me-3(src="https://ui-avatars.com/api/?name=Maria+Gonzalez&size=50&background=198754&color=fff" alt="Maria Gonzalez" width="50" height="50" loading="lazy" decoding="async")
                 div
                   h6.mb-0.fw-bold Maria Gonzalez
                   small.text-muted Cliente desde 2024
@@ -1724,7 +1779,7 @@ html(lang="es")
           .col-md-4
             .testimonial-card.shadow-sm
               .d-flex.align-items-center.mb-3
-                img.rounded-circle.me-3(src="https://ui-avatars.com/api/?name=Juan+Perez&size=50&background=FFC107&color=000" alt="Juan Perez" width="50" height="50" loading="lazy")
+                img.rounded-circle.me-3(src="https://ui-avatars.com/api/?name=Juan+Perez&size=50&background=FFC107&color=000" alt="Juan Perez" width="50" height="50" loading="lazy" decoding="async")
                 div
                   h6.mb-0.fw-bold Juan Perez
                   small.text-muted Cliente desde 2022
@@ -1847,22 +1902,22 @@ html(lang="es")
             p= setting && setting.siteTagline ? setting.siteTagline : 'Soluciones integrales en seguridad electrónica.'
             .footer-social.mt-3
               if setting && setting.social && setting.social.facebook
-                a(href=setting.social.facebook target="_blank" rel="noopener" title="Facebook")
+                a(href=setting.social.facebook target="_blank" rel="noopener" title="Facebook" aria-label="Facebook")
                   i.fab.fa-facebook-f
               if setting && setting.social && setting.social.instagram
-                a(href=setting.social.instagram target="_blank" rel="noopener" title="Instagram")
+                a(href=setting.social.instagram target="_blank" rel="noopener" title="Instagram" aria-label="Instagram")
                   i.fab.fa-instagram
               if setting && setting.social && setting.social.youtube
-                a(href=setting.social.youtube target="_blank" rel="noopener" title="YouTube")
+                a(href=setting.social.youtube target="_blank" rel="noopener" title="YouTube" aria-label="YouTube")
                   i.fab.fa-youtube
               if setting && setting.social && setting.social.tiktok
-                a(href=setting.social.tiktok target="_blank" rel="noopener" title="TikTok")
+                a(href=setting.social.tiktok target="_blank" rel="noopener" title="TikTok" aria-label="TikTok")
                   i.fab.fa-tiktok
               if setting && setting.social && setting.social.linkedin
-                a(href=setting.social.linkedin target="_blank" rel="noopener" title="LinkedIn")
+                a(href=setting.social.linkedin target="_blank" rel="noopener" title="LinkedIn" aria-label="LinkedIn")
                   i.fab.fa-linkedin-in
               if setting && setting.social && setting.social.whatsapp
-                a(href=`https://wa.me/${setting.social.whatsapp}` target="_blank" rel="noopener" title="WhatsApp")
+                a(href=`https://wa.me/${setting.social.whatsapp}` target="_blank" rel="noopener" title="WhatsApp" aria-label="WhatsApp")
                   i.fab.fa-whatsapp
 
           .col-md-2.col-6
@@ -1926,9 +1981,14 @@ html(lang="es")
     //- CARRITO LATERAL
     //- ============================================
     .cart-overlay#cartOverlay
-    aside.cart-sidebar#cartSidebar(aria-label="Carrito de compras")
+    aside.cart-sidebar#cartSidebar(
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="cartTitle"
+      aria-label="Carrito de compras"
+    )
       .cart-header
-        h5.mb-0
+        h5.mb-0#cartTitle
           i.fas.fa-shopping-cart.me-2
           | Mi Carrito
         button.icon-btn#cartClose(type="button" aria-label="Cerrar carrito")
@@ -1947,9 +2007,13 @@ html(lang="es")
         .d-flex.justify-content-between.mb-3.fs-5
           span.fw-bold Total
           strong.text-primary#cartTotal S/. 0.00
-        a.btn.btn-primary.w-100.rounded-pill.py-2(href="/checkout")
-          i.fas.fa-credit-card.me-2
-          | Pago Contra entrega
+        .d-flex.gap-2
+          button.btn.btn-outline-danger.rounded-pill.py-2#cartClear(type="button" title="Vaciar carrito")
+            i.fas.fa-trash.me-1
+            | Vaciar
+          a.btn.btn-primary.flex-grow-1.rounded-pill.py-2(href="/checkout")
+            i.fas.fa-credit-card.me-2
+            | Pago Contra entrega
 
     //- ============================================
     //- BOTONES FLOTANTES
@@ -1968,12 +2032,21 @@ html(lang="es")
       i.fas.fa-arrow-up
 
     //- ============================================
+    //- TOAST GLOBAL (feedback)
+    //- ============================================
+    .app-toast#appToast(role="status" aria-live="polite")
+      i.fas.fa-check-circle
+      span#appToastText
+
+    //- ============================================
     //- SCRIPTS
     //- ============================================
     script(src="/bootstrap/js/bootstrap.bundle.min.js")
 
     script.
-      /* UTILIDADES */
+      /* ============================================================
+         UTILIDADES
+         ============================================================ */
       function esc(value) {
         return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) {
           return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -1981,7 +2054,23 @@ html(lang="es")
       }
       const PLACEHOLDER_IMG = "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Crect width='60' height='60' fill='%23f1f5f9'/%3E%3C/svg%3E";
 
-      /* LINK ACTIVO EN EL MENÚ */
+      /* Toast helper */
+      let toastTimer = null;
+      function showToast(message, iconClass) {
+        const toast = document.getElementById('appToast');
+        const text = document.getElementById('appToastText');
+        if (!toast || !text) return;
+        text.textContent = message;
+        const icon = toast.querySelector('i');
+        if (icon) icon.className = 'fas ' + (iconClass || 'fa-check-circle');
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 2200);
+      }
+
+      /* ============================================================
+         LINK ACTIVO EN EL MENÚ
+         ============================================================ */
       (function markActiveLink() {
         document.querySelectorAll('.main-nav > .nav-item > a.nav-link[href]').forEach(function (a) {
           const href = a.getAttribute('href');
@@ -1991,26 +2080,48 @@ html(lang="es")
         });
       })();
 
-      /* DROPDOWN HOVER (solo escritorio) */
-      if (window.innerWidth >= 992) {
-        document.querySelectorAll('.navbar .dropdown').forEach(function (dropdown) {
-          const toggle = dropdown.querySelector('.dropdown-toggle');
-          if (!toggle) return;
-          dropdown.addEventListener('mouseenter', function () {
-            bootstrap.Dropdown.getOrCreateInstance(toggle).show();
+      /* ============================================================
+         DROPDOWN HOVER (solo escritorio)
+         ============================================================ */
+      (function initDropdownHover() {
+        function apply() {
+          const isDesktop = window.innerWidth >= 992;
+          document.querySelectorAll('.navbar .dropdown').forEach(function (dropdown) {
+            if (dropdown.dataset.hoverInit === '1') {
+              if (!isDesktop) {
+                // Desactivar hover en móvil
+                dropdown.onmouseenter = null;
+                dropdown.onmouseleave = null;
+              }
+              return;
+            }
+            if (!isDesktop) return;
+            const toggle = dropdown.querySelector('.dropdown-toggle');
+            if (!toggle) return;
+            dropdown.dataset.hoverInit = '1';
+            dropdown.onmouseenter = function () {
+              bootstrap.Dropdown.getOrCreateInstance(toggle).show();
+            };
+            dropdown.onmouseleave = function () {
+              bootstrap.Dropdown.getOrCreateInstance(toggle).hide();
+            };
+            toggle.addEventListener('click', function (e) {
+              e.preventDefault();
+              e.stopPropagation();
+            });
           });
-          dropdown.addEventListener('mouseleave', function () {
-            bootstrap.Dropdown.getOrCreateInstance(toggle).hide();
-          });
-          // Evita que el clic cierre el menú recién abierto por hover
-          toggle.addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-          });
+        }
+        apply();
+        let resizeT = null;
+        window.addEventListener('resize', function () {
+          clearTimeout(resizeT);
+          resizeT = setTimeout(apply, 200);
         });
-      }
+      })();
 
-      /* BUSCADOR EN VIVO */
+      /* ============================================================
+         BUSCADOR EN VIVO
+         ============================================================ */
       (function initLiveSearch() {
         const liveSearch = document.getElementById('liveSearch');
         const searchResults = document.getElementById('searchResults');
@@ -2019,6 +2130,7 @@ html(lang="es")
         const searchEmpty = document.querySelector('.search-empty');
         let searchTimeout = null;
         let requestId = 0;
+        let controller = null;
 
         if (!liveSearch || !searchResults) return;
 
@@ -2038,10 +2150,13 @@ html(lang="es")
 
           searchTimeout = setTimeout(function () {
             const currentRequest = ++requestId;
-            fetch('/api/products/search?q=' + encodeURIComponent(q))
+            if (controller) controller.abort();
+            controller = new AbortController();
+
+            fetch('/api/products/search?q=' + encodeURIComponent(q), { signal: controller.signal })
               .then(function (r) { return r.json(); })
               .then(function (data) {
-                if (currentRequest !== requestId) return; // descarta respuestas viejas
+                if (currentRequest !== requestId) return;
                 searchLoading.classList.add('d-none');
 
                 if (!data.products || data.products.length === 0) {
@@ -2051,12 +2166,13 @@ html(lang="es")
 
                 searchList.innerHTML = data.products.slice(0, 8).map(function (p) {
                   const price = Number(p.finalPrice != null ? p.finalPrice : p.customerPrice) || 0;
-                  const meta = [p.category ? p.category.name : '', p.model || ''].filter(Boolean).map(esc).join(' · ');
+                  const meta = [p.category ? p.category.name : '', p.model || '']
+                    .filter(Boolean).map(esc).join(' · ');
                   return '' +
-                    '<a href="/products/' + encodeURIComponent(p._id) + '" class="search-result-item">' +
+                    '<a href="/products/' + encodeURIComponent(p._id) + '" class="search-result-item" role="option">' +
                       '<div class="search-result-img">' +
                         (p.image
-                          ? '<img src="' + esc(p.image) + '" alt="' + esc(p.name) + '">'
+                          ? '<img src="' + esc(p.image) + '" alt="' + esc(p.name) + '" loading="lazy" decoding="async">'
                           : '<i class="fas fa-image text-muted"></i>') +
                       '</div>' +
                       '<div class="search-result-info">' +
@@ -2071,6 +2187,7 @@ html(lang="es")
                   '</div>';
               })
               .catch(function (err) {
+                if (err && err.name === 'AbortError') return;
                 console.error('Error buscando:', err);
                 searchLoading.classList.add('d-none');
                 searchEmpty.classList.remove('d-none');
@@ -2090,9 +2207,19 @@ html(lang="es")
             this.blur();
           }
         });
+
+        // Cerrar dropdown al enviar el formulario
+        const form = liveSearch.closest('form');
+        if (form) {
+          form.addEventListener('submit', function () {
+            searchResults.classList.remove('show');
+          });
+        }
       })();
 
-      /* CARRITO */
+      /* ============================================================
+         CARRITO
+         ============================================================ */
       const CART_KEY = 'jp_cart';
 
       function getCart() {
@@ -2121,6 +2248,7 @@ html(lang="es")
           });
         }
         saveCart(cart);
+        showToast('Agregado al carrito', 'fa-cart-plus');
         openCart();
       }
 
@@ -2142,6 +2270,11 @@ html(lang="es")
         saveCart(cart);
       }
 
+      function clearCart() {
+        saveCart([]);
+        showToast('Carrito vaciado', 'fa-trash');
+      }
+
       function updateCartUI() {
         const cart = getCart();
         const count = cart.reduce(function (s, i) { return s + i.qty; }, 0);
@@ -2151,7 +2284,10 @@ html(lang="es")
         const cartSubtotal = document.getElementById('cartSubtotal');
         const cartTotal = document.getElementById('cartTotal');
 
-        if (cartCount) cartCount.textContent = count;
+        if (cartCount) {
+          cartCount.textContent = count;
+          cartCount.style.display = count > 0 ? '' : 'none';
+        }
         if (cartSubtotal) cartSubtotal.textContent = 'S/. ' + subtotal.toFixed(2);
         if (cartTotal) cartTotal.textContent = 'S/. ' + subtotal.toFixed(2);
 
@@ -2170,8 +2306,9 @@ html(lang="es")
         cart.forEach(function (item) {
           const div = document.createElement('div');
           div.className = 'cart-item';
+          const imgSrc = item.image ? esc(item.image) : PLACEHOLDER_IMG;
           div.innerHTML =
-            '<img src="' + esc(item.image || PLACEHOLDER_IMG) + '" alt="' + esc(item.name) + '">' +
+            '<img src="' + imgSrc + '" alt="' + esc(item.name) + '" loading="lazy" decoding="async">' +
             '<div class="flex-grow-1 min-w-0">' +
               '<div class="fw-semibold small text-truncate">' + esc(item.name) + '</div>' +
               '<div class="text-primary fw-bold small">S/. ' + Number(item.price).toFixed(2) + '</div>' +
@@ -2191,8 +2328,14 @@ html(lang="es")
       function openCart() {
         const s = document.getElementById('cartSidebar');
         const o = document.getElementById('cartOverlay');
-        if (s) s.classList.add('open');
+        if (s) {
+          s.classList.add('open');
+          // Foco al botón cerrar (accesibilidad)
+          const closeBtn = document.getElementById('cartClose');
+          if (closeBtn) setTimeout(function () { closeBtn.focus(); }, 100);
+        }
         if (o) o.classList.add('open');
+        document.body.style.overflow = 'hidden';
       }
 
       function closeCart() {
@@ -2200,19 +2343,91 @@ html(lang="es")
         const o = document.getElementById('cartOverlay');
         if (s) s.classList.remove('open');
         if (o) o.classList.remove('open');
+        document.body.style.overflow = '';
       }
 
+      /* ============================================================
+         FAVORITOS (localStorage básico)
+         ============================================================ */
+      const FAV_KEY = 'jp_favs';
+
+      function getFavs() {
+        try { return JSON.parse(localStorage.getItem(FAV_KEY)) || []; }
+        catch (e) { return []; }
+      }
+
+      function saveFavs(favs) {
+        try { localStorage.setItem(FAV_KEY, JSON.stringify(favs)); } catch (e) {}
+        updateFavUI();
+      }
+
+      function toggleFav(product) {
+        const favs = getFavs();
+        const id = String(product.id);
+        const idx = favs.findIndex(function (f) { return String(f.id) === id; });
+        if (idx >= 0) {
+          favs.splice(idx, 1);
+          showToast('Quitado de favoritos', 'fa-heart-broken');
+        } else {
+          favs.push({
+            id: id,
+            name: product.name,
+            price: Number(product.price) || 0,
+            image: product.image || ''
+          });
+          showToast('Agregado a favoritos', 'fa-heart');
+        }
+        saveFavs(favs);
+      }
+
+      function updateFavUI() {
+        const favs = getFavs();
+        const favCount = document.getElementById('favCount');
+        if (favCount) {
+          favCount.textContent = favs.length;
+          favCount.style.display = favs.length > 0 ? '' : 'none';
+        }
+        // Marcar botones .fav-btn activos
+        document.querySelectorAll('.fav-btn').forEach(function (btn) {
+          const id = String(btn.dataset.id);
+          const isFav = favs.some(function (f) { return String(f.id) === id; });
+          btn.classList.toggle('active', isFav);
+          const icon = btn.querySelector('i');
+          if (icon) {
+            icon.className = isFav ? 'fas fa-heart text-danger' : 'far fa-heart';
+          }
+        });
+      }
+
+      /* ============================================================
+         DELEGACIÓN DE EVENTOS GLOBALES
+         ============================================================ */
       document.addEventListener('click', function (e) {
+        // Carrito: cambiar cantidad
         const qtyBtn = e.target.closest('.cart-qty-btn');
         if (qtyBtn) {
           e.preventDefault();
           updateQty(qtyBtn.dataset.id, qtyBtn.dataset.action === 'increase' ? 1 : -1);
           return;
         }
+        // Carrito: eliminar item
         const removeBtn = e.target.closest('.cart-remove-btn');
         if (removeBtn) {
           e.preventDefault();
           removeFromCart(removeBtn.dataset.id);
+          return;
+        }
+        // Favoritos
+        const favBtn = e.target.closest('.fav-btn');
+        if (favBtn) {
+          e.preventDefault();
+          toggleFav({
+            id: favBtn.dataset.id,
+            name: favBtn.dataset.name,
+            price: parseFloat(favBtn.dataset.price),
+            image: favBtn.dataset.image
+          });
+          return;
         }
       });
 
@@ -2220,8 +2435,12 @@ html(lang="es")
         if (e.key === 'Escape') closeCart();
       });
 
+      /* ============================================================
+         INICIALIZACIÓN
+         ============================================================ */
       document.addEventListener('DOMContentLoaded', function () {
         updateCartUI();
+        updateFavUI();
 
         const cartBtn = document.getElementById('cartBtn');
         if (cartBtn) cartBtn.addEventListener('click', openCart);
@@ -2232,6 +2451,29 @@ html(lang="es")
         const cartOverlay = document.getElementById('cartOverlay');
         if (cartOverlay) cartOverlay.addEventListener('click', closeCart);
 
+        const cartClear = document.getElementById('cartClear');
+        if (cartClear) cartClear.addEventListener('click', function () {
+          if (getCart().length === 0) {
+            showToast('El carrito ya está vacío', 'fa-info-circle');
+            return;
+          }
+          if (window.confirm('¿Vaciar todo el carrito?')) clearCart();
+        });
+
+        // Botón favoritos del navbar (muestra resumen)
+        const favBtn = document.getElementById('favBtn');
+        if (favBtn) {
+          favBtn.addEventListener('click', function () {
+            const favs = getFavs();
+            if (favs.length === 0) {
+              showToast('Aún no tienes favoritos', 'fa-info-circle');
+            } else {
+              showToast('Tienes ' + favs.length + ' favorito(s)', 'fa-heart');
+            }
+          });
+        }
+
+        // Botones "Agregar al carrito"
         document.querySelectorAll('.btn-add-cart').forEach(function (btn) {
           btn.addEventListener('click', function () {
             addToCart({
@@ -2242,9 +2484,21 @@ html(lang="es")
             });
           });
         });
+
+        // Fallback de logos de marcas (reemplaza el onerror inline)
+        document.querySelectorAll('img[data-brand-logo="true"]').forEach(function (img) {
+          img.addEventListener('error', function () {
+            const parent = this.parentElement;
+            if (parent) {
+              parent.innerHTML = '<i class="fas fa-trademark"></i>';
+            }
+          }, { once: true });
+        });
       });
 
-      /* SCROLL TOP */
+      /* ============================================================
+         SCROLL TOP
+         ============================================================ */
       (function initScrollTop() {
         const scrollTop = document.getElementById('scrollTop');
         if (!scrollTop) return;
@@ -2257,7 +2511,9 @@ html(lang="es")
         });
       })();
 
-      /* CARRUSEL DE CATEGORÍAS */
+      /* ============================================================
+         CARRUSEL DE CATEGORÍAS
+         ============================================================ */
       (function initCategoryCarousel() {
         const carousel = document.getElementById('categoryCarousel');
         const btnPrev = document.getElementById('catPrev');
@@ -2268,7 +2524,7 @@ html(lang="es")
         const getScrollAmount = function () {
           const card = carousel.querySelector('.category-slide-card');
           if (!card) return 300;
-          return card.offsetWidth + 16; // ancho + gap
+          return card.offsetWidth + 16;
         };
 
         function updateNavButtons() {
@@ -2294,12 +2550,12 @@ html(lang="es")
         window.addEventListener('resize', updateNavButtons);
         updateNavButtons();
 
-        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
         let autoScrollTimer = null;
         let isUserInteracting = false;
 
         function startAutoScroll() {
-          if (autoScrollTimer || reduceMotion) return;
+          if (autoScrollTimer || motionQuery.matches) return;
           autoScrollTimer = setInterval(function () {
             if (isUserInteracting) return;
             const atEnd = carousel.scrollLeft + carousel.clientWidth >= carousel.scrollWidth - 5;
@@ -2332,7 +2588,19 @@ html(lang="es")
           }, { passive: true });
         });
 
+        // Reaccionar a cambios en preferencias de movimiento
+        if (motionQuery.addEventListener) {
+          motionQuery.addEventListener('change', function () {
+            if (motionQuery.matches) stopAutoScroll();
+            else if (carousel.querySelectorAll('.category-slide-card').length > 4) startAutoScroll();
+          });
+        }
+
         if (carousel.querySelectorAll('.category-slide-card').length > 4) {
           startAutoScroll();
         }
       })();
+
+
+
+                    
