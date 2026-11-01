@@ -2148,12 +2148,12 @@ html(lang="es")
           searchEmpty.classList.add('d-none');
           searchList.innerHTML = '';
 
-          searchTimeout = setTimeout(function () {
+          searchTimeout = setTimeout(function (){
             const currentRequest = ++requestId;
             if (controller) controller.abort();
             controller = new AbortController();
 
-            fetch('/products/search?q=' + encodeURIComponent(q)), { signal: controller.signal })
+            fetch('/products/search?q=' + encodeURIComponent(q), { signal: controller.signal })
               .then(function (r) { return r.json(); })
               .then(function (data) {
                 if (currentRequest !== requestId) return;
