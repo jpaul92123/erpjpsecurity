@@ -1405,10 +1405,7 @@ html(lang="es")
                   .hero-content.w-100
                     .row.align-items-center
                       .col-lg-8
-                        if slide.category && slide.category.name
-                          span.badge.bg-white.text-primary.rounded-pill.mb-3.px-3.py-2
-                            i.fas.fa-folder-open.me-1
-                            = slide.category.name
+                        
                         h1.display-4.fw-bold.mb-3= slide.title || ''
                         p.lead.mb-4= slide.subtitle || ''
                         if slide.buttonText
