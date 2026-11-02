@@ -311,10 +311,10 @@ exports.detail = async (req, res) => {
     if (product.category) {
       const related = await Product.find({
         category: product.category._id,
-        _id: { $ne: product._id }, // Que no sea el mismo producto
+        _id: { $ne: product._id },
         isActive: true
       })
-      .limit(6) // Traemos hasta 6 productos
+      .limit(6)
       .populate('category', 'name')
       .populate('brand', 'name');
 
@@ -324,7 +324,7 @@ exports.detail = async (req, res) => {
     res.render('products/detail', {
       title: product.name,
       product: normalizedProduct,
-      relatedProducts // <-- Enviamos los relacionados a la vista
+      relatedProducts
     });
   } catch (error) {
     console.error('Error en detalle:', error);
@@ -368,12 +368,10 @@ exports.downloadCatalog = async (req, res) => {
         categoryName = cat.name;
 
         if (cat.parent === null) {
-          // Categoría padre: incluir subcategorías
           const subs = await Category.find({ parent: cat._id });
           const catIds = [cat._id, ...subs.map(s => s._id)];
           filter.category = { $in: catIds };
         } else {
-          // Subcategoría
           filter.subcategory = cat._id;
         }
       }
@@ -404,7 +402,6 @@ exports.downloadCatalog = async (req, res) => {
       grouped[catId].subcategories[subId].products.push(p);
     });
 
-    // -------- Render sin layout --------
     res.render('products/catalog', {
       title: 'Catálogo de Productos',
       grouped,
@@ -412,7 +409,7 @@ exports.downloadCatalog = async (req, res) => {
       categoryObj,
       totalProducts: normalizedProducts.length,
       generatedAt: new Date(),
-      layout: false   // ⚠️ sin layout para imprimir limpio
+      layout: false
     });
   } catch (error) {
     console.error('Error al generar catálogo:', error);
@@ -434,7 +431,6 @@ exports.searchProducts = async (req, res) => {
 
     const regex = new RegExp(q, 'i');
 
-    // 1. Buscar categorías y marcas que coincidan con el término
     const matchingCategories = await Category.find({
       isActive: true,
       name: regex
@@ -448,7 +444,6 @@ exports.searchProducts = async (req, res) => {
     const categoryIds = matchingCategories.map(c => c._id);
     const brandIds = matchingBrands.map(b => b._id);
 
-    // 2. Construir condiciones de búsqueda
     const orConditions = [
       { name: regex },
       { model: regex },
@@ -464,7 +459,6 @@ exports.searchProducts = async (req, res) => {
       orConditions.push({ brand: { $in: brandIds } });
     }
 
-    // 3. Buscar productos
     const products = await Product.find({
       isActive: true,
       $or: orConditions
@@ -476,7 +470,6 @@ exports.searchProducts = async (req, res) => {
       .limit(8)
       .lean();
 
-    // 4. Calcular finalPrice en cada resultado
     const normalizedProducts = products.map(p => {
       const customerPrice = p.customerPrice || 0;
       const discount = p.discount || 0;
@@ -491,5 +484,78 @@ exports.searchProducts = async (req, res) => {
   } catch (error) {
     console.error('Error en búsqueda:', error);
     res.status(500).json({ products: [], error: error.message });
+  }
+};
+
+// ============================================
+// 🆕 HOME: PRODUCTOS POR CATEGORÍA (para carruseles)
+// ============================================
+exports.home = async (req, res) => {
+  try {
+    // 1. Categorías activas (padres) con sus subcategorías
+    const categories = await Category.find({ parent: null, isActive: true }).sort({ name: 1 });
+    const categoriesWithSubs = await Promise.all(categories.map(async (cat) => {
+      const subs = await Category.find({ parent: cat._id, isActive: true }).sort({ name: 1 });
+      return { ...cat.toObject(), subcategories: subs };
+    }));
+
+    // 2. Últimos productos (para la sección "Últimos Productos")
+    const latestRaw = await Product.find({ isActive: true })
+      .populate('category', 'name')
+      .populate('subcategory', 'name')
+      .populate('brand', 'name')
+      .sort({ createdAt: -1 })
+      .limit(8)
+      .lean();
+    const latestProducts = latestRaw.map(normalizeProduct);
+
+    // 3. 🆕 PRODUCTOS POR CATEGORÍA (mínimo 4, hasta 12 por categoría)
+    const productsByCategory = await Promise.all(
+      categoriesWithSubs.map(async (cat) => {
+        // Incluye productos de la categoría padre Y de sus subcategorías
+        const subIds = (cat.subcategories || []).map(s => s._id);
+        const catIds = [cat._id, ...subIds];
+
+        const raw = await Product.find({
+          isActive: true,
+          $or: [
+            { category: { $in: catIds } },
+            { subcategory: { $in: catIds } }
+          ]
+        })
+          .populate('category', 'name')
+          .populate('subcategory', 'name')
+          .populate('brand', 'name')
+          .sort({ createdAt: -1 })
+          .limit(12)
+          .lean();
+
+        return {
+          category: cat,
+          products: raw.map(normalizeProduct)
+        };
+      })
+    );
+
+    // Filtrar categorías sin productos (no tiene sentido mostrarlas)
+    const productsByCategoryFiltered = productsByCategory.filter(
+      (b) => b.products && b.products.length > 0
+    );
+
+    // 4. Marcas activas (para el marquee de marcas)
+    const brands = await Brand.find({ isActive: true }).sort({ name: 1 }).lean();
+
+    // 5. Render
+    res.render('index', {
+      setting: res.locals.setting || null, // viene del middleware global si existe
+      categories: categoriesWithSubs,
+      latestProducts,
+      brands,
+      productsByCategory: productsByCategoryFiltered, // 🆕
+      user: req.user || null
+    });
+  } catch (error) {
+    console.error('Error en home:', error);
+    res.status(500).send('Error al cargar la página principal');
   }
 };
