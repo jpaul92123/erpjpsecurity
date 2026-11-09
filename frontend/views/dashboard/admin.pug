@@ -143,7 +143,7 @@ block content
             | Ver pedidos
 
   //- ============================================
-  //- ESTADÍSTICAS (4 stats completos)
+  //- ESTADÍSTICAS
   //- ============================================
   .row.g-2.g-md-3.mb-3.mb-md-4.stats-mobile
     .col-6.col-lg-3
@@ -221,7 +221,6 @@ block content
             .brands-marquee
               .brands-marquee-inner
 
-                //- Primera vuelta
                 each brand in brands
                   a.brand-chip(
                     href=`/brands/${brand._id}`
@@ -241,7 +240,6 @@ block content
                     .brand-chip-info
                       span.brand-chip-name= brand.name
 
-                //- Segunda vuelta (loop infinito)
                 each brand in brands
                   a.brand-chip(
                     href=`/brands/${brand._id}`
@@ -357,18 +355,22 @@ block content
         i.fas.fa-th-large.me-2.text-primary
         | Módulos del Sistema
 
+  //- ============================================
+  //- MIXIN MEJORADO: icono grande + color + categoría
+  //- ============================================
   mixin moduleCard(href, icon, label, color, category)
-    .col-4.col-md-4.col-lg-3.module-item(data-category=category)
+    .col-6.col-md-4.col-lg-3.col-xl-2.module-item(data-category=category)
       a.module-card.card.text-decoration-none.border-0.shadow-sm.h-100(href=href, class=`module-${color}`)
-        .card-body.p-2.p-md-3.d-flex.flex-column.flex-md-row.align-items-center.align-items-md-center.gap-2.gap-md-3.text-center.text-md-start
-          .module-icon
+        .card-body.p-3.d-flex.flex-column.align-items-center.justify-content-center.text-center.gap-2
+          .module-icon-lg
             i(class=icon)
-          .flex-grow-1.min-w-0.w-100
-            .module-label.fw-semibold.text-truncate= label
-            small.text-muted.module-sub= category
-          i.fas.fa-chevron-right.module-arrow.d-none.d-md-block
+          .w-100.min-w-0
+            .module-label.fw-bold.text-truncate= label
+            small.text-muted.module-sub.d-block= category
 
+  //- ============================================
   //- SEGURIDAD
+  //- ============================================
   .row.mb-2
     .col-12
       .d-flex.align-items-center.mb-2
@@ -377,11 +379,13 @@ block content
           | Seguridad
         .flex-grow-1.border-bottom
   .row.g-2.g-md-3.mb-3.mb-md-4
-    +moduleCard('/users', 'fas.fa-users', 'Usuarios', 'indigo', 'seguridad')
-    +moduleCard('/clients', 'fas.fa-building', 'Clientes', 'success', 'seguridad')
-    +moduleCard('/suppliers', 'fas.fa-handshake', 'Proveedores', 'teal', 'seguridad')
+    +moduleCard('/users', 'fas.fa-users', 'Usuarios', 'indigo', 'Seguridad')
+    +moduleCard('/clients', 'fas.fa-building', 'Clientes', 'success', 'Seguridad')
+    +moduleCard('/suppliers', 'fas.fa-handshake', 'Proveedores', 'teal', 'Seguridad')
 
+  //- ============================================
   //- INVENTARIO
+  //- ============================================
   .row.mb-2
     .col-12
       .d-flex.align-items-center.mb-2
@@ -390,12 +394,14 @@ block content
           | Inventario
         .flex-grow-1.border-bottom
   .row.g-2.g-md-3.mb-3.mb-md-4
-    +moduleCard('/products', 'fas.fa-box', 'Productos', 'danger', 'inventario')
-    +moduleCard('/categories', 'fas.fa-tags', 'Categorías', 'purple', 'inventario')
-    +moduleCard('/brands', 'fas.fa-trademark', 'Marcas', 'slate', 'inventario')
-    +moduleCard('/warehouses', 'fas.fa-warehouse', 'Almacenes', 'amber', 'inventario')
+    +moduleCard('/products', 'fas.fa-box', 'Productos', 'danger', 'Inventario')
+    +moduleCard('/categories', 'fas.fa-tags', 'Categorías', 'purple', 'Inventario')
+    +moduleCard('/brands', 'fas.fa-trademark', 'Marcas', 'slate', 'Inventario')
+    +moduleCard('/warehouses', 'fas.fa-warehouse', 'Almacenes', 'amber', 'Inventario')
 
+  //- ============================================
   //- VENTAS
+  //- ============================================
   .row.mb-2
     .col-12
       .d-flex.align-items-center.mb-2
@@ -404,12 +410,14 @@ block content
           | Ventas
         .flex-grow-1.border-bottom
   .row.g-2.g-md-3.mb-3.mb-md-4
-    +moduleCard('/quotations', 'fas.fa-file-invoice', 'Cotizaciones', 'blue', 'ventas')
-    +moduleCard('/orders', 'fas.fa-clipboard-list', 'Pedidos', 'orange', 'ventas')
-    +moduleCard('/sales', 'fas.fa-cart-plus', 'Ventas', 'emerald', 'ventas')
-    +moduleCard('/vouchers', 'fas.fa-file-pdf', 'Comprobantes', 'rose', 'ventas')
+    +moduleCard('/quotations', 'fas.fa-file-invoice-dollar', 'Cotizaciones', 'blue', 'Ventas')
+    +moduleCard('/orders', 'fas.fa-clipboard-list', 'Pedidos', 'orange', 'Ventas')
+    +moduleCard('/sales', 'fas.fa-cash-register', 'Ventas', 'emerald', 'Ventas')
+    +moduleCard('/vouchers', 'fas.fa-receipt', 'Comprobantes', 'rose', 'Ventas')
 
+  //- ============================================
   //- SERVICIOS
+  //- ============================================
   .row.mb-2
     .col-12
       .d-flex.align-items-center.mb-2
@@ -418,13 +426,15 @@ block content
           | Servicios
         .flex-grow-1.border-bottom
   .row.g-2.g-md-3.mb-3.mb-md-4
-    +moduleCard('/installations', 'fas.fa-wrench', 'Instalaciones', 'cyan', 'servicios')
-    +moduleCard('/maintenances', 'fas.fa-sync-alt', 'Mantenimientos', 'amber', 'servicios')
-    +moduleCard('/visits', 'fas.fa-clipboard-check', 'Visitas', 'teal', 'servicios')
-    +moduleCard('/work-orders', 'fas.fa-tasks', 'Órdenes Trabajo', 'red', 'servicios')
-    +moduleCard('/projects', 'fas.fa-project-diagram', 'Proyectos', 'violet', 'servicios')
+    +moduleCard('/installations', 'fas.fa-screwdriver-wrench', 'Instalaciones', 'cyan', 'Servicios')
+    +moduleCard('/maintenances', 'fas.fa-gears', 'Mantenimientos', 'amber', 'Servicios')
+    +moduleCard('/visits', 'fas.fa-clipboard-check', 'Visitas', 'teal', 'Servicios')
+    +moduleCard('/work-orders', 'fas.fa-list-check', 'Órdenes Trabajo', 'red', 'Servicios')
+    +moduleCard('/projects', 'fas.fa-diagram-project', 'Proyectos', 'violet', 'Servicios')
 
+  //- ============================================
   //- ANALÍTICA
+  //- ============================================
   .row.mb-2
     .col-12
       .d-flex.align-items-center.mb-2
@@ -433,9 +443,11 @@ block content
           | Analítica
         .flex-grow-1.border-bottom
   .row.g-2.g-md-3.mb-3.mb-md-4
-    +moduleCard('/reports/sales', 'fas.fa-chart-simple', 'Reportes', 'indigo', 'reportes')
+    +moduleCard('/reports/sales', 'fas.fa-chart-simple', 'Reportes', 'indigo', 'Reportes')
 
+  //- ============================================
   //- SISTEMA
+  //- ============================================
   .row.mb-2
     .col-12
       .d-flex.align-items-center.mb-2
@@ -444,10 +456,12 @@ block content
           | Sistema
         .flex-grow-1.border-bottom
   .row.g-2.g-md-3.mb-3.mb-md-4
-    +moduleCard('/settings', 'fas.fa-cog', 'Configuración', 'slate', 'sistema')
-    +moduleCard('/about/admin', 'fas.fa-building', 'Nosotros', 'slate', 'sistema')
+    +moduleCard('/settings', 'fas.fa-cog', 'Configuración', 'slate', 'Sistema')
+    +moduleCard('/about/admin', 'fas.fa-circle-info', 'Nosotros', 'slate', 'Sistema')
 
+  //- ============================================
   //- CTA LANDING
+  //- ============================================
   .row.mt-3.mb-4
     .col-12
       .card.border-0.shadow-sm.rounded-4.overflow-hidden
@@ -596,54 +610,71 @@ block content
     }
     .brand-chip:hover .brand-chip-name { color: #0d6efd; }
 
-    /* ==== MÓDULOS ESTILO APP ==== */
+    /* ==== MÓDULOS CON ICONOS GRANDES (estilo app) ==== */
     .module-card {
       transition: all 0.25s ease;
-      border-radius: 14px;
+      border-radius: 16px;
       overflow: hidden;
     }
     .module-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 24px rgba(0,0,0,0.08) !important;
+      transform: translateY(-4px);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.10) !important;
     }
-    .module-icon {
-      width: 44px; height: 44px;
-      display: inline-flex; align-items: center; justify-content: center;
-      border-radius: 12px; font-size: 1.15rem; flex-shrink: 0;
+    .module-icon-lg {
+      width: 56px;
+      height: 56px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 16px;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+      transition: all 0.25s ease;
     }
-    .module-arrow { color: #cbd5e1; font-size: 0.85rem; flex-shrink: 0; }
-    .module-sub { text-transform: capitalize; font-size: 0.7rem; }
+    .module-card:hover .module-icon-lg {
+      transform: scale(1.08);
+    }
+    .module-label {
+      font-size: 0.85rem;
+      line-height: 1.2;
+      color: #1e293b;
+    }
+    .module-sub {
+      font-size: 0.68rem;
+      text-transform: capitalize;
+      margin-top: 2px;
+    }
 
-    /* Colores de módulos */
-    .module-indigo   .module-icon { background: #e0e7ff; color: #4f46e5; }
-    .module-success  .module-icon { background: #dcfce7; color: #16a34a; }
-    .module-teal     .module-icon { background: #ccfbf1; color: #0d9488; }
-    .module-danger   .module-icon { background: #fee2e2; color: #dc2626; }
-    .module-purple   .module-icon { background: #f3e8ff; color: #9333ea; }
-    .module-slate    .module-icon { background: #e2e8f0; color: #475569; }
-    .module-amber    .module-icon { background: #fef3c7; color: #d97706; }
-    .module-blue     .module-icon { background: #dbeafe; color: #2563eb; }
-    .module-orange   .module-icon { background: #ffedd5; color: #ea580c; }
-    .module-emerald  .module-icon { background: #d1fae5; color: #059669; }
-    .module-rose     .module-icon { background: #ffe4e6; color: #e11d48; }
-    .module-cyan     .module-icon { background: #cffafe; color: #0891b2; }
-    .module-red      .module-icon { background: #fee2e2; color: #dc2626; }
-    .module-violet   .module-icon { background: #ede9fe; color: #7c3aed; }
+    /* Colores de fondo de los iconos grandes */
+    .module-indigo   .module-icon-lg { background: #e0e7ff; color: #4f46e5; }
+    .module-success  .module-icon-lg { background: #dcfce7; color: #16a34a; }
+    .module-teal     .module-icon-lg { background: #ccfbf1; color: #0d9488; }
+    .module-danger   .module-icon-lg { background: #fee2e2; color: #dc2626; }
+    .module-purple   .module-icon-lg { background: #f3e8ff; color: #9333ea; }
+    .module-slate    .module-icon-lg { background: #e2e8f0; color: #475569; }
+    .module-amber    .module-icon-lg { background: #fef3c7; color: #d97706; }
+    .module-blue     .module-icon-lg { background: #dbeafe; color: #2563eb; }
+    .module-orange   .module-icon-lg { background: #ffedd5; color: #ea580c; }
+    .module-emerald  .module-icon-lg { background: #d1fae5; color: #059669; }
+    .module-rose     .module-icon-lg { background: #ffe4e6; color: #e11d48; }
+    .module-cyan     .module-icon-lg { background: #cffafe; color: #0891b2; }
+    .module-red      .module-icon-lg { background: #fee2e2; color: #dc2626; }
+    .module-violet   .module-icon-lg { background: #ede9fe; color: #7c3aed; }
 
     /* ==== MÓVIL: módulos como app ==== */
     @media (max-width: 767.98px) {
-      .module-card .card-body {
-        flex-direction: column !important;
-        text-align: center;
-        padding: 12px 6px !important;
-        gap: 8px !important;
+      .module-icon-lg {
+        width: 64px;
+        height: 64px;
+        font-size: 1.7rem;
+        border-radius: 18px;
       }
-      .module-icon {
-        width: 52px; height: 52px;
-        font-size: 1.4rem; border-radius: 16px;
+      .module-label {
+        font-size: 0.78rem;
       }
-      .module-label { font-size: 0.8rem; line-height: 1.15; }
-      .module-sub { display: none; }
+      .module-sub {
+        display: none;
+      }
       .brand-chip { padding: 8px 14px 8px 8px; min-width: 110px; gap: 8px; }
       .brand-chip-logo { width: 32px; height: 32px; font-size: 14px; }
       .brand-chip-name { font-size: 12px; }
@@ -712,24 +743,25 @@ block content
     document.addEventListener('DOMContentLoaded', function() {
 
       /* ---------- BUSCADOR DE MÓDULOS ---------- */
-      const searchInput = document.getElementById('moduleSearch');
-      const items = document.querySelectorAll('.module-item');
-      const sectionRows = document.querySelectorAll('.row.mb-2');
+      var searchInput = document.getElementById('moduleSearch');
+      var items = document.querySelectorAll('.module-item');
+      var sectionRows = document.querySelectorAll('.row.mb-2');
 
       if (searchInput) {
         searchInput.addEventListener('input', function(e) {
-          const term = e.target.value.toLowerCase().trim();
-          items.forEach(item => {
-            const label = item.querySelector('.module-label').textContent.toLowerCase();
-            const category = (item.dataset.category || '').toLowerCase();
-            const match = label.includes(term) || category.includes(term);
+          var term = e.target.value.toLowerCase().trim();
+          items.forEach(function(item) {
+            var labelEl = item.querySelector('.module-label');
+            var label = labelEl ? labelEl.textContent.toLowerCase() : '';
+            var category = (item.dataset.category || '').toLowerCase();
+            var match = label.indexOf(term) !== -1 || category.indexOf(term) !== -1;
             item.style.display = (match || !term) ? '' : 'none';
           });
-          sectionRows.forEach(row => {
+          sectionRows.forEach(function(row) {
             if (!term) { row.style.display = ''; return; }
-            const nextRow = row.nextElementSibling;
+            var nextRow = row.nextElementSibling;
             if (nextRow && nextRow.classList.contains('row')) {
-              const visible = nextRow.querySelectorAll('.module-item:not([style*="display: none"])').length;
+              var visible = nextRow.querySelectorAll('.module-item:not([style*="display: none"])').length;
               row.style.display = visible > 0 ? '' : 'none';
               nextRow.style.display = visible > 0 ? '' : 'none';
             }
@@ -745,16 +777,16 @@ block content
       }
 
       /* ---------- NOTIFICACIONES ---------- */
-      const notificationBadge = document.getElementById('notificationBadge');
-      const notificationList  = document.getElementById('notificationList');
-      const notifSubtitle     = document.getElementById('notifSubtitle');
-      const notifFab          = document.getElementById('notifFab');
-      const fabBadge          = document.getElementById('fabBadge');
-      let lastPendingCount = #{pendingOrdersCount || 0};
+      var notificationBadge = document.getElementById('notificationBadge');
+      var notificationList  = document.getElementById('notificationList');
+      var notifSubtitle     = document.getElementById('notifSubtitle');
+      var notifFab          = document.getElementById('notifFab');
+      var fabBadge          = document.getElementById('fabBadge');
+      var lastPendingCount = #{pendingOrdersCount || 0};
 
       function renderNotifications(data) {
         if (!notificationList) return;
-        const count = data.pendingOrdersCount || 0;
+        var count = data.pendingOrdersCount || 0;
 
         if (notificationBadge) {
           notificationBadge.textContent = count;
@@ -769,46 +801,42 @@ block content
         }
 
         if (data.pendingOrders && data.pendingOrders.length > 0) {
-          notificationList.innerHTML = data.pendingOrders.map(order => `
-            <a class="dropdown-item d-flex align-items-start gap-3 py-3 border-bottom text-wrap" href="/orders/${order._id}" style="white-space: normal;">
-              <div class="rounded-circle bg-warning-subtle text-warning d-flex align-items-center justify-content-center flex-shrink-0" style="width: 42px; height: 42px;">
-                <i class="fas fa-shopping-bag"></i>
-              </div>
-              <div class="flex-grow-1 min-w-0">
-                <div class="d-flex justify-content-between align-items-center mb-1 gap-2">
-                  <span class="fw-bold text-primary text-truncate">${order.orderNumber}</span>
-                  <small class="text-muted flex-shrink-0">${new Date(order.createdAt).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</small>
-                </div>
-                <div class="small fw-semibold text-truncate">${order.customerName}</div>
-                <div class="small text-muted text-truncate">${order.customerPhone} · S/. ${order.total.toFixed(2)}</div>
-                <div class="small text-muted">
-                  <i class="fas fa-box me-1"></i>${order.itemsCount} producto${order.itemsCount !== 1 ? 's' : ''}
-                </div>
-              </div>
-            </a>
-          `).join('') + `
-            <li class="px-3 py-2 text-center border-top">
-              <a class="btn btn-sm btn-link text-decoration-none fw-semibold" href="/orders?status=pendiente">
-                Ver todos los pedidos pendientes <i class="fas fa-arrow-right ms-1"></i>
-              </a>
-            </li>
-          `;
+          notificationList.innerHTML = data.pendingOrders.map(function(order) {
+            return '<a class="dropdown-item d-flex align-items-start gap-3 py-3 border-bottom text-wrap" href="/orders/' + order._id + '" style="white-space: normal;">' +
+              '<div class="rounded-circle bg-warning-subtle text-warning d-flex align-items-center justify-content-center flex-shrink-0" style="width: 42px; height: 42px;">' +
+                '<i class="fas fa-shopping-bag"></i>' +
+              '</div>' +
+              '<div class="flex-grow-1 min-w-0">' +
+                '<div class="d-flex justify-content-between align-items-center mb-1 gap-2">' +
+                  '<span class="fw-bold text-primary text-truncate">' + order.orderNumber + '</span>' +
+                  '<small class="text-muted flex-shrink-0">' + new Date(order.createdAt).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) + '</small>' +
+                '</div>' +
+                '<div class="small fw-semibold text-truncate">' + order.customerName + '</div>' +
+                '<div class="small text-muted text-truncate">' + order.customerPhone + ' · S/. ' + order.total.toFixed(2) + '</div>' +
+                '<div class="small text-muted"><i class="fas fa-box me-1"></i>' + order.itemsCount + ' producto' + (order.itemsCount !== 1 ? 's' : '') + '</div>' +
+              '</div>' +
+            '</a>';
+          }).join('') +
+          '<li class="px-3 py-2 text-center border-top">' +
+            '<a class="btn btn-sm btn-link text-decoration-none fw-semibold" href="/orders?status=pendiente">' +
+              'Ver todos los pedidos pendientes <i class="fas fa-arrow-right ms-1"></i>' +
+            '</a>' +
+          '</li>';
         } else {
-          notificationList.innerHTML = `
-            <li class="text-center py-5 text-muted">
-              <i class="fas fa-bell-slash fa-3x mb-3 opacity-25 d-block"></i>
-              <p class="mb-0">No hay pedidos pendientes</p>
-            </li>
-          `;
+          notificationList.innerHTML =
+            '<li class="text-center py-5 text-muted">' +
+              '<i class="fas fa-bell-slash fa-3x mb-3 opacity-25 d-block"></i>' +
+              '<p class="mb-0">No hay pedidos pendientes</p>' +
+            '</li>';
         }
       }
 
       function checkNotifications() {
         fetch('/api/notifications')
-          .then(r => r.json())
-          .then(data => {
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
             if (!data.success) return;
-            const newPendingCount = data.pendingOrdersCount || 0;
+            var newPendingCount = data.pendingOrdersCount || 0;
             if (newPendingCount > lastPendingCount) {
               showNotificationToast(data.pendingOrders[0]);
               playNotificationSound();
@@ -816,49 +844,46 @@ block content
             lastPendingCount = newPendingCount;
             renderNotifications(data);
           })
-          .catch(err => console.error('Error:', err));
+          .catch(function(err) { console.error('Error:', err); });
       }
 
       setInterval(checkNotifications, 30000);
 
       function showNotificationToast(order) {
         if (!order) return;
-        const toast = document.createElement('div');
+        var toast = document.createElement('div');
         toast.className = 'notification-toast';
-        toast.innerHTML = `
-          <div class="d-flex align-items-start gap-3">
-            <div class="rounded-circle bg-warning text-white d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px; font-size: 1.3rem;">
-              <i class="fas fa-bell animate-ring"></i>
-            </div>
-            <div class="flex-grow-1 min-w-0">
-              <div class="d-flex justify-content-between align-items-center mb-1">
-                <strong class="text-dark">¡Nuevo pedido!</strong>
-                <button type="button" class="btn-close btn-sm" onclick="this.closest('.notification-toast').remove()"></button>
-              </div>
-              <div class="small fw-semibold text-primary text-truncate">${order.orderNumber}</div>
-              <div class="small text-muted text-truncate">${order.customerName}</div>
-              <div class="small text-muted mb-2">S/. ${order.total.toFixed(2)}</div>
-              <a href="/orders/${order._id}" class="btn btn-sm btn-warning rounded-pill fw-semibold">
-                Ver pedido
-              </a>
-            </div>
-          </div>
-        `;
+        toast.innerHTML =
+          '<div class="d-flex align-items-start gap-3">' +
+            '<div class="rounded-circle bg-warning text-white d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px; font-size: 1.3rem;">' +
+              '<i class="fas fa-bell animate-ring"></i>' +
+            '</div>' +
+            '<div class="flex-grow-1 min-w-0">' +
+              '<div class="d-flex justify-content-between align-items-center mb-1">' +
+                '<strong class="text-dark">¡Nuevo pedido!</strong>' +
+                '<button type="button" class="btn-close btn-sm" onclick="this.closest(\'.notification-toast\').remove()"></button>' +
+              '</div>' +
+              '<div class="small fw-semibold text-primary text-truncate">' + order.orderNumber + '</div>' +
+              '<div class="small text-muted text-truncate">' + order.customerName + '</div>' +
+              '<div class="small text-muted mb-2">S/. ' + order.total.toFixed(2) + '</div>' +
+              '<a href="/orders/' + order._id + '" class="btn btn-sm btn-warning rounded-pill fw-semibold">Ver pedido</a>' +
+            '</div>' +
+          '</div>';
         document.body.appendChild(toast);
-        setTimeout(() => {
+        setTimeout(function() {
           if (toast.parentNode) {
             toast.style.opacity = '0';
             toast.style.transform = 'translateX(120%)';
-            setTimeout(() => toast.remove(), 300);
+            setTimeout(function() { toast.remove(); }, 300);
           }
         }, 10000);
       }
 
       function playNotificationSound() {
         try {
-          const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-          const oscillator = audioCtx.createOscillator();
-          const gainNode = audioCtx.createGain();
+          var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          var oscillator = audioCtx.createOscillator();
+          var gainNode = audioCtx.createGain();
           oscillator.connect(gainNode);
           gainNode.connect(audioCtx.destination);
           oscillator.frequency.value = 800;
@@ -872,7 +897,7 @@ block content
         }
       }
 
-      const markAllReadBtn = document.getElementById('markAllRead');
+      var markAllReadBtn = document.getElementById('markAllRead');
       if (markAllReadBtn) {
         markAllReadBtn.addEventListener('click', function() {
           if (notificationBadge) notificationBadge.classList.add('d-none');
@@ -883,7 +908,7 @@ block content
 
       if (notifFab) {
         notifFab.addEventListener('click', function() {
-          const trigger = document.querySelector('.notification-dropdown [data-bs-toggle="dropdown"]');
+          var trigger = document.querySelector('.notification-dropdown [data-bs-toggle="dropdown"]');
           if (trigger && window.bootstrap) {
             bootstrap.Dropdown.getOrCreateInstance(trigger).toggle();
           } else {
