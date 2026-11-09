@@ -5,18 +5,9 @@ html(lang="es")
     meta(name="viewport" content="width=device-width, initial-scale=1.0")
 
     //- ============================================
-    //- DETECCIÓN DE ROL (funciona con ObjectId o populado)
+    //- DETECCIÓN DE ROL (usa roleName de la sesión)
     //- ============================================
-    - const ADMIN_ROLE_ID = (typeof adminRoleId !== 'undefined' && adminRoleId) ? String(adminRoleId) : null
-    - let roleName = ''
-    - if (user && user.role) {
-    -   if (typeof user.role === 'object' && user.role.name) {
-    -     roleName = user.role.name
-    -   } else if (ADMIN_ROLE_ID && String(user.role) === ADMIN_ROLE_ID) {
-    -     roleName = 'admin'
-    -   }
-    - }
-    - const isAdmin = roleName === 'admin'
+    - const isAdmin = user && user.roleName === 'admin'
 
     //- ============================================
     //- SEO
@@ -103,6 +94,7 @@ html(lang="es")
         max-width: 200px;
       }
 
+      /* Botón hamburguesa */
       .btn-hamburger {
         width: 42px; height: 42px;
         border-radius: 10px;
@@ -144,6 +136,7 @@ html(lang="es")
       }
       .btn-nav-ghost:hover { background: var(--brand); color: #fff; }
 
+      /* Campana de notificaciones */
       .btn-icon-nav {
         position: relative;
         width: 42px; height: 42px;
@@ -170,6 +163,7 @@ html(lang="es")
         border: 2px solid #0f172a;
       }
 
+      /* Avatar navbar */
       .avatar-nav {
         width: 38px; height: 38px;
         border-radius: 50%;
@@ -184,7 +178,7 @@ html(lang="es")
       }
 
       /* ================================================
-         DRAWER LATERAL
+         DRAWER LATERAL (IZQUIERDA)
          ================================================ */
       .drawer-backdrop {
         position: fixed;
@@ -348,6 +342,7 @@ html(lang="es")
         text-align: center;
       }
 
+      /* Footer del drawer */
       .drawer-footer {
         flex-shrink: 0;
         border-top: 1px solid rgba(255,255,255,0.08);
@@ -387,23 +382,6 @@ html(lang="es")
         overflow: hidden;
         text-overflow: ellipsis;
       }
-      .drawer-footer .btn-drawer-primary {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        width: 100%;
-        padding: 0.7rem;
-        border-radius: 10px;
-        background: var(--brand);
-        border: none;
-        color: #fff;
-        font-weight: 600;
-        font-size: 0.9rem;
-        text-decoration: none;
-        transition: all 0.2s;
-      }
-      .drawer-footer .btn-drawer-primary:hover { background: var(--brand-dark); color: #fff; }
       .drawer-footer .btn-drawer-outline {
         display: flex;
         align-items: center;
@@ -453,8 +431,14 @@ html(lang="es")
         margin-top: 2rem;
       }
 
+      /* ================================================
+         FLASH MESSAGES
+         ================================================ */
       .flash-wrapper { padding-top: calc(var(--navbar-height) + 16px); }
 
+      /* ================================================
+         RESPONSIVE
+         ================================================ */
       @media (max-width: 991px) {
         .navbar-admin .brand-name { max-width: 140px; }
       }
@@ -563,6 +547,7 @@ html(lang="es")
                     i.fas.fa-store.me-2.text-primary
                     | Ver tienda
 
+                //- Configuración solo admin
                 if isAdmin
                   li
                     a.dropdown-item(href="/settings")
@@ -576,7 +561,7 @@ html(lang="es")
                     | Cerrar Sesión
 
     //- ============================================
-    //- DRAWER LATERAL
+    //- DRAWER LATERAL (IZQUIERDA)
     //- ============================================
     .drawer-backdrop#drawerBackdrop
     aside.side-drawer#sideDrawer(aria-hidden="true" role="navigation")
@@ -605,7 +590,9 @@ html(lang="es")
               i.fas.fa-store.drawer-icon
               span.drawer-label Ver Tienda
 
+        //- ============================================
         //- SEGURIDAD (solo admin)
+        //- ============================================
         if isAdmin
           .drawer-section-label Seguridad
           ul.drawer-nav
@@ -622,6 +609,7 @@ html(lang="es")
                 i.fas.fa-handshake.drawer-icon
                 span.drawer-label Proveedores
 
+          //- INVENTARIO (solo admin)
           .drawer-section-label Inventario
           ul.drawer-nav
             li
@@ -655,7 +643,9 @@ html(lang="es")
                       i.fas.fa-warehouse
                       span Almacenes
 
+        //- ============================================
         //- VENTAS (TODOS)
+        //- ============================================
         .drawer-section-label Ventas
         ul.drawer-nav
           li
@@ -689,7 +679,9 @@ html(lang="es")
                     i.fas.fa-file-pdf
                     span Comprobantes
 
+        //- ============================================
         //- SERVICIOS (TODOS)
+        //- ============================================
         .drawer-section-label Servicios
         ul.drawer-nav
           li
@@ -727,7 +719,9 @@ html(lang="es")
                     i.fas.fa-project-diagram
                     span Proyectos
 
+        //- ============================================
         //- ANALÍTICA + SISTEMA (solo admin)
+        //- ============================================
         if isAdmin
           .drawer-section-label Analítica
           ul.drawer-nav
@@ -944,7 +938,7 @@ html(lang="es")
                 </div>
                 <div class="flex-grow-1 min-w-0">
                   <div class="d-flex justify-content-between align-items-center mb-1 gap-2">
-                    <span class="fw-bold text-primary text-truncate">${order.orderNumber}</span>
+                    <span class="fw-bold text-primary text-truncate">${order.orderNumber}</span>                  
                     <small class="text-muted flex-shrink-0">${new Date(order.createdAt).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</small>
                   </div>
                   <div class="small fw-semibold text-truncate">${order.customerName}</div>
