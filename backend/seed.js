@@ -2,13 +2,12 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const path = require('path');
 
-// Cargar variables de entorno desde el archivo .env
+// Cargar variables de entorno
 dotenv.config({ path: path.join(__dirname, '.env') });
 
 // Importar modelos
 const Role = require('./models/Role');
 const User = require('./models/User');
-const Client = require('./models/Client');
 
 // Conectar a MongoDB
 const connectDB = require('./config/db');
@@ -17,27 +16,53 @@ const seedDatabase = async () => {
   try {
     await connectDB();
 
-    // 1. Crear roles (si no existen)
+    // ============================================================
+    // 1. CREAR ROLES
+    // ============================================================
     console.log('🔐 Creando roles...');
+
+    // -------- ADMIN: acceso total --------
     const adminRole = await Role.findOneAndUpdate(
       { name: 'admin' },
-      { name: 'admin', permissions: [
-      '*', // Mantén el comodín o lista todos
-      'view_users', 'create_user', 'edit_user', 'delete_user',
-      'view_clients', 'create_client', 'edit_client', 'delete_client',
-
-      ] },
+      {
+        name: 'admin',
+        permissions: ['*']
+      },
       { upsert: true, new: true }
     );
+    console.log('✅ Rol admin listo');
+
+    // -------- USER: solo ventas y servicios --------
     const userRole = await Role.findOneAndUpdate(
       { name: 'user' },
-      { name: 'user', permissions: ['view_dashboard'] },
+      {
+        name: 'user',
+        permissions: [
+          // Ventas
+          'ventas',
+          'view_quotations', 'create_quotation', 'edit_quotation', 'delete_quotation',
+          'view_orders', 'create_order', 'edit_order', 'delete_order',
+          'view_sales', 'create_sale', 'edit_sale', 'delete_sale',
+          'view_vouchers', 'create_voucher', 'edit_voucher', 'delete_voucher',
+          // Servicios
+          'servicios',
+          'view_installations', 'create_installation', 'edit_installation', 'delete_installation',
+          'view_maintenances', 'create_maintenance', 'edit_maintenance', 'delete_maintenance',
+          'view_visits', 'create_visit', 'edit_visit', 'delete_visit',
+          'view_work_orders', 'create_work_order', 'edit_work_order', 'delete_work_order',
+          'view_projects', 'create_project', 'edit_project', 'delete_project'
+        ]
+      },
       { upsert: true, new: true }
     );
-    console.log('✅ Roles listos');
+    console.log('✅ Rol user listo');
 
-    // 2. Crear usuario administrador (si no existe)
-    console.log('👤 Creando usuario administrador...');
+    // ============================================================
+    // 2. CREAR USUARIOS
+    // ============================================================
+    console.log('👤 Creando usuarios...');
+
+    // -------- ADMIN --------
     let adminUser = await User.findOne({ email: 'admin@jpsecurity.com' });
     if (!adminUser) {
       adminUser = new User({
@@ -48,59 +73,39 @@ const seedDatabase = async () => {
         isActive: true
       });
       await adminUser.save();
-      console.log('✅ Usuario admin creado');
+      console.log('✅ Usuario admin creado: admin@jpsecurity.com / Admin123');
     } else {
-      console.log('ℹ️  Usuario admin ya existe');
+      // Actualizar rol por si cambió
+      adminUser.role = adminRole._id;
+      await adminUser.save();
+      console.log('ℹ️  Usuario admin ya existía (rol actualizado)');
     }
 
-    // 3. Crear clientes de prueba (asociados al admin)
-    console.log('🏢 Creando clientes de prueba...');
-    const clientsData = [
-      {
-        businessName: 'Seguridad Total SAC',
-        ruc: '20123456789',
-        email: 'info@seguridadtotal.com',
-        phone: '987654321',
-        type: 'Jurídico',
-        createdBy: adminUser._id
-      },
-      {
-        businessName: 'Alarmas Peruanas EIRL',
-        ruc: '20456789012',
-        email: 'ventas@alarmasperuanas.com',
-        phone: '912345678',
-        type: 'Jurídico',
-        createdBy: adminUser._id
-      },
-      {
-        businessName: 'Juan Pérez',
-        ruc: '12345678901',
-        email: 'juan@perez.com',
-        phone: '955555555',
-        type: 'Natural',
-        createdBy: adminUser._id
-      },
-      {
-        businessName: 'Constructora San Miguel',
-        ruc: '20567890123',
-        email: 'constru@sanmiguel.com',
-        phone: '987654321',
-        type: 'Jurídico',
-        createdBy: adminUser._id
-      }
-    ];
-
-    // Insertar clientes solo si no existen (usando upsert)
-    for (const clientData of clientsData) {
-      await Client.findOneAndUpdate(
-        { ruc: clientData.ruc },
-        clientData,
-        { upsert: true, new: true }
-      );
+    // -------- USER --------
+    let normalUser = await User.findOne({ email: 'user@jpsecurity.com' });
+    if (!normalUser) {
+      normalUser = new User({
+        name: 'Usuario Ventas',
+        email: 'user@jpsecurity.com',
+        password: 'User1234',
+        role: userRole._id,
+        isActive: true
+      });
+      await normalUser.save();
+      console.log('✅ Usuario user creado: user@jpsecurity.com / User1234');
+    } else {
+      // Actualizar rol por si cambió
+      normalUser.role = userRole._id;
+      await normalUser.save();
+      console.log('ℹ️  Usuario user ya existía (rol actualizado)');
     }
-    console.log('✅ Clientes de prueba creados/actualizados');
 
     console.log('🎉 ¡Seed completado exitosamente!');
+    console.log('');
+    console.log('📋 CREDENCIALES:');
+    console.log('   👑 Admin: admin@jpsecurity.com / Admin123');
+    console.log('   👤 User:  user@jpsecurity.com / User1234');
+    console.log('');
     process.exit(0);
   } catch (error) {
     console.error('❌ Error en el seed:', error);
