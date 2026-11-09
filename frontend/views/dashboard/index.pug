@@ -3,20 +3,6 @@ extends ../layouts/layout
 block content
 
   //- ============================================
-  //- DETECCIÓN DE ROL (misma lógica que el layout)
-  //- ============================================
-  - const ADMIN_ROLE_ID = (typeof adminRoleId !== 'undefined' && adminRoleId) ? String(adminRoleId) : null
-  - let roleName = ''
-  - if (user && user.role) {
-  -   if (typeof user.role === 'object' && user.role.name) {
-  -     roleName = user.role.name
-  -   } else if (ADMIN_ROLE_ID && String(user.role) === ADMIN_ROLE_ID) {
-  -     roleName = 'admin'
-  -   }
-  - }
-  - const isAdmin = roleName === 'admin'
-
-  //- ============================================
   //- HEADER DEL DASHBOARD
   //- ============================================
   .dashboard-header.mb-3.mb-md-4
@@ -314,7 +300,7 @@ block content
             a.alert-link(href="/brands/create") Crea la primera aquí
 
   //- ============================================
-  //- PEDIDOS RECIENTES + VENTAS DEL DÍA (todos los roles)
+  //- PEDIDOS RECIENTES + VENTAS DEL DÍA
   //- ============================================
   .row.g-3.mb-3.mb-md-4
 
