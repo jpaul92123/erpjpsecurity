@@ -29,13 +29,12 @@ block content
         span.d-sm-none Nueva
 
   //- ============================================
-  //- BARRA DE BÚSQUEDA Y FILTROS
+  //- BUSCADOR Y FILTROS
   //- ============================================
   .card.border-0.shadow-sm.rounded-3.mb-3
     .card-body.p-2.p-md-3
       .row.g-2.align-items-center
 
-        //- Buscador
         .col-12.col-md-6
           .input-group
             span.input-group-text.bg-transparent.border-end-0
@@ -46,7 +45,6 @@ block content
               autocomplete="off"
             )
 
-        //- Filtro por estado
         .col-8.col-md-4
           select.form-select#statusFilter
             option(value="") Todos los estados
@@ -55,16 +53,15 @@ block content
             option(value="Completado") Completado
             option(value="Cancelado") Cancelado
 
-        //- Contador
         .col-4.col-md-2.text-end
           span.badge.bg-primary-subtle.text-primary.rounded-pill.px-3.py-2.w-100.inst-count-badge
             i.fas.fa-list.me-1
             span#resultCount= (installations && installations.length) || 0
 
   //- ============================================
-  //- VISTA DE TABLA (DESKTOP / TABLET)
+  //- TABLA (desktop/tablet)
   //- ============================================
-  .card.border-0.shadow-sm.rounded-3.d-none.d-md-block
+  .card.border-0.shadow-sm.rounded-3.d-none.d-md-block#tableCard
     .card-body.p-0
       .table-responsive
         table.table.table-hover.align-middle.mb-0.inst-table
@@ -79,8 +76,12 @@ block content
           tbody#installationsTableBody
             if installations && installations.length
               each installation in installations
+                - const statusClass = installation.status === 'Completado' ? 'inst-badge-success' : installation.status === 'Cancelado' ? 'inst-badge-danger' : installation.status === 'En proceso' ? 'inst-badge-info' : 'inst-badge-warning'
+                - const statusIcon = installation.status === 'Completado' ? 'fa-check-circle' : installation.status === 'Cancelado' ? 'fa-times-circle' : installation.status === 'En proceso' ? 'fa-spinner' : 'fa-clock'
+                - const searchData = ((installation.client ? installation.client.businessName : '') + ' ' + (installation.equipment || '') + ' ' + (installation.technician || '')).toLowerCase()
+
                 tr.inst-row(
-                  data-search=((installation.client ? installation.client.businessName : '') + ' ' + (installation.equipment || '') + ' ' + (installation.technician || '')).toLowerCase()
+                  data-search=searchData
                   data-status=installation.status
                 )
                   td
@@ -92,7 +93,8 @@ block content
 
                   td
                     div.small.fw-semibold.text-truncate= installation.equipment
-                    small.text-muted.text-truncate.d-block= installation.serialNumber || ''
+                    if installation.serialNumber
+                      small.text-muted.text-truncate.d-block= installation.serialNumber
 
                   td
                     div.small.fw-semibold
@@ -102,18 +104,8 @@ block content
                     div.small.text-truncate= installation.technician
 
                   td
-                    span.inst-badge(
-                      class=installation.status === 'Completado' ? 'inst-badge-success'
-                      class=installation.status === 'Cancelado' ? 'inst-badge-danger'
-                      class=installation.status === 'En proceso' ? 'inst-badge-info'
-                      class='inst-badge-warning'
-                    )
-                      i.fas(
-                        class=installation.status === 'Completado' ? 'fa-check-circle'
-                        class=installation.status === 'Cancelado' ? 'fa-times-circle'
-                        class=installation.status === 'En proceso' ? 'fa-spinner'
-                        class='fa-clock'
-                      )
+                    span.inst-badge(class=statusClass)
+                      i.fas(class=statusIcon)
                       span= installation.status
 
                   td.text-end
@@ -149,18 +141,21 @@ block content
                       | Registrar primera instalación
 
   //- ============================================
-  //- VISTA DE CARDS (MÓVIL)
+  //- CARDS (móvil)
   //- ============================================
-  .d-md-none#installationsCardsView
+  .d-md-none#cardsView
     if installations && installations.length
       each installation in installations
+        - const statusClass = installation.status === 'Completado' ? 'inst-badge-success' : installation.status === 'Cancelado' ? 'inst-badge-danger' : installation.status === 'En proceso' ? 'inst-badge-info' : 'inst-badge-warning'
+        - const statusIcon = installation.status === 'Completado' ? 'fa-check-circle' : installation.status === 'Cancelado' ? 'fa-times-circle' : installation.status === 'En proceso' ? 'fa-spinner' : 'fa-clock'
+        - const searchData = ((installation.client ? installation.client.businessName : '') + ' ' + (installation.equipment || '') + ' ' + (installation.technician || '')).toLowerCase()
+
         .card.inst-mobile-card.border-0.shadow-sm.rounded-4.mb-2.inst-row(
-          data-search=((installation.client ? installation.client.businessName : '') + ' ' + (installation.equipment || '') + ' ' + (installation.technician || '')).toLowerCase()
+          data-search=searchData
           data-status=installation.status
         )
           .card-body.p-3
 
-            //- Header
             .d-flex.justify-content-between.align-items-start.gap-2.mb-2
               .d-flex.align-items-center.gap-2.min-w-0
                 .inst-avatar
@@ -170,21 +165,10 @@ block content
                     = installation.client ? installation.client.businessName : '-'
                   small.text-muted.text-truncate.d-block= installation.equipment
 
-              span.inst-badge.flex-shrink-0(
-                class=installation.status === 'Completado' ? 'inst-badge-success'
-                class=installation.status === 'Cancelado' ? 'inst-badge-danger'
-                class=installation.status === 'En proceso' ? 'inst-badge-info'
-                class='inst-badge-warning'
-              )
-                i.fas(
-                  class=installation.status === 'Completado' ? 'fa-check-circle'
-                  class=installation.status === 'Cancelado' ? 'fa-times-circle'
-                  class=installation.status === 'En proceso' ? 'fa-spinner'
-                  class='fa-clock'
-                )
+              span.inst-badge.flex-shrink-0(class=statusClass)
+                i.fas(class=statusIcon)
                 span= installation.status
 
-            //- Info
             .inst-mobile-info.mb-3
               .d-flex.align-items-center.gap-2.mb-1
                 i.fas.fa-calendar.text-primary.fa-sm
@@ -194,7 +178,6 @@ block content
                 i.fas.fa-user-cog.text-primary.fa-sm
                 small.text-muted.text-truncate= installation.technician
 
-            //- Acciones
             .d-flex.gap-2
               a.btn.btn-sm.btn-outline-info.flex-fill.rounded-pill(
                 href=`/installations/${installation._id}`
@@ -225,7 +208,7 @@ block content
               | Registrar primera instalación
 
   //- ============================================
-  //- MENSAJE SIN RESULTADOS (filtros)
+  //- SIN RESULTADOS (filtros)
   //- ============================================
   .card.border-0.shadow-sm.rounded-3.d-none#noResultsCard
     .card-body.text-center.py-5
@@ -236,19 +219,14 @@ block content
   //- ESTILOS
   //- ============================================
   style.
-    /* ---- Page header ---- */
     .inst-page-header { padding-bottom: 0; }
-
-    /* ---- Botón nueva instalación ---- */
     .inst-new-btn { white-space: nowrap; }
 
-    /* ---- Contador ---- */
     .inst-count-badge {
       font-size: 0.85rem;
       font-weight: 700;
     }
 
-    /* ---- Avatar cliente ---- */
     .inst-avatar {
       width: 38px; height: 38px;
       border-radius: 10px;
@@ -261,7 +239,6 @@ block content
       flex-shrink: 0;
     }
 
-    /* ---- Tabla ---- */
     .inst-table thead th {
       font-size: 0.72rem;
       text-transform: uppercase;
@@ -284,7 +261,6 @@ block content
       border-bottom: none;
     }
 
-    /* ---- Action buttons ---- */
     .inst-action-btn {
       width: 34px;
       height: 34px;
@@ -299,7 +275,6 @@ block content
       transform: translateY(-1px);
     }
 
-    /* ---- Badges de estado ---- */
     .inst-badge {
       display: inline-flex;
       align-items: center;
@@ -316,10 +291,8 @@ block content
     .inst-badge-warning { background: #fef3c7; color: #b45309; }
     .inst-badge-info    { background: #dbeafe; color: #1d4ed8; }
 
-    /* ---- Empty state ---- */
     .inst-empty i { color: #cbd5e1; }
 
-    /* ---- Mobile cards ---- */
     .inst-mobile-card {
       transition: all 0.2s ease;
       border: 1px solid #eef2f7 !important;
@@ -334,7 +307,6 @@ block content
       padding: 0.6rem 0.75rem;
     }
 
-    /* ---- Responsive ---- */
     @media (max-width: 575.98px) {
       .inst-page-header h1 { font-size: 1.15rem; }
       .inst-new-btn { padding: 0.5rem 0.9rem; font-size: 0.85rem; }
@@ -342,7 +314,6 @@ block content
       .inst-badge { font-size: 0.7rem; padding: 0.3rem 0.6rem; }
     }
 
-    /* ---- Tablet: ajustar paddings de tabla ---- */
     @media (min-width: 768px) and (max-width: 991.98px) {
       .inst-table thead th,
       .inst-table tbody td { padding: 0.7rem 0.5rem; }
@@ -350,34 +321,28 @@ block content
     }
 
   //- ============================================
-  //- SCRIPT (filtros + búsqueda)
+  //- SCRIPT
   //- ============================================
   script.
     document.addEventListener('DOMContentLoaded', function() {
-      const searchInput = document.getElementById('searchInput');
-      const statusFilter = document.getElementById('statusFilter');
-      const resultCount = document.getElementById('resultCount');
-      const tableBody = document.getElementById('installationsTableBody');
-      const cardsView = document.getElementById('installationsCardsView');
-      const noResultsCard = document.getElementById('noResultsCard');
-      const tableCard = document.querySelector('.inst-table')?.closest('.card');
-      const mobileCardContainer = cardsView;
-
-      function getRows() {
-        return document.querySelectorAll('.inst-row');
-      }
+      var searchInput = document.getElementById('searchInput');
+      var statusFilter = document.getElementById('statusFilter');
+      var resultCount = document.getElementById('resultCount');
+      var tableCard = document.getElementById('tableCard');
+      var cardsView = document.getElementById('cardsView');
+      var noResultsCard = document.getElementById('noResultsCard');
 
       function applyFilters() {
-        const term = (searchInput?.value || '').toLowerCase().trim();
-        const status = statusFilter?.value || '';
+        var term = searchInput ? searchInput.value.toLowerCase().trim() : '';
+        var status = statusFilter ? statusFilter.value : '';
+        var rows = document.querySelectorAll('.inst-row');
+        var visible = 0;
 
-        let visible = 0;
-        getRows().forEach(row => {
-          const searchData = row.getAttribute('data-search') || '';
-          const rowStatus = row.getAttribute('data-status') || '';
-
-          const matchSearch = !term || searchData.includes(term);
-          const matchStatus = !status || rowStatus === status;
+        rows.forEach(function(row) {
+          var searchData = row.getAttribute('data-search') || '';
+          var rowStatus = row.getAttribute('data-status') || '';
+          var matchSearch = !term || searchData.indexOf(term) !== -1;
+          var matchStatus = !status || rowStatus === status;
 
           if (matchSearch && matchStatus) {
             row.style.display = '';
@@ -387,10 +352,8 @@ block content
           }
         });
 
-        // Actualizar contador
         if (resultCount) resultCount.textContent = visible;
 
-        // Mostrar/ocultar vista vacía
         if (visible === 0) {
           if (tableCard) tableCard.classList.add('d-none');
           if (cardsView) cardsView.classList.add('d-none');
@@ -405,7 +368,6 @@ block content
       if (searchInput) searchInput.addEventListener('input', applyFilters);
       if (statusFilter) statusFilter.addEventListener('change', applyFilters);
 
-      // Atajo Ctrl+K / Cmd+K
       document.addEventListener('keydown', function(e) {
         if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
           e.preventDefault();
