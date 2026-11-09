@@ -5,188 +5,191 @@ block content
   //- ============================================
   //- HEADER
   //- ============================================
-  .d-flex.flex-wrap.flex-md-nowrap.align-items-center.justify-content-between.pb-3.mb-4.border-bottom
-    .d-flex.align-items-center
-      .bg-primary.bg-opacity-10.rounded-3.p-3.me-3
-        i.fas.fa-users.text-primary.fa-2x
-      div
-        h1.h2.mb-0.fw-bold Clientes
-        p.text-muted.mb-0
-          i.fas.fa-info-circle.me-1
-          | Gestión de clientes registrados
-    div.d-flex.gap-2
-      a.btn.btn-primary.rounded-pill.px-4.shadow-sm(href="/clients/create")
-        i.fas.fa-plus-circle.me-1
-        | Nuevo Cliente
+  .cli-page-header.mb-3.mb-md-4
+    .d-flex.flex-wrap.justify-content-between.align-items-center.gap-2.gap-md-3
+      div.min-w-0
+        nav.d-none.d-md-block(aria-label="breadcrumb")
+          ol.breadcrumb.mb-1
+            li.breadcrumb-item
+              a.text-decoration-none(href="/") Inicio
+            li.breadcrumb-item.active(aria-current="page") Clientes
+
+        h1.h4.h3-md.fw-bold.mb-1.text-dark.text-truncate
+          i.fas.fa-users.me-2.text-primary
+          | Clientes
+
+        p.text-muted.mb-0.small.d-none.d-sm-block
+          | Gestiona los clientes registrados en el sistema
+
+      a.btn.btn-primary.rounded-pill.px-3.px-md-4.fw-semibold.d-inline-flex.align-items-center.gap-2.cli-new-btn(
+        href="/clients/create"
+      )
+        i.fas.fa-plus-circle
+        span.d-none.d-sm-inline Nuevo Cliente
+        span.d-sm-none Nuevo
 
   //- ============================================
-  //- TARJETAS DE ESTADÍSTICAS
+  //- ESTADÍSTICAS
   //- ============================================
-  .row.g-3.mb-4
-    .col-sm-6.col-lg-3
-      .card.border-0.shadow-sm.rounded-3.stat-card.h-100
-        .card-body.d-flex.justify-content-between.align-items-center
-          div
-            h6.card-title.mb-1.small.text-uppercase.text-muted.fw-semibold Total Clientes
-            h2.card-text.mb-0.fw-bold.text-dark #{clients.length}
-            small.text-primary
-              i.fas.fa-users.me-1
-              | Registrados
-          .stat-icon.bg-primary.bg-opacity-10.text-primary.rounded-3
-            i.fas.fa-users.fa-lg
+  .row.g-2.g-md-3.mb-3.mb-md-4
+    .col-6.col-lg-3
+      .card.cli-stat-card.border-0.shadow-sm.rounded-3.h-100
+        .card-body.p-2.p-md-3
+          .d-flex.justify-content-between.align-items-center
+            div.min-w-0
+              p.cli-stat-label.mb-1.text-muted Total
+              h3.cli-stat-value.mb-0.text-primary #{clients ? clients.length : 0}
+            .cli-stat-icon.cli-stat-icon-primary
+              i.fas.fa-users
 
-    .col-sm-6.col-lg-3
-      .card.border-0.shadow-sm.rounded-3.stat-card.h-100
-        .card-body.d-flex.justify-content-between.align-items-center
-          div
-            h6.card-title.mb-1.small.text-uppercase.text-muted.fw-semibold Activos
-            h2.card-text.mb-0.fw-bold.text-success #{clients.filter(c => c.isActive).length}
-            small.text-success
-              i.fas.fa-check-circle.me-1
-              | Disponibles
-          .stat-icon.bg-success.bg-opacity-10.text-success.rounded-3
-            i.fas.fa-user-check.fa-lg
+    .col-6.col-lg-3
+      .card.cli-stat-card.border-0.shadow-sm.rounded-3.h-100
+        .card-body.p-2.p-md-3
+          .d-flex.justify-content-between.align-items-center
+            div.min-w-0
+              p.cli-stat-label.mb-1.text-muted Activos
+              h3.cli-stat-value.mb-0.text-success #{clients ? clients.filter(function(c){ return c.isActive; }).length : 0}
+            .cli-stat-icon.cli-stat-icon-success
+              i.fas.fa-user-check
 
-    .col-sm-6.col-lg-3
-      .card.border-0.shadow-sm.rounded-3.stat-card.h-100
-        .card-body.d-flex.justify-content-between.align-items-center
-          div
-            h6.card-title.mb-1.small.text-uppercase.text-muted.fw-semibold Jurídicos
-            h2.card-text.mb-0.fw-bold.text-info #{clients.filter(c => c.type === 'Jurídico').length}
-            small.text-info
-              i.fas.fa-building.me-1
-              | Empresas
-          .stat-icon.bg-info.bg-opacity-10.text-info.rounded-3
-            i.fas.fa-building.fa-lg
+    .col-6.col-lg-3
+      .card.cli-stat-card.border-0.shadow-sm.rounded-3.h-100
+        .card-body.p-2.p-md-3
+          .d-flex.justify-content-between.align-items-center
+            div.min-w-0
+              p.cli-stat-label.mb-1.text-muted Jurídicos
+              h3.cli-stat-value.mb-0.text-info #{clients ? clients.filter(function(c){ return c.type === 'Jurídico'; }).length : 0}
+            .cli-stat-icon.cli-stat-icon-info
+              i.fas.fa-building
 
-    .col-sm-6.col-lg-3
-      .card.border-0.shadow-sm.rounded-3.stat-card.h-100
-        .card-body.d-flex.justify-content-between.align-items-center
-          div
-            h6.card-title.mb-1.small.text-uppercase.text-muted.fw-semibold Naturales
-            h2.card-text.mb-0.fw-bold.text-warning #{clients.filter(c => c.type === 'Natural').length}
-            small.text-warning
-              i.fas.fa-user.me-1
-              | Personas
-          .stat-icon.bg-warning.bg-opacity-10.text-warning.rounded-3
-            i.fas.fa-user.fa-lg
+    .col-6.col-lg-3
+      .card.cli-stat-card.border-0.shadow-sm.rounded-3.h-100
+        .card-body.p-2.p-md-3
+          .d-flex.justify-content-between.align-items-center
+            div.min-w-0
+              p.cli-stat-label.mb-1.text-muted Naturales
+              h3.cli-stat-value.mb-0.text-warning #{clients ? clients.filter(function(c){ return c.type === 'Natural'; }).length : 0}
+            .cli-stat-icon.cli-stat-icon-warning
+              i.fas.fa-user
 
   //- ============================================
-  //- FILTROS
+  //- BÚSQUEDA Y FILTROS
   //- ============================================
   .card.border-0.shadow-sm.rounded-3.mb-3
-    .card-body.p-3
-      .row.g-3.align-items-center
-        .col-md-5
+    .card-body.p-2.p-md-3
+      .row.g-2.align-items-center
+
+        .col-12.col-md-5
           .input-group
-            span.input-group-text.bg-white.border-end-0
+            span.input-group-text.bg-transparent.border-end-0
               i.fas.fa-search.text-muted
-            input.form-control.border-start-0(
+            input.form-control.border-start-0#searchClient(
               type="text"
-              id="searchClient"
               placeholder="Buscar por nombre, RUC o email..."
+              autocomplete="off"
             )
-        .col-md-3
+
+        .col-6.col-md-3
           select.form-select#filterType
             option(value="") Todos los tipos
-            option(value="Jurídico") 🏢 Jurídicos
-            option(value="Natural") 👤 Naturales
-        .col-md-2
+            option(value="Jurídico") Jurídicos
+            option(value="Natural") Naturales
+
+        .col-6.col-md-2
           select.form-select#filterStatus
             option(value="") Todos
-            option(value="active") ✅ Activos
-            option(value="inactive") ❌ Inactivos
-        .col-md-2.text-md-end
-          span.text-muted.small
-            i.fas.fa-filter.me-1
-            span#resultsCount #{clients.length} resultados
+            option(value="active") Activos
+            option(value="inactive") Inactivos
+
+        .col-12.col-md-2.text-md-end
+          span.badge.bg-primary-subtle.text-primary.rounded-pill.px-3.py-2.w-100.cli-count-badge
+            i.fas.fa-list.me-1
+            span#resultsCount= (clients && clients.length) || 0
 
   //- ============================================
-  //- TABLA
+  //- TABLA (desktop/tablet)
   //- ============================================
-  .card.border-0.shadow-sm.rounded-3.overflow-hidden
+  .card.border-0.shadow-sm.rounded-3.d-none.d-md-block#tableCard
     .card-body.p-0
       .table-responsive
-        table.table.table-hover.align-middle.mb-0#clientsTable
-          thead.bg-light
+        table.table.table-hover.align-middle.mb-0.cli-table
+          thead.table-light
             tr
-              th(style="min-width: 250px;") Cliente
-              th(style="min-width: 130px;") RUC / DNI
-              th(style="min-width: 150px;") Contacto
-              th.text-center(style="min-width: 120px;") Tipo
-              th.text-center(style="min-width: 110px;") Estado
-              th.text-center(style="min-width: 140px;") Acciones
-          tbody
-            if clients.length
+              th Cliente
+              th RUC / DNI
+              th Contacto
+              th.text-center Tipo
+              th.text-center Estado
+              th.text-end Acciones
+          tbody#clientsTableBody
+            if clients && clients.length
               each client in clients
-                tr(
+                - const statusClass = client.isActive ? 'cli-badge-success' : 'cli-badge-danger'
+                - const statusText = client.isActive ? 'Activo' : 'Inactivo'
+                - const statusIcon = client.isActive ? 'fa-check-circle' : 'fa-times-circle'
+                - const typeClass = client.type === 'Jurídico' ? 'cli-type-info' : 'cli-type-secondary'
+                - const typeIcon = client.type === 'Jurídico' ? 'fa-building' : 'fa-user'
+                - const searchData = ((client.businessName || '') + ' ' + (client.ruc || '') + ' ' + (client.email || '') + ' ' + (client.phone || '')).toLowerCase()
+
+                tr.cli-row(
+                  data-search=searchData
                   data-type=client.type
                   data-status=client.isActive ? 'active' : 'inactive'
                 )
                   td
-                    .d-flex.align-items-center
-                      .bg-primary.bg-opacity-10.rounded-circle.me-3(
-                        style="width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"
-                      )
-                        i.fas.text-primary.fa-lg(
-                          class=client.type === 'Jurídico' ? 'fa-building' : 'fa-user'
-                        )
-                      div
-                        a.text-decoration-none.fw-semibold.d-block.text-dark(
+                    .d-flex.align-items-center.gap-2
+                      .cli-avatar
+                        i.fas(class=typeIcon)
+                      div.min-w-0
+                        a.text-decoration-none.fw-semibold.text-dark.text-truncate.d-block(
                           href=`/clients/${client._id}`
-                        ) #{client.businessName}
+                        )= client.businessName
                         small.text-muted
                           i.fas.fa-hashtag.me-1
                           | #{client._id.toString().slice(-6).toUpperCase()}
+
                   td
                     if client.ruc
-                      div.fw-semibold #{client.ruc}
-                      small.text-muted RUC
+                      div.small.fw-semibold= client.ruc
+                      small.text-muted Documento
                     else
-                      span.text-muted.fst-italic Sin documento
+                      span.text-muted.fst-italic.small Sin documento
+
                   td
                     if client.phone
-                      div
+                      div.small
                         i.fas.fa-phone.text-success.me-1
                         | #{client.phone}
                     if client.email
-                      div
-                        small.text-muted
-                          i.fas.fa-envelope.me-1
-                          | #{client.email}
+                      div.small.text-muted.text-truncate
+                        i.fas.fa-envelope.me-1
+                        | #{client.email}
                     if !client.phone && !client.email
-                      span.text-muted.fst-italic Sin contacto
+                      span.text-muted.fst-italic.small Sin contacto
+
                   td.text-center
-                    if client.type === 'Jurídico'
-                      span.badge.bg-info-subtle.text-info.px-3.py-2.rounded-pill.border.border-info-subtle
-                        i.fas.fa-building.me-1
-                        | Jurídico
-                    else
-                      span.badge.bg-secondary-subtle.text-secondary.px-3.py-2.rounded-pill.border.border-secondary-subtle
-                        i.fas.fa-user.me-1
-                        | Natural
+                    span.cli-type-badge(class=typeClass)
+                      i.fas(class=typeIcon + ' me-1')
+                      = client.type
+
                   td.text-center
-                    if client.isActive
-                      span.badge.bg-success-subtle.text-success.px-3.py-2.rounded-pill.border.border-success-subtle
-                        i.fas.fa-check-circle.me-1
-                        | Activo
-                    else
-                      span.badge.bg-danger-subtle.text-danger.px-3.py-2.rounded-pill.border.border-danger-subtle
-                        i.fas.fa-times-circle.me-1
-                        | Inactivo
-                  td
-                    .d-flex.justify-content-center.gap-1
-                      a.btn.btn-sm.btn-outline-primary.rounded-circle.action-btn(
+                    span.cli-badge(class=statusClass)
+                      i.fas(class=statusIcon)
+                      span= statusText
+
+                  td.text-end
+                    .btn-group.btn-group-sm
+                      a.btn.btn-outline-info.cli-action-btn(
                         href=`/clients/${client._id}`
-                        title="Ver detalle"
+                        title="Ver"
                       )
                         i.fas.fa-eye
-                      a.btn.btn-sm.btn-outline-warning.rounded-circle.action-btn(
+                      a.btn.btn-outline-warning.cli-action-btn(
                         href=`/clients/${client._id}/edit`
                         title="Editar"
                       )
                         i.fas.fa-pen
-                      button.btn.btn-sm.btn-outline-danger.rounded-circle.action-btn.btn-delete-client(
+                      button.btn.btn-outline-danger.cli-action-btn.btn-delete-client(
                         type="button"
                         title="Eliminar"
                         data-client-id=client._id
@@ -194,15 +197,105 @@ block content
                       )
                         i.fas.fa-trash
             else
-              tr#emptyRow
+              tr
                 td(colspan="6").text-center.py-5
-                  .mb-3
-                    i.fas.fa-users.fa-3x.text-muted.opacity-25
-                  h5.text-muted.fw-semibold No hay clientes registrados
-                  p.text-muted.mb-4 Comienza agregando tu primer cliente
-                  a.btn.btn-primary.rounded-pill.px-4(href="/clients/create")
-                    i.fas.fa-plus-circle.me-1
-                    | Crear Primer Cliente
+                  .cli-empty
+                    i.fas.fa-users.fa-3x.mb-3.opacity-25.d-block
+                    p.text-muted.mb-3 No hay clientes registrados
+                    a.btn.btn-sm.btn-primary.rounded-pill(href="/clients/create")
+                      i.fas.fa-plus-circle.me-1
+                      | Crear primer cliente
+
+  //- ============================================
+  //- CARDS (móvil)
+  //- ============================================
+  .d-md-none#cardsView
+    if clients && clients.length
+      each client in clients
+        - const statusClass = client.isActive ? 'cli-badge-success' : 'cli-badge-danger'
+        - const statusText = client.isActive ? 'Activo' : 'Inactivo'
+        - const statusIcon = client.isActive ? 'fa-check-circle' : 'fa-times-circle'
+        - const typeClass = client.type === 'Jurídico' ? 'cli-type-info' : 'cli-type-secondary'
+        - const typeIcon = client.type === 'Jurídico' ? 'fa-building' : 'fa-user'
+        - const searchData = ((client.businessName || '') + ' ' + (client.ruc || '') + ' ' + (client.email || '') + ' ' + (client.phone || '')).toLowerCase()
+
+        .card.cli-mobile-card.border-0.shadow-sm.rounded-4.mb-2.cli-row(
+          data-search=searchData
+          data-type=client.type
+          data-status=client.isActive ? 'active' : 'inactive'
+        )
+          .card-body.p-3
+
+            .d-flex.justify-content-between.align-items-start.gap-2.mb-2
+              .d-flex.align-items-center.gap-2.min-w-0
+                .cli-avatar.cli-avatar-lg
+                  i.fas(class=typeIcon)
+                div.min-w-0
+                  .fw-bold.text-dark.text-truncate= client.businessName
+                  small.text-muted
+                    i.fas.fa-hashtag.me-1
+                    | #{client._id.toString().slice(-6).toUpperCase()}
+
+              span.cli-badge.flex-shrink-0(class=statusClass)
+                i.fas(class=statusIcon)
+                span= statusText
+
+            .mb-2
+              span.cli-type-badge(class=typeClass)
+                i.fas(class=typeIcon + ' me-1')
+                = client.type
+
+            .cli-mobile-info.mb-3
+              if client.ruc
+                .d-flex.align-items-center.gap-2.mb-1
+                  i.fas.fa-id-card.text-primary.fa-sm
+                  small.text-muted= client.ruc
+              if client.phone
+                .d-flex.align-items-center.gap-2.mb-1
+                  i.fas.fa-phone.text-primary.fa-sm
+                  small.text-muted= client.phone
+              if client.email
+                .d-flex.align-items-center.gap-2
+                  i.fas.fa-envelope.text-primary.fa-sm
+                  small.text-muted.text-truncate= client.email
+              if !client.ruc && !client.phone && !client.email
+                small.text-muted.fst-italic Sin datos de contacto
+
+            .d-flex.gap-2
+              a.btn.btn-sm.btn-outline-info.flex-fill.rounded-pill(
+                href=`/clients/${client._id}`
+              )
+                i.fas.fa-eye.me-1
+                | Ver
+              a.btn.btn-sm.btn-outline-warning.flex-fill.rounded-pill(
+                href=`/clients/${client._id}/edit`
+              )
+                i.fas.fa-pen.me-1
+                | Editar
+              button.btn.btn-sm.btn-outline-danger.flex-fill.rounded-pill.btn-delete-client(
+                type="button"
+                data-client-id=client._id
+                data-client-name=client.businessName
+              )
+                i.fas.fa-trash.me-1
+                | Borrar
+    else
+      .card.border-0.shadow-sm.rounded-4
+        .card-body.text-center.py-5
+          .cli-empty
+            i.fas.fa-users.fa-3x.mb-3.opacity-25.d-block
+            p.text-muted.mb-3 No hay clientes registrados
+            a.btn.btn-primary.rounded-pill(href="/clients/create")
+              i.fas.fa-plus-circle.me-1
+              | Crear primer cliente
+
+  //- ============================================
+  //- SIN RESULTADOS
+  //- ============================================
+  .card.border-0.shadow-sm.rounded-3.d-none#noResultsCard
+    .card-body.text-center.py-5
+      i.fas.fa-search.fa-3x.mb-3.opacity-25.d-block.text-muted
+      p.text-muted.mb-0 No se encontraron clientes con esos filtros
 
   //- ============================================
   //- MODAL CONFIRMAR ELIMINACIÓN
@@ -256,85 +349,154 @@ block content
   //- ESTILOS
   //- ============================================
   style.
-    .stat-card {
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .stat-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 24px rgba(0,0,0,0.08) !important;
-    }
-    .stat-icon {
-      width: 52px;
-      height: 52px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
+    .cli-page-header { padding-bottom: 0; }
+    .cli-new-btn { white-space: nowrap; }
 
-    .table th {
-      font-weight: 600;
-      font-size: 0.75rem;
+    /* ---- Stats ---- */
+    .cli-stat-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .cli-stat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.08) !important;
+    }
+    .cli-stat-label {
+      font-size: 0.72rem;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      background: #f8fafc;
-      color: #64748b;
-      padding: 1rem 0.75rem;
-      border-bottom: 2px solid #e2e8f0;
-      white-space: nowrap;
+      font-weight: 700;
+      margin: 0;
     }
-    .table td {
-      vertical-align: middle;
-      padding: 0.9rem 0.75rem;
+    .cli-stat-value {
+      font-size: 1.5rem;
+      line-height: 1.1;
+      font-weight: 700;
     }
-    .table tbody tr {
-      transition: background 0.15s ease;
-    }
-    .table tbody tr:hover {
-      background: #f8fafc;
-    }
-
-    .badge {
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.2px;
-    }
-
-    .action-btn {
-      width: 34px;
-      height: 34px;
-      padding: 0;
+    .cli-stat-icon {
+      width: 44px; height: 44px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      border-radius: 12px;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .cli-stat-icon-primary { background: #e0e7ff; color: #4f46e5; }
+    .cli-stat-icon-success { background: #dcfce7; color: #15803d; }
+    .cli-stat-icon-info    { background: #cffafe; color: #0e7490; }
+    .cli-stat-icon-warning { background: #fef3c7; color: #b45309; }
+
+    /* ---- Contador ---- */
+    .cli-count-badge { font-size: 0.85rem; font-weight: 700; }
+
+    /* ---- Avatar ---- */
+    .cli-avatar {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      background: #eff6ff;
+      color: #2563eb;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+    .cli-avatar-lg {
+      width: 46px; height: 46px;
+      font-size: 1.05rem;
+    }
+
+    /* ---- Tabla ---- */
+    .cli-table thead th {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      font-weight: 700;
+      color: #64748b;
+      border-bottom: 2px solid #e2e8f0;
+      padding: 0.9rem 0.75rem;
+      white-space: nowrap;
+    }
+    .cli-table tbody td {
+      padding: 0.85rem 0.75rem;
+      vertical-align: middle;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .cli-table tbody tr:hover { background: #f8fafc; }
+    .cli-table tbody tr:last-child td { border-bottom: none; }
+
+    /* ---- Action buttons ---- */
+    .cli-action-btn {
+      width: 34px; height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px !important;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+    .cli-action-btn:hover { transform: translateY(-1px); }
+
+    /* ---- Badges ---- */
+    .cli-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .cli-badge i { font-size: 0.7rem; }
+    .cli-badge-success { background: #dcfce7; color: #15803d; }
+    .cli-badge-danger  { background: #fee2e2; color: #b91c1c; }
+
+    /* ---- Badges de tipo ---- */
+    .cli-type-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.28rem 0.7rem;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+    .cli-type-info      { background: #cffafe; color: #0e7490; }
+    .cli-type-secondary { background: #e2e8f0; color: #475569; }
+
+    /* ---- Empty ---- */
+    .cli-empty i { color: #cbd5e1; }
+
+    /* ---- Mobile cards ---- */
+    .cli-mobile-card {
       transition: all 0.2s ease;
+      border: 1px solid #eef2f7 !important;
     }
-    .action-btn:hover {
-      transform: scale(1.1);
+    .cli-mobile-card:active {
+      transform: scale(0.99);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
     }
-
-    .input-group-text {
-      background-color: #fff !important;
-    }
-    .input-group:focus-within .input-group-text,
-    .input-group:focus-within .form-control {
-      border-color: #86b7fe;
-      box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.1);
+    .cli-mobile-info {
+      background: #f8fafc;
+      border-radius: 10px;
+      padding: 0.6rem 0.75rem;
     }
 
-    .form-select:focus, .form-control:focus {
-      border-color: #86b7fe;
-      box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.1);
+    /* ---- Responsive ---- */
+    @media (max-width: 575.98px) {
+      .cli-page-header h1 { font-size: 1.15rem; }
+      .cli-new-btn { padding: 0.5rem 0.9rem; font-size: 0.85rem; }
+      .cli-mobile-card .card-body { padding: 0.85rem !important; }
+      .cli-badge { font-size: 0.7rem; padding: 0.3rem 0.6rem; }
+      .cli-stat-value { font-size: 1.25rem; }
+      .cli-stat-icon { width: 38px; height: 38px; font-size: 0.9rem; }
     }
 
-    @media (max-width: 768px) {
-      .table-responsive {
-        font-size: 0.85rem;
-      }
-      .stat-icon {
-        width: 44px;
-        height: 44px;
-      }
+    @media (min-width: 768px) and (max-width: 991.98px) {
+      .cli-table thead th,
+      .cli-table tbody td { padding: 0.7rem 0.5rem; }
+      .cli-table { font-size: 0.85rem; }
     }
 
   //- ============================================
@@ -342,39 +504,51 @@ block content
   //- ============================================
   script.
     document.addEventListener('DOMContentLoaded', function() {
-      const searchInput = document.getElementById('searchClient');
-      const filterType = document.getElementById('filterType');
-      const filterStatus = document.getElementById('filterStatus');
-      const table = document.getElementById('clientsTable');
-      const resultsCount = document.getElementById('resultsCount');
+      var searchInput = document.getElementById('searchClient');
+      var filterType = document.getElementById('filterType');
+      var filterStatus = document.getElementById('filterStatus');
+      var resultsCount = document.getElementById('resultsCount');
+      var tableCard = document.getElementById('tableCard');
+      var cardsView = document.getElementById('cardsView');
+      var noResultsCard = document.getElementById('noResultsCard');
 
       // ============================================
       // FILTROS
       // ============================================
       function filterTable() {
-        const term = searchInput.value.toLowerCase().trim();
-        const type = filterType.value;
-        const status = filterStatus.value;
-        const rows = table.querySelectorAll('tbody tr');
-        let visible = 0;
+        var term = searchInput ? searchInput.value.toLowerCase().trim() : '';
+        var type = filterType ? filterType.value : '';
+        var status = filterStatus ? filterStatus.value : '';
+        var rows = document.querySelectorAll('.cli-row');
+        var visible = 0;
 
-        rows.forEach(row => {
-          if (row.id === 'emptyRow') return;
+        rows.forEach(function(row) {
+          var searchData = row.getAttribute('data-search') || '';
+          var rowType = row.getAttribute('data-type') || '';
+          var rowStatus = row.getAttribute('data-status') || '';
 
-          const text = row.textContent.toLowerCase();
-          const rowType = row.dataset.type || '';
-          const rowStatus = row.dataset.status || '';
+          var matchSearch = !term || searchData.indexOf(term) !== -1;
+          var matchType = !type || rowType === type;
+          var matchStatus = !status || rowStatus === status;
 
-          let show = text.includes(term);
-          if (type) show = show && (rowType === type);
-          if (status) show = show && (rowStatus === status);
-
-          row.style.display = show ? '' : 'none';
-          if (show) visible++;
+          if (matchSearch && matchType && matchStatus) {
+            row.style.display = '';
+            visible++;
+          } else {
+            row.style.display = 'none';
+          }
         });
 
-        if (resultsCount) {
-          resultsCount.textContent = visible + (visible === 1 ? ' resultado' : ' resultados');
+        if (resultsCount) resultsCount.textContent = visible;
+
+        if (visible === 0) {
+          if (tableCard) tableCard.classList.add('d-none');
+          if (cardsView) cardsView.classList.add('d-none');
+          if (noResultsCard) noResultsCard.classList.remove('d-none');
+        } else {
+          if (noResultsCard) noResultsCard.classList.add('d-none');
+          if (tableCard) tableCard.classList.remove('d-none');
+          if (cardsView) cardsView.classList.remove('d-none');
         }
       }
 
@@ -385,27 +559,38 @@ block content
       // ============================================
       // ELIMINAR CLIENTE
       // ============================================
-      const modalDelete = new bootstrap.Modal(document.getElementById('modalDeleteClient'));
-      const deleteClientName = document.getElementById('deleteClientName');
-      const formDeleteClient = document.getElementById('formDeleteClient');
-      const btnConfirmarDelete = document.getElementById('btnConfirmarDelete');
+      var modalEl = document.getElementById('modalDeleteClient');
+      var modalDelete = modalEl ? new bootstrap.Modal(modalEl) : null;
+      var deleteClientName = document.getElementById('deleteClientName');
+      var formDeleteClient = document.getElementById('formDeleteClient');
+      var btnConfirmarDelete = document.getElementById('btnConfirmarDelete');
 
-      document.querySelectorAll('.btn-delete-client').forEach(btn => {
+      document.querySelectorAll('.btn-delete-client').forEach(function(btn) {
         btn.addEventListener('click', function() {
-          const clientId = this.dataset.clientId;
-          const clientName = this.dataset.clientName;
+          var clientId = this.dataset.clientId;
+          var clientName = this.dataset.clientName;
 
-          deleteClientName.textContent = clientName;
-          formDeleteClient.action = `/clients/${clientId}?_method=DELETE`;
+          if (deleteClientName) deleteClientName.textContent = clientName;
+          if (formDeleteClient) formDeleteClient.action = '/clients/' + clientId + '?_method=DELETE';
 
-          modalDelete.show();
+          if (modalDelete) modalDelete.show();
         });
       });
 
       if (formDeleteClient) {
         formDeleteClient.addEventListener('submit', function() {
-          btnConfirmarDelete.disabled = true;
-          btnConfirmarDelete.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Eliminando...';
+          if (btnConfirmarDelete) {
+            btnConfirmarDelete.disabled = true;
+            btnConfirmarDelete.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Eliminando...';
+          }
         });
       }
+
+      // Atajo Ctrl+K
+      document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+          e.preventDefault();
+          if (searchInput) searchInput.focus();
+        }
+      });
     });
