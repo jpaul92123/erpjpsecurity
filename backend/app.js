@@ -34,7 +34,6 @@ const Project = require('./models/Project');
 const Supplier = require('./models/Supplier');
 const Setting = require('./models/Setting');
 const PublicOrder = require('./models/PublicOrder');
-const Role = require('./models/Role');   // 🔑 NUEVO: para cargar el ID del rol admin
 
 // ============================================================
 // RUTAS (todas agrupadas en index.js)
@@ -80,17 +79,6 @@ app.use(session({
 // FLASH MESSAGES
 // ============================================================
 app.use(flash());
-
-// ============================================================
-// 🔑 ROL ADMIN GLOBAL (para las vistas)
-// Expone res.locals.adminRoleId a TODAS las vistas.
-// El layout y dashboard lo usan para detectar al admin
-// sin necesidad de popular user.role.
-// ============================================================
-app.use((req, res, next) => {
-  res.locals.adminRoleId = process.env.ADMIN_ROLE_ID || null;
-  next();
-});
 
 // ============================================================
 // VARIABLES GLOBALES PARA TODAS LAS VISTAS
@@ -350,25 +338,6 @@ app.use((err, req, res, next) => {
     user: req.session.user || null
   });
 });
-
-// ============================================================
-// 🔑 CARGAR ADMIN_ROLE_ID AL INICIAR
-// Busca el _id del rol "admin" en la BD y lo guarda en
-// process.env para que el middleware lo exponga a las vistas.
-// ============================================================
-(async () => {
-  try {
-    const adminRole = await Role.findOne({ name: 'admin' }).lean();
-    if (adminRole) {
-      process.env.ADMIN_ROLE_ID = adminRole._id.toString();
-      console.log('✅ ADMIN_ROLE_ID cargado:', process.env.ADMIN_ROLE_ID);
-    } else {
-      console.warn('⚠️  No se encontró el rol "admin" en la BD. Ejecuta el seed.');
-    }
-  } catch (err) {
-    console.error('❌ Error al cargar rol admin:', err.message);
-  }
-})();
 
 // ============================================================
 // INICIAR SERVIDOR
