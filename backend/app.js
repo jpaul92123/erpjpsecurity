@@ -34,9 +34,10 @@ const Project = require('./models/Project');
 const Supplier = require('./models/Supplier');
 const Setting = require('./models/Setting');
 const PublicOrder = require('./models/PublicOrder');
+const Role = require('./models/Role');
 
 // ============================================================
-// RUTAS (todas agrupadas en index.js)
+// RUTAS
 // ============================================================
 const routes = require('./routes/index');
 
@@ -48,15 +49,14 @@ const app = express();
 connectDB();
 
 // ============================================================
-// CONFIGURACIÓN DE VISTAS (Pug)
+// VISTAS
 // ============================================================
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, '../frontend/views'));
 
 // ============================================================
-// MIDDLEWARES
+// MIDDLEWARES BASE
 // ============================================================
-
 app.use(express.static(path.join(__dirname, '../frontend/public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -76,12 +76,42 @@ app.use(session({
 }));
 
 // ============================================================
-// FLASH MESSAGES
+// FLASH
 // ============================================================
 app.use(flash());
 
 // ============================================================
-// VARIABLES GLOBALES PARA TODAS LAS VISTAS
+// 🔑 ROL ADMIN GLOBAL (lazy load, sin romper arranque)
+// ============================================================
+let _adminRoleIdCache = null;
+let _adminRoleLoading = null;
+
+app.use(async (req, res, next) => {
+  if (_adminRoleIdCache) {
+    res.locals.adminRoleId = _adminRoleIdCache;
+    return next();
+  }
+  try {
+    if (!_adminRoleLoading) {
+      _adminRoleLoading = Role.findOne({ name: 'admin' }).lean();
+    }
+    const adminRole = await _adminRoleLoading;
+    if (adminRole) {
+      _adminRoleIdCache = adminRole._id.toString();
+      res.locals.adminRoleId = _adminRoleIdCache;
+    } else {
+      res.locals.adminRoleId = null;
+    }
+  } catch (err) {
+    console.error('⚠️ Error cargando rol admin:', err.message);
+    res.locals.adminRoleId = null;
+    _adminRoleLoading = null;
+  }
+  next();
+});
+
+// ============================================================
+// VARIABLES GLOBALES
 // ============================================================
 app.use(async (req, res, next) => {
   res.locals.user = req.session.user || null;
@@ -97,16 +127,15 @@ app.use(async (req, res, next) => {
 });
 
 // ============================================================
-// MONTAJE DE TODAS LAS RUTAS
+// RUTAS
 // ============================================================
 app.use('/', routes);
 
 // ============================================================
-// RUTA RAÍZ (dashboard o landing)
+// RUTA RAÍZ
 // ============================================================
 app.get('/', async (req, res) => {
   if (req.session.user) {
-    // ============ USUARIO LOGUEADO → DASHBOARD ============
     try {
       const totalUsers = await User.countDocuments();
       const totalClients = await Client.countDocuments();
@@ -208,7 +237,6 @@ app.get('/', async (req, res) => {
       });
     }
   } else {
-    // ============ USUARIO NO LOGUEADO → LANDING ============
     try {
       const categories = await Category.find({ parent: null, isActive: true }).sort({ name: 1 });
       const categoriesWithSubs = await Promise.all(categories.map(async (cat) => {
@@ -222,7 +250,6 @@ app.get('/', async (req, res) => {
         .sort({ createdAt: -1 })
         .limit(8);
 
-      // ✅ AGREGADO: Consultar marcas activas para el carrusel
       const brands = await Brand.find({ isActive: true })
         .select('name logo')
         .sort({ name: 1 })
@@ -238,7 +265,7 @@ app.get('/', async (req, res) => {
         setting,
         categories: categoriesWithSubs,
         latestProducts,
-        brands,   // ⬅️ AGREGADO
+        brands,
         user: null
       });
     } catch (error) {
@@ -248,7 +275,7 @@ app.get('/', async (req, res) => {
         setting: null,
         categories: [],
         latestProducts: [],
-        brands: [],   // ⬅️ AGREGADO
+        brands: [],
         user: null
       });
     }
@@ -256,7 +283,7 @@ app.get('/', async (req, res) => {
 });
 
 // ============================================================
-// RUTA LANDING (accesible siempre)
+// RUTA LANDING
 // ============================================================
 app.get('/landing', async (req, res) => {
   try {
@@ -272,7 +299,6 @@ app.get('/landing', async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(8);
 
-    // ✅ AGREGADO: Consultar marcas activas
     const brands = await Brand.find({ isActive: true })
       .select('name logo')
       .sort({ name: 1 })
@@ -288,7 +314,7 @@ app.get('/landing', async (req, res) => {
       setting,
       categories: categoriesWithSubs,
       latestProducts,
-      brands,   // ⬅️ AGREGADO
+      brands,
       user: req.session.user || null
     });
   } catch (error) {
@@ -298,14 +324,14 @@ app.get('/landing', async (req, res) => {
       setting: null,
       categories: [],
       latestProducts: [],
-      brands: [],   // ⬅️ AGREGADO
+      brands: [],
       user: req.session.user || null
     });
   }
 });
 
 // ============================================================
-// MANEJO 404
+// 404
 // ============================================================
 app.use((req, res) => {
   res.status(404).render('error/404', {
@@ -316,7 +342,7 @@ app.use((req, res) => {
 });
 
 // ============================================================
-// MANEJO DE ERRORES GLOBAL
+// ERROR GLOBAL
 // ============================================================
 app.use((err, req, res, next) => {
   console.error('❌ Error global:', err);
@@ -340,7 +366,7 @@ app.use((err, req, res, next) => {
 });
 
 // ============================================================
-// INICIAR SERVIDOR
+// SERVIDOR
 // ============================================================
 const PORT = process.env.PORT || 3100;
 app.listen(PORT, () => {
