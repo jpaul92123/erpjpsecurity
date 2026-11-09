@@ -24,13 +24,12 @@ block content
 
       .d-flex.align-items-center.gap-2.flex-shrink-0
 
-        //- ⚙️ Configuración (solo admin)
-        if isAdmin
-          a.btn.btn-light.rounded-circle.shadow-sm.icon-btn(
-            href="/settings"
-            title="Configuración"
-          )
-            i.fas.fa-cog
+        //- ⚙️ Configuración
+        a.btn.btn-light.rounded-circle.shadow-sm.icon-btn(
+          href="/settings"
+          title="Configuración"
+        )
+          i.fas.fa-cog
 
         //- 🔔 Campana con dropdown de notificaciones
         .dropdown.notification-dropdown
@@ -144,160 +143,130 @@ block content
             | Ver pedidos
 
   //- ============================================
-  //- ESTADÍSTICAS
+  //- ESTADÍSTICAS  (cantidades ABAJO en móvil)
   //- ============================================
   .row.g-2.g-md-3.mb-3.mb-md-4.stats-mobile
-    if isAdmin
-      .col-6.col-lg-3
-        .card.stat-card.border-0.shadow-sm.h-100
-          .card-body.p-2.p-md-3
-            .d-flex.justify-content-between.align-items-start.mb-2
-              .stat-icon.bg-primary-subtle.text-primary
-                i.fas.fa-users
-              span.badge.bg-success-subtle.text-success.rounded-pill.d-none.d-sm-inline-flex
-                i.fas.fa-arrow-up.me-1
-                | 12%
-            h3.fw-bold.mb-1 #{totalUsers || 0}
-            p.text-muted.small.mb-0 Usuarios
+    .col-6.col-lg-3
+      .card.stat-card.border-0.shadow-sm.h-100
+        .card-body.p-2.p-md-3
+          .d-flex.justify-content-between.align-items-start.mb-2
+            .stat-icon.bg-primary-subtle.text-primary
+              i.fas.fa-users
+            span.badge.bg-success-subtle.text-success.rounded-pill.d-none.d-sm-inline-flex
+              i.fas.fa-arrow-up.me-1
+              | 12%
+          h3.fw-bold.mb-1 #{totalUsers || 0}
+          p.text-muted.small.mb-0 Usuarios
 
-      .col-6.col-lg-3
-        .card.stat-card.border-0.shadow-sm.h-100
-          .card-body.p-2.p-md-3
-            .d-flex.justify-content-between.align-items-start.mb-2
-              .stat-icon.bg-success-subtle.text-success
-                i.fas.fa-building
-              span.badge.bg-success-subtle.text-success.rounded-pill.d-none.d-sm-inline-flex
-                i.fas.fa-arrow-up.me-1
-                | 8%
-            h3.fw-bold.mb-1 #{totalClients || 0}
-            p.text-muted.small.mb-0 Clientes
+    .col-6.col-lg-3
+      .card.stat-card.border-0.shadow-sm.h-100
+        .card-body.p-2.p-md-3
+          .d-flex.justify-content-between.align-items-start.mb-2
+            .stat-icon.bg-success-subtle.text-success
+              i.fas.fa-building
+            span.badge.bg-success-subtle.text-success.rounded-pill.d-none.d-sm-inline-flex
+              i.fas.fa-arrow-up.me-1
+              | 8%
+          h3.fw-bold.mb-1 #{totalClients || 0}
+          p.text-muted.small.mb-0 Clientes
 
-      .col-6.col-lg-3
-        .card.stat-card.border-0.shadow-sm.h-100
-          .card-body.p-2.p-md-3
-            .d-flex.justify-content-between.align-items-start.mb-2
-              .stat-icon.bg-warning-subtle.text-warning
-                i.fas.fa-box
+    .col-6.col-lg-3
+      .card.stat-card.border-0.shadow-sm.h-100
+        .card-body.p-2.p-md-3
+          .d-flex.justify-content-between.align-items-start.mb-2
+            .stat-icon.bg-warning-subtle.text-warning
+              i.fas.fa-box
+            span.badge.bg-danger-subtle.text-danger.rounded-pill.d-none.d-sm-inline-flex
+              i.fas.fa-arrow-down.me-1
+              | 3%
+          h3.fw-bold.mb-1 #{totalProducts || 0}
+          p.text-muted.small.mb-0 Productos
+
+    .col-6.col-lg-3
+      .card.stat-card.border-0.shadow-sm.h-100(
+        class=(pendingOrdersCount > 0 ? 'border-warning' : '')
+      )
+        .card-body.p-2.p-md-3
+          .d-flex.justify-content-between.align-items-start.mb-2
+            .stat-icon.bg-warning-subtle.text-warning
+              i.fas.fa-shopping-bag
+            if pendingOrdersCount > 0
               span.badge.bg-danger-subtle.text-danger.rounded-pill.d-none.d-sm-inline-flex
-                i.fas.fa-arrow-down.me-1
-                | 3%
-            h3.fw-bold.mb-1 #{totalProducts || 0}
-            p.text-muted.small.mb-0 Productos
-
-      .col-6.col-lg-3
-        .card.stat-card.border-0.shadow-sm.h-100(
-          class=(pendingOrdersCount > 0 ? 'border-warning' : '')
-        )
-          .card-body.p-2.p-md-3
-            .d-flex.justify-content-between.align-items-start.mb-2
-              .stat-icon.bg-warning-subtle.text-warning
-                i.fas.fa-shopping-bag
-              if pendingOrdersCount > 0
-                span.badge.bg-danger-subtle.text-danger.rounded-pill.d-none.d-sm-inline-flex
-                  i.fas.fa-exclamation-circle.me-1
-                  | Nuevos
-              else
-                span.badge.bg-success-subtle.text-success.rounded-pill.d-none.d-sm-inline-flex
-                  i.fas.fa-check.me-1
-                  | Al día
-            h3.fw-bold.mb-1 #{pendingOrdersCount || 0}
-            p.text-muted.small.mb-0 Pendientes
-    else
-      .col-6
-        .card.stat-card.border-0.shadow-sm.h-100(
-          class=(pendingOrdersCount > 0 ? 'border-warning' : '')
-        )
-          .card-body.p-3
-            .d-flex.justify-content-between.align-items-start.mb-2
-              .stat-icon.bg-warning-subtle.text-warning
-                i.fas.fa-shopping-bag
-              if pendingOrdersCount > 0
-                span.badge.bg-danger-subtle.text-danger.rounded-pill
-                  i.fas.fa-exclamation-circle.me-1
-                  | Nuevos
-              else
-                span.badge.bg-success-subtle.text-success.rounded-pill
-                  i.fas.fa-check.me-1
-                  | Al día
-            h3.fw-bold.mb-1 #{pendingOrdersCount || 0}
-            p.text-muted.small.mb-0 Pedidos pendientes
-
-      .col-6
-        .card.stat-card.border-0.shadow-sm.h-100
-          .card-body.p-3
-            .d-flex.justify-content-between.align-items-start.mb-2
-              .stat-icon.bg-success-subtle.text-success
-                i.fas.fa-chart-line
-            h3.fw-bold.mb-1 S/. #{todaySalesTotal.toFixed(2)}
-            p.text-muted.small.mb-0 Ventas de hoy
+                i.fas.fa-exclamation-circle.me-1
+                | Nuevos
+            else
+              span.badge.bg-success-subtle.text-success.rounded-pill.d-none.d-sm-inline-flex
+                i.fas.fa-check.me-1
+                | Al día
+          h3.fw-bold.mb-1 #{pendingOrdersCount || 0}
+          p.text-muted.small.mb-0 Pendientes
 
   //- ============================================
-  //- CARRUSEL DE MARCAS (solo admin)
+  //- CARRUSEL DE MARCAS
   //- ============================================
-  if isAdmin
-    if brands && brands.length
-      .row.mb-3.mb-md-4
-        .col-12
-          .card.border-0.shadow-sm.rounded-3.overflow-hidden.brands-carousel-card
-            .card-header.bg-white.border-bottom.py-3.d-flex.justify-content-between.align-items-center
-              h6.mb-0.fw-bold
-                i.fas.fa-trademark.me-2.text-primary
-                | Nuestras Marcas
-                span.badge.bg-primary-subtle.text-primary.ms-2 #{brands.length}
-              a.btn.btn-sm.btn-link.text-decoration-none.fw-semibold(href="/brands")
-                | Ver todas
-                i.fas.fa-arrow-right.ms-1
+  if brands && brands.length
+    .row.mb-3.mb-md-4
+      .col-12
+        .card.border-0.shadow-sm.rounded-3.overflow-hidden.brands-carousel-card
+          .card-header.bg-white.border-bottom.py-3.d-flex.justify-content-between.align-items-center
+            h6.mb-0.fw-bold
+              i.fas.fa-trademark.me-2.text-primary
+              | Nuestras Marcas
+              span.badge.bg-primary-subtle.text-primary.ms-2 #{brands.length}
+            a.btn.btn-sm.btn-link.text-decoration-none.fw-semibold(href="/brands")
+              | Ver todas
+              i.fas.fa-arrow-right.ms-1
 
-            .card-body.p-0
-              .brands-marquee
-                .brands-marquee-inner
+          .card-body.p-0
+            .brands-marquee
+              .brands-marquee-inner
 
-                  //- Primera vuelta
-                  each brand in brands
-                    a.brand-chip(
-                      href=`/brands/${brand._id}`
-                      title=brand.name
-                    )
-                      .brand-chip-logo
-                        if brand.logo && !brand.logo.includes('default')
-                          img(
-                            src=brand.logo
-                            alt=brand.name
-                            loading="lazy"
-                            onerror="this.style.display='none'; this.parentElement.classList.add('no-logo');"
-                          )
-                        else
-                          i.fas.fa-trademark
+                //- Primera vuelta
+                each brand in brands
+                  a.brand-chip(
+                    href=`/brands/${brand._id}`
+                    title=brand.name
+                  )
+                    .brand-chip-logo
+                      if brand.logo && !brand.logo.includes('default')
+                        img(
+                          src=brand.logo
+                          alt=brand.name
+                          loading="lazy"
+                          onerror="this.style.display='none'; this.parentElement.classList.add('no-logo');"
+                        )
+                      else
+                        i.fas.fa-trademark
 
-                      .brand-chip-info
-                        span.brand-chip-name= brand.name
+                    .brand-chip-info
+                      span.brand-chip-name= brand.name
 
-                  //- Segunda vuelta (loop infinito)
-                  each brand in brands
-                    a.brand-chip(
-                      href=`/brands/${brand._id}`
-                      title=brand.name
-                    )
-                      .brand-chip-logo
-                        if brand.logo && !brand.logo.includes('default')
-                          img(
-                            src=brand.logo
-                            alt=brand.name
-                            loading="lazy"
-                            onerror="this.style.display='none'; this.parentElement.classList.add('no-logo');"
-                          )
-                        else
-                          i.fas.fa-trademark
+                //- Segunda vuelta (loop infinito)
+                each brand in brands
+                  a.brand-chip(
+                    href=`/brands/${brand._id}`
+                    title=brand.name
+                  )
+                    .brand-chip-logo
+                      if brand.logo && !brand.logo.includes('default')
+                        img(
+                          src=brand.logo
+                          alt=brand.name
+                          loading="lazy"
+                          onerror="this.style.display='none'; this.parentElement.classList.add('no-logo');"
+                        )
+                      else
+                        i.fas.fa-trademark
 
-                      .brand-chip-info
-                        span.brand-chip-name= brand.name
-    else
-      .row.mb-3.mb-md-4
-        .col-12
-          .alert.alert-info.rounded-3.text-center.border-0.shadow-sm
-            i.fas.fa-info-circle.me-2
-            | No hay marcas activas. 
-            a.alert-link(href="/brands/create") Crea la primera aquí
+                    .brand-chip-info
+                      span.brand-chip-name= brand.name
+  else
+    .row.mb-3.mb-md-4
+      .col-12
+        .alert.alert-info.rounded-3.text-center.border-0.shadow-sm
+          i.fas.fa-info-circle.me-2
+          | No hay marcas activas. 
+          a.alert-link(href="/brands/create") Crea la primera aquí
 
   //- ============================================
   //- PEDIDOS RECIENTES + VENTAS DEL DÍA
@@ -380,7 +349,7 @@ block content
             kbd.d-none.d-md-inline.align-self-center.me-2 Ctrl + K
 
   //- ============================================
-  //- MÓDULOS DEL SISTEMA
+  //- MÓDULOS DEL SISTEMA  (cards tipo app en móvil)
   //- ============================================
   .row.mb-3
     .col-12
@@ -399,36 +368,34 @@ block content
             small.text-muted.module-sub= category
           i.fas.fa-chevron-right.module-arrow.d-none.d-md-block
 
-  //- SEGURIDAD (solo admin)
-  if isAdmin
-    .row.mb-2
-      .col-12
-        .d-flex.align-items-center.mb-2
-          span.badge.bg-primary-subtle.text-primary.me-2
-            i.fas.fa-shield-alt.me-1
-            | Seguridad
-          .flex-grow-1.border-bottom
-    .row.g-2.g-md-3.mb-3.mb-md-4
-      +moduleCard('/users', 'fas.fa-users', 'Usuarios', 'indigo', 'seguridad')
-      +moduleCard('/clients', 'fas.fa-building', 'Clientes', 'success', 'seguridad')
-      +moduleCard('/suppliers', 'fas.fa-handshake', 'Proveedores', 'teal', 'seguridad')
+  //- SEGURIDAD
+  .row.mb-2
+    .col-12
+      .d-flex.align-items-center.mb-2
+        span.badge.bg-primary-subtle.text-primary.me-2
+          i.fas.fa-shield-alt.me-1
+          | Seguridad
+        .flex-grow-1.border-bottom
+  .row.g-2.g-md-3.mb-3.mb-md-4
+    +moduleCard('/users', 'fas.fa-users', 'Usuarios', 'indigo', 'seguridad')
+    +moduleCard('/clients', 'fas.fa-building', 'Clientes', 'success', 'seguridad')
+    +moduleCard('/suppliers', 'fas.fa-handshake', 'Proveedores', 'teal', 'seguridad')
 
-  //- INVENTARIO (solo admin)
-  if isAdmin
-    .row.mb-2
-      .col-12
-        .d-flex.align-items-center.mb-2
-          span.badge.bg-warning-subtle.text-warning.me-2
-            i.fas.fa-boxes-stacked.me-1
-            | Inventario
-          .flex-grow-1.border-bottom
-    .row.g-2.g-md-3.mb-3.mb-md-4
-      +moduleCard('/products', 'fas.fa-box', 'Productos', 'danger', 'inventario')
-      +moduleCard('/categories', 'fas.fa-tags', 'Categorías', 'purple', 'inventario')
-      +moduleCard('/brands', 'fas.fa-trademark', 'Marcas', 'slate', 'inventario')
-      +moduleCard('/warehouses', 'fas.fa-warehouse', 'Almacenes', 'amber', 'inventario')
+  //- INVENTARIO
+  .row.mb-2
+    .col-12
+      .d-flex.align-items-center.mb-2
+        span.badge.bg-warning-subtle.text-warning.me-2
+          i.fas.fa-boxes-stacked.me-1
+          | Inventario
+        .flex-grow-1.border-bottom
+  .row.g-2.g-md-3.mb-3.mb-md-4
+    +moduleCard('/products', 'fas.fa-box', 'Productos', 'danger', 'inventario')
+    +moduleCard('/categories', 'fas.fa-tags', 'Categorías', 'purple', 'inventario')
+    +moduleCard('/brands', 'fas.fa-trademark', 'Marcas', 'slate', 'inventario')
+    +moduleCard('/warehouses', 'fas.fa-warehouse', 'Almacenes', 'amber', 'inventario')
 
-  //- VENTAS (TODOS)
+  //- VENTAS
   .row.mb-2
     .col-12
       .d-flex.align-items-center.mb-2
@@ -442,7 +409,7 @@ block content
     +moduleCard('/sales', 'fas.fa-cart-plus', 'Ventas', 'emerald', 'ventas')
     +moduleCard('/vouchers', 'fas.fa-file-pdf', 'Comprobantes', 'rose', 'ventas')
 
-  //- SERVICIOS (TODOS)
+  //- SERVICIOS
   .row.mb-2
     .col-12
       .d-flex.align-items-center.mb-2
@@ -457,30 +424,28 @@ block content
     +moduleCard('/work-orders', 'fas.fa-tasks', 'Órdenes Trabajo', 'red', 'servicios')
     +moduleCard('/projects', 'fas.fa-project-diagram', 'Proyectos', 'violet', 'servicios')
 
-  //- ANALÍTICA (solo admin)
-  if isAdmin
-    .row.mb-2
-      .col-12
-        .d-flex.align-items-center.mb-2
-          span.badge.bg-secondary-subtle.text-secondary.me-2
-            i.fas.fa-chart-line.me-1
-            | Analítica
-          .flex-grow-1.border-bottom
-    .row.g-2.g-md-3.mb-3.mb-md-4
-      +moduleCard('/reports/sales', 'fas.fa-chart-simple', 'Reportes', 'indigo', 'reportes')
+  //- ANALÍTICA
+  .row.mb-2
+    .col-12
+      .d-flex.align-items-center.mb-2
+        span.badge.bg-secondary-subtle.text-secondary.me-2
+          i.fas.fa-chart-line.me-1
+          | Analítica
+        .flex-grow-1.border-bottom
+  .row.g-2.g-md-3.mb-3.mb-md-4
+    +moduleCard('/reports/sales', 'fas.fa-chart-simple', 'Reportes', 'indigo', 'reportes')
 
-  //- SISTEMA (solo admin)
-  if isAdmin
-    .row.mb-2
-      .col-12
-        .d-flex.align-items-center.mb-2
-          span.badge.bg-dark-subtle.text-dark.me-2
-            i.fas.fa-cog.me-1
-            | Sistema
-          .flex-grow-1.border-bottom
-    .row.g-2.g-md-3.mb-3.mb-md-4
-      +moduleCard('/settings', 'fas.fa-cog', 'Configuración', 'slate', 'sistema')
-      +moduleCard('/about/admin', 'fas.fa-building', 'Nosotros', 'slate', 'sistema')
+  //- SISTEMA
+  .row.mb-2
+    .col-12
+      .d-flex.align-items-center.mb-2
+        span.badge.bg-dark-subtle.text-dark.me-2
+          i.fas.fa-cog.me-1
+          | Sistema
+        .flex-grow-1.border-bottom
+  .row.g-2.g-md-3.mb-3.mb-md-4
+    +moduleCard('/settings', 'fas.fa-cog', 'Configuración', 'slate', 'sistema')
+    +moduleCard('/about/admin', 'fas.fa-building', 'Nosotros', 'slate', 'sistema')
 
   //- CTA LANDING
   .row.mt-3.mb-4
@@ -612,6 +577,7 @@ block content
       transition: all 0.3s ease; flex-shrink: 0;
       min-width: 130px; max-width: 200px;
     }
+   
     .brand-chip-logo {
       width: 38px; height: 38px; border-radius: 50%;
       background: #f1f5f9; display: flex; align-items: center; justify-content: center;
@@ -665,7 +631,7 @@ block content
     .module-red      .module-icon { background: #fee2e2; color: #dc2626; }
     .module-violet   .module-icon { background: #ede9fe; color: #7c3aed; }
 
-    /* ==== MÓVIL: módulos como app ==== */
+    /* ==== MÓVIL: módulos como app (grid 3 columnas, icono grande arriba) ==== */
     @media (max-width: 767.98px) {
       .module-card .card-body {
         flex-direction: column !important;
@@ -677,7 +643,7 @@ block content
         width: 52px; height: 52px;
         font-size: 1.4rem; border-radius: 16px;
       }
-      .module-label { font-size: 0.8rem; line-height: 1.15; }
+            .module-label { font-size: 0.8rem; line-height: 1.15; }
       .module-sub { display: none; }
       .brand-chip { padding: 8px 14px 8px 8px; min-width: 110px; gap: 8px; }
       .brand-chip-logo { width: 32px; height: 32px; font-size: 14px; }
@@ -725,12 +691,13 @@ block content
       70%  { transform: scale(1.12); }
       100% { transform: scale(1); opacity: 1; }
     }
+    /* El toast sube para no chocar con el FAB */
     @media (max-width: 575.98px) {
       .notification-toast { bottom: 156px !important; }
     }
 
   //- ============================================
-  //- FAB FLOTANTE
+  //- FAB FLOTANTE (solo visible si hay pendientes)
   //- ============================================
   button.notif-fab#notifFab(
     type="button"
@@ -791,14 +758,18 @@ block content
         if (!notificationList) return;
         const count = data.pendingOrdersCount || 0;
 
+        // Badge del header
         if (notificationBadge) {
           notificationBadge.textContent = count;
           notificationBadge.classList.toggle('d-none', count === 0);
         }
+
+        // FAB flotante
         if (notifFab && fabBadge) {
           fabBadge.textContent = count;
           notifFab.classList.toggle('show', count > 0);
         }
+
         if (notifSubtitle) {
           notifSubtitle.textContent = count + ' pedidos pendientes';
         }
@@ -856,6 +827,7 @@ block content
 
       setInterval(checkNotifications, 30000);
 
+      /* ---------- TOAST ---------- */
       function showNotificationToast(order) {
         if (!order) return;
         const toast = document.createElement('div');
@@ -907,6 +879,7 @@ block content
         }
       }
 
+      /* ---------- MARCAR COMO LEÍDAS ---------- */
       const markAllReadBtn = document.getElementById('markAllRead');
       if (markAllReadBtn) {
         markAllReadBtn.addEventListener('click', function() {
@@ -916,12 +889,14 @@ block content
         });
       }
 
+      /* ---------- FAB: abre el dropdown de notificaciones ---------- */
       if (notifFab) {
         notifFab.addEventListener('click', function() {
           const trigger = document.querySelector('.notification-dropdown [data-bs-toggle="dropdown"]');
           if (trigger && window.bootstrap) {
             bootstrap.Dropdown.getOrCreateInstance(trigger).toggle();
           } else {
+            // fallback: navegar a pedidos pendientes
             window.location.href = '/orders?status=pendiente';
           }
         });
