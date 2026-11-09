@@ -1,21 +1,305 @@
 extends ../layouts/layout
 
 block content
-  h1 Crear Usuario
-  form(action="/users", method="POST")
-    .mb-3
-      label.form-label Nombre
-      input.form-control(type="text", name="name", required)
-    .mb-3
-      label.form-label Email
-      input.form-control(type="email", name="email", required)
-    .mb-3
-      label.form-label Contraseña
-      input.form-control(type="password", name="password", required)
-    .mb-3
-      label.form-label Rol
-      select.form-control(name="role")
-        each role in roles
-          option(value=role.id)= role.name
-    button.btn.btn-primary(type="submit") Guardar
-    a.btn.btn-secondary(href="/users") Cancelar
+
+  //- ============================================
+  //- HEADER
+  //- ============================================
+  .usr-create-header.mb-3.mb-md-4
+    .d-flex.flex-wrap.justify-content-between.align-items-center.gap-2.gap-md-3
+      div.min-w-0
+        nav.d-none.d-md-block(aria-label="breadcrumb")
+          ol.breadcrumb.mb-1
+            li.breadcrumb-item
+              a.text-decoration-none(href="/") Inicio
+            li.breadcrumb-item
+              a.text-decoration-none(href="/users") Usuarios
+            li.breadcrumb-item.active(aria-current="page") Crear
+
+        h1.h4.h3-md.fw-bold.mb-1.text-dark.text-truncate
+          i.fas.fa-user-plus.me-2.text-primary
+          | Crear Usuario
+
+        p.text-muted.mb-0.small.d-none.d-sm-block
+          | Registra un nuevo usuario en el sistema
+
+      a.btn.btn-light.rounded-circle.shadow-sm.usr-back-btn(
+        href="/users"
+        title="Volver"
+      )
+        i.fas.fa-arrow-left
+
+  //- ============================================
+  //- FORM
+  //- ============================================
+  .row.justify-content-center
+    .col-12.col-lg-10.col-xl-8
+      form#userForm(
+        method="POST"
+        action="/users"
+      )
+
+        //- ============================================
+        //- CARD: DATOS DEL USUARIO
+        //- ============================================
+        .card.border-0.shadow-sm.rounded-4.mb-3
+          .card-header.bg-transparent.border-0.py-3.px-3.px-md-4
+            h6.mb-0.fw-bold
+              i.fas.fa-id-card.me-2.text-primary
+              | Datos del usuario
+
+          .card-body.p-3.p-md-4
+
+            //- Nombre
+            .mb-3
+              label.form-label.fw-semibold(for="name")
+                | Nombre completo
+                span.text-danger.ms-1 *
+              input.form-control#name(
+                type="text"
+                name="name"
+                required
+                placeholder="Ej: Juan Pérez"
+                autocomplete="off"
+              )
+
+            //- Email
+            .mb-3
+              label.form-label.fw-semibold(for="email")
+                | Correo electrónico
+                span.text-danger.ms-1 *
+              input.form-control#email(
+                type="email"
+                name="email"
+                required
+                placeholder="usuario@ejemplo.com"
+                autocomplete="off"
+              )
+              small.text-muted
+                i.fas.fa-info-circle.me-1
+                | Este email será el que use para iniciar sesión
+
+            //- Rol
+            .mb-0
+              label.form-label.fw-semibold(for="role")
+                | Rol del usuario
+                span.text-danger.ms-1 *
+              select.form-select#role(name="role" required)
+                option(value="" disabled selected) — Seleccionar rol —
+                each role in (roles || [])
+                  - const roleIdStr = role._id ? role._id.toString() : role.id
+                  option(value=roleIdStr)= role.name
+              small.text-muted
+                i.fas.fa-shield-alt.me-1
+                | Define qué módulos y permisos tendrá el usuario
+
+        //- ============================================
+        //- CARD: CONTRASEÑA
+        //- ============================================
+        .card.border-0.shadow-sm.rounded-4.mb-3
+          .card-header.bg-transparent.border-0.py-3.px-3.px-md-4
+            h6.mb-0.fw-bold
+              i.fas.fa-lock.me-2.text-warning
+              | Contraseña
+
+          .card-body.p-3.p-md-4
+
+            //- Nueva contraseña
+            .mb-3
+              label.form-label.fw-semibold(for="password")
+                | Contraseña
+                span.text-danger.ms-1 *
+              .input-group
+                input.form-control#password(
+                  type="password"
+                  name="password"
+                  required
+                  placeholder="Mínimo 6 caracteres"
+                  autocomplete="new-password"
+                  minlength="6"
+                )
+                button.btn.btn-outline-secondary.usr-toggle-pass(
+                  type="button"
+                  data-target="password"
+                  title="Mostrar/ocultar"
+                )
+                  i.fas.fa-eye
+
+            //- Confirmar contraseña
+            .mb-0
+              label.form-label.fw-semibold(for="passwordConfirm")
+                | Confirmar contraseña
+                span.text-danger.ms-1 *
+              .input-group
+                input.form-control#passwordConfirm(
+                  type="password"
+                  name="passwordConfirm"
+                  required
+                  placeholder="Repite la contraseña"
+                  autocomplete="new-password"
+                )
+                button.btn.btn-outline-secondary.usr-toggle-pass(
+                  type="button"
+                  data-target="passwordConfirm"
+                  title="Mostrar/ocultar"
+                )
+                  i.fas.fa-eye
+
+            #passwordError.text-danger.small.mt-2.d-none
+              i.fas.fa-exclamation-circle.me-1
+              | Las contraseñas no coinciden.
+
+        //- ============================================
+        //- ACCIONES
+        //- ============================================
+        .d-flex.flex-wrap.gap-2.justify-content-end.mb-4
+          a.btn.btn-light.rounded-pill.px-4(href="/users")
+            i.fas.fa-times.me-1
+            | Cancelar
+          button.btn.btn-primary.rounded-pill.px-4.fw-semibold(
+            type="submit"
+          )
+            i.fas.fa-user-plus.me-1
+            | Crear usuario
+
+  //- ============================================
+  //- ESTILOS
+  //- ============================================
+  style.
+    .usr-create-header { padding-bottom: 0; }
+
+    .usr-back-btn {
+      width: 42px; height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .card-header h6 { font-size: 1rem; }
+
+    .form-label {
+      font-size: 0.85rem;
+      color: #334155;
+      margin-bottom: 0.4rem;
+    }
+
+    .form-control,
+    .form-select {
+      border-radius: 10px;
+      border: 1.5px solid #e2e8f0;
+      padding: 0.65rem 0.9rem;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    .form-control:focus,
+    .form-select:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .input-group .form-control { border-right: none; }
+    .input-group .btn-outline-secondary {
+      border: 1.5px solid #e2e8f0;
+      border-left: none;
+      border-radius: 0 10px 10px 0;
+      color: #64748b;
+    }
+    .input-group .btn-outline-secondary:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+
+    @media (max-width: 575.98px) {
+      .usr-create-header h1 { font-size: 1.15rem; }
+      .usr-back-btn { width: 38px; height: 38px; }
+      .card-body { padding: 1rem !important; }
+    }
+
+  //- ============================================
+  //- SCRIPT
+  //- ============================================
+  script.
+    document.addEventListener('DOMContentLoaded', function() {
+
+      /* ---------- Toggle mostrar/ocultar contraseña ---------- */
+      document.querySelectorAll('.usr-toggle-pass').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var targetId = this.getAttribute('data-target');
+          var input = document.getElementById(targetId);
+          if (!input) return;
+
+          if (input.type === 'password') {
+            input.type = 'text';
+            this.querySelector('i').classList.remove('fa-eye');
+            this.querySelector('i').classList.add('fa-eye-slash');
+          } else {
+            input.type = 'password';
+            this.querySelector('i').classList.remove('fa-eye-slash');
+            this.querySelector('i').classList.add('fa-eye');
+          }
+        });
+      });
+
+      /* ---------- Validación de contraseñas ---------- */
+      var form = document.getElementById('userForm');
+      var password = document.getElementById('password');
+      var passwordConfirm = document.getElementById('passwordConfirm');
+      var passwordError = document.getElementById('passwordError');
+
+      function validatePasswords() {
+        if (!password || !passwordConfirm) return true;
+
+        var pwd = password.value;
+        var confirm = passwordConfirm.value;
+
+        // Ambos vacíos → error (son obligatorias al crear)
+        if (pwd === '' && confirm === '') {
+          if (passwordError) passwordError.classList.add('d-none');
+          return false;
+        }
+
+        // Solo uno lleno → error
+        if (pwd === '' || confirm === '') {
+          if (passwordError) {
+            passwordError.classList.remove('d-none');
+            passwordError.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i>Completa ambos campos de contraseña.';
+          }
+          return false;
+        }
+
+        // No coinciden → error
+        if (pwd !== confirm) {
+          if (passwordError) {
+            passwordError.classList.remove('d-none');
+            passwordError.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i>Las contraseñas no coinciden.';
+          }
+          return false;
+        }
+
+        // Muy corta → error
+        if (pwd.length < 6) {
+          if (passwordError) {
+            passwordError.classList.remove('d-none');
+            passwordError.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i>La contraseña debe tener al menos 6 caracteres.';
+          }
+          return false;
+        }
+
+        // Todo OK
+        if (passwordError) passwordError.classList.add('d-none');
+        return true;
+      }
+
+      if (password) password.addEventListener('input', validatePasswords);
+      if (passwordConfirm) passwordConfirm.addEventListener('input', validatePasswords);
+
+      if (form) {
+        form.addEventListener('submit', function(e) {
+          if (!validatePasswords()) {
+            e.preventDefault();
+            if (passwordError) passwordError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        });
+      }
+    });
