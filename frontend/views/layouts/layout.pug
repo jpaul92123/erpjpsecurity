@@ -22,7 +22,14 @@ html(lang="es")
     //- CSS GLOBAL
     //- ============================================
     link(rel="stylesheet" href="/bootstrap/css/bootstrap.min.css")
-    link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css")
+
+    //- 🔑 FONT AWESOME LOCAL (no depende de CDN)
+    link(rel="stylesheet" href="/fontawesome/css/all.min.css")
+
+    //- Fallback: si la local no existe, intenta CDN
+    //- (descomenta si quieres tener los dos)
+    //- link(rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css")
+
     link(rel="stylesheet" href="/css/styles.css")
 
     //- ============================================
@@ -58,6 +65,23 @@ html(lang="es")
         padding-top: calc(var(--navbar-height) + 24px);
         padding-bottom: 40px;
       }
+
+      /* ================================================
+         FIX: FORZAR FONT AWESOME EN ICONOS
+         ================================================ */
+      .fa, .fas, .far, .fal, .fad, .fab,
+      .fa-solid, .fa-regular, .fa-brands {
+        font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", "Font Awesome 5 Free", "FontAwesome" !important;
+        font-style: normal !important;
+        font-variant: normal !important;
+        text-rendering: auto !important;
+        -webkit-font-smoothing: antialiased !important;
+        -moz-osx-font-smoothing: grayscale !important;
+        display: inline-block !important;
+      }
+      .fas, .fa-solid { font-weight: 900 !important; }
+      .far, .fa-regular { font-weight: 400 !important; }
+      .fab, .fa-brands { font-weight: 400 !important; }
 
       /* ================================================
          NAVBAR
@@ -547,7 +571,6 @@ html(lang="es")
                     i.fas.fa-store.me-2.text-primary
                     | Ver tienda
 
-                //- Configuración solo admin
                 if isAdmin
                   li
                     a.dropdown-item(href="/settings")
@@ -561,7 +584,7 @@ html(lang="es")
                     | Cerrar Sesión
 
     //- ============================================
-    //- DRAWER LATERAL (IZQUIERDA)
+    //- DRAWER LATERAL
     //- ============================================
     .drawer-backdrop#drawerBackdrop
     aside.side-drawer#sideDrawer(aria-hidden="true" role="navigation")
@@ -590,9 +613,7 @@ html(lang="es")
               i.fas.fa-store.drawer-icon
               span.drawer-label Ver Tienda
 
-        //- ============================================
         //- SEGURIDAD (solo admin)
-        //- ============================================
         if isAdmin
           .drawer-section-label Seguridad
           ul.drawer-nav
@@ -609,7 +630,6 @@ html(lang="es")
                 i.fas.fa-handshake.drawer-icon
                 span.drawer-label Proveedores
 
-          //- INVENTARIO (solo admin)
           .drawer-section-label Inventario
           ul.drawer-nav
             li
@@ -643,9 +663,7 @@ html(lang="es")
                       i.fas.fa-warehouse
                       span Almacenes
 
-        //- ============================================
         //- VENTAS (TODOS)
-        //- ============================================
         .drawer-section-label Ventas
         ul.drawer-nav
           li
@@ -679,9 +697,7 @@ html(lang="es")
                     i.fas.fa-file-pdf
                     span Comprobantes
 
-        //- ============================================
         //- SERVICIOS (TODOS)
-        //- ============================================
         .drawer-section-label Servicios
         ul.drawer-nav
           li
@@ -719,9 +735,7 @@ html(lang="es")
                     i.fas.fa-project-diagram
                     span Proyectos
 
-        //- ============================================
         //- ANALÍTICA + SISTEMA (solo admin)
-        //- ============================================
         if isAdmin
           .drawer-section-label Analítica
           ul.drawer-nav
@@ -938,7 +952,7 @@ html(lang="es")
                 </div>
                 <div class="flex-grow-1 min-w-0">
                   <div class="d-flex justify-content-between align-items-center mb-1 gap-2">
-                    <span class="fw-bold text-primary text-truncate">${order.orderNumber}</span>                  
+                    <span class="fw-bold text-primary text-truncate">${order.orderNumber}</span>
                     <small class="text-muted flex-shrink-0">${new Date(order.createdAt).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</small>
                   </div>
                   <div class="small fw-semibold text-truncate">${order.customerName}</div>
