@@ -5,168 +5,176 @@ block content
   //- ============================================
   //- HEADER
   //- ============================================
-  .d-flex.flex-wrap.flex-md-nowrap.align-items-center.justify-content-between.pb-3.mb-4.border-bottom
-    .d-flex.align-items-center
-      .bg-primary.bg-opacity-10.rounded-3.p-3.me-3
-        i.fas.fa-handshake.text-primary.fa-2x
-      div
-        h1.h2.mb-0.fw-bold Proveedores
-        p.text-muted.mb-0
-          i.fas.fa-info-circle.me-1
-          | Gestión de proveedores registrados
-    div.d-flex.gap-2
-      a.btn.btn-primary.rounded-pill.px-4.shadow-sm(href="/suppliers/create")
-        i.fas.fa-plus-circle.me-1
-        | Nuevo Proveedor
+  .sup-page-header.mb-3.mb-md-4
+    .d-flex.flex-wrap.justify-content-between.align-items-center.gap-2.gap-md-3
+      div.min-w-0
+        nav.d-none.d-md-block(aria-label="breadcrumb")
+          ol.breadcrumb.mb-1
+            li.breadcrumb-item
+              a.text-decoration-none(href="/") Inicio
+            li.breadcrumb-item.active(aria-current="page") Proveedores
+
+        h1.h4.h3-md.fw-bold.mb-1.text-dark.text-truncate
+          i.fas.fa-handshake.me-2.text-primary
+          | Proveedores
+
+        p.text-muted.mb-0.small.d-none.d-sm-block
+          | Gestiona los proveedores registrados en el sistema
+
+      a.btn.btn-primary.rounded-pill.px-3.px-md-4.fw-semibold.d-inline-flex.align-items-center.gap-2.sup-new-btn(
+        href="/suppliers/create"
+      )
+        i.fas.fa-plus-circle
+        span.d-none.d-sm-inline Nuevo Proveedor
+        span.d-sm-none Nuevo
 
   //- ============================================
-  //- TARJETAS DE ESTADÍSTICAS
+  //- ESTADÍSTICAS (4 cards compactas)
   //- ============================================
-  .row.g-3.mb-4
-    .col-sm-6.col-lg-3
-      .card.border-0.shadow-sm.rounded-3.stat-card.h-100
-        .card-body.d-flex.justify-content-between.align-items-center
-          div
-            h6.card-title.mb-1.small.text-uppercase.text-muted.fw-semibold Total Proveedores
-            h2.card-text.mb-0.fw-bold.text-dark #{suppliers ? suppliers.length : 0}
-            small.text-primary
-              i.fas.fa-handshake.me-1
-              | Registrados
-          .stat-icon.bg-primary.bg-opacity-10.text-primary.rounded-3
-            i.fas.fa-handshake.fa-lg
+  .row.g-2.g-md-3.mb-3.mb-md-4
+    .col-6.col-lg-3
+      .card.sup-stat-card.border-0.shadow-sm.rounded-3.h-100
+        .card-body.p-2.p-md-3
+          .d-flex.justify-content-between.align-items-center
+            div.min-w-0
+              p.sup-stat-label.mb-1.text-muted Total
+              h3.sup-stat-value.mb-0.text-primary #{suppliers ? suppliers.length : 0}
+            .sup-stat-icon.sup-stat-icon-primary
+              i.fas.fa-handshake
 
-    .col-sm-6.col-lg-3
-      .card.border-0.shadow-sm.rounded-3.stat-card.h-100
-        .card-body.d-flex.justify-content-between.align-items-center
-          div
-            h6.card-title.mb-1.small.text-uppercase.text-muted.fw-semibold Activos
-            h2.card-text.mb-0.fw-bold.text-success #{suppliers ? suppliers.filter(s => s.isActive).length : 0}
-            small.text-success
-              i.fas.fa-check-circle.me-1
-              | Disponibles
-          .stat-icon.bg-success.bg-opacity-10.text-success.rounded-3
-            i.fas.fa-check-double.fa-lg
+    .col-6.col-lg-3
+      .card.sup-stat-card.border-0.shadow-sm.rounded-3.h-100
+        .card-body.p-2.p-md-3
+          .d-flex.justify-content-between.align-items-center
+            div.min-w-0
+              p.sup-stat-label.mb-1.text-muted Activos
+              h3.sup-stat-value.mb-0.text-success #{suppliers ? suppliers.filter(function(s){ return s.isActive; }).length : 0}
+            .sup-stat-icon.sup-stat-icon-success
+              i.fas.fa-check-circle
 
-    .col-sm-6.col-lg-3
-      .card.border-0.shadow-sm.rounded-3.stat-card.h-100
-        .card-body.d-flex.justify-content-between.align-items-center
-          div
-            h6.card-title.mb-1.small.text-uppercase.text-muted.fw-semibold Inactivos
-            h2.card-text.mb-0.fw-bold.text-danger #{suppliers ? suppliers.filter(s => !s.isActive).length : 0}
-            small.text-danger
-              i.fas.fa-times-circle.me-1
-              | Deshabilitados
-          .stat-icon.bg-danger.bg-opacity-10.text-danger.rounded-3
-            i.fas.fa-ban.fa-lg
+    .col-6.col-lg-3
+      .card.sup-stat-card.border-0.shadow-sm.rounded-3.h-100
+        .card-body.p-2.p-md-3
+          .d-flex.justify-content-between.align-items-center
+            div.min-w-0
+              p.sup-stat-label.mb-1.text-muted Inactivos
+              h3.sup-stat-value.mb-0.text-danger #{suppliers ? suppliers.filter(function(s){ return !s.isActive; }).length : 0}
+            .sup-stat-icon.sup-stat-icon-danger
+              i.fas.fa-ban
 
-    .col-sm-6.col-lg-3
-      .card.border-0.shadow-sm.rounded-3.stat-card.h-100
-        .card-body.d-flex.justify-content-between.align-items-center
-          div
-            h6.card-title.mb-1.small.text-uppercase.text-muted.fw-semibold Con RUC
-            h2.card-text.mb-0.fw-bold.text-info #{suppliers ? suppliers.filter(s => s.ruc).length : 0}
-            small.text-info
-              i.fas.fa-id-card.me-1
-              | Registrados
-          .stat-icon.bg-info.bg-opacity-10.text-info.rounded-3
-            i.fas.fa-id-card.fa-lg
+    .col-6.col-lg-3
+      .card.sup-stat-card.border-0.shadow-sm.rounded-3.h-100
+        .card-body.p-2.p-md-3
+          .d-flex.justify-content-between.align-items-center
+            div.min-w-0
+              p.sup-stat-label.mb-1.text-muted Con RUC
+              h3.sup-stat-value.mb-0.text-info #{suppliers ? suppliers.filter(function(s){ return s.ruc; }).length : 0}
+            .sup-stat-icon.sup-stat-icon-info
+              i.fas.fa-id-card
 
   //- ============================================
-  //- FILTROS
+  //- BÚSQUEDA Y FILTROS
   //- ============================================
   .card.border-0.shadow-sm.rounded-3.mb-3
-    .card-body.p-3
-      .row.g-3.align-items-center
-        .col-md-6
+    .card-body.p-2.p-md-3
+      .row.g-2.align-items-center
+
+        .col-12.col-md-6
           .input-group
-            span.input-group-text.bg-white.border-end-0
+            span.input-group-text.bg-transparent.border-end-0
               i.fas.fa-search.text-muted
-            input.form-control.border-start-0(
+            input.form-control.border-start-0#searchSupplier(
               type="text"
-              id="searchSupplier"
               placeholder="Buscar por nombre, RUC o email..."
+              autocomplete="off"
             )
-        .col-md-3
+
+        .col-8.col-md-4
           select.form-select#filterStatus
             option(value="") Todos los estados
-            option(value="active") ✅ Activos
-            option(value="inactive") ❌ Inactivos
-        .col-md-3.text-md-end
-          span.text-muted.small
-            i.fas.fa-filter.me-1
-            span#resultsCount #{suppliers ? suppliers.length : 0} resultados
+            option(value="active") Solo activos
+            option(value="inactive") Solo inactivos
+
+        .col-4.col-md-2.text-end
+          span.badge.bg-primary-subtle.text-primary.rounded-pill.px-3.py-2.w-100.sup-count-badge
+            i.fas.fa-list.me-1
+            span#resultsCount= (suppliers && suppliers.length) || 0
 
   //- ============================================
-  //- TABLA
+  //- TABLA (desktop/tablet)
   //- ============================================
-  .card.border-0.shadow-sm.rounded-3.overflow-hidden
+  .card.border-0.shadow-sm.rounded-3.d-none.d-md-block#tableCard
     .card-body.p-0
       .table-responsive
-        table.table.table-hover.align-middle.mb-0#suppliersTable
-          thead.bg-light
+        table.table.table-hover.align-middle.mb-0.sup-table
+          thead.table-light
             tr
-              th(style="min-width: 250px;") Proveedor
-              th(style="min-width: 130px;") RUC
-              th(style="min-width: 150px;") Contacto
-              th.text-center(style="min-width: 110px;") Estado
-              th.text-center(style="min-width: 140px;") Acciones
-          tbody
+              th Proveedor
+              th RUC
+              th Contacto
+              th.text-center Estado
+              th.text-end Acciones
+          tbody#suppliersTableBody
             if suppliers && suppliers.length
               each supplier in suppliers
-                tr(data-status=supplier.isActive ? 'active' : 'inactive')
+                - const statusClass = supplier.isActive ? 'sup-badge-success' : 'sup-badge-danger'
+                - const statusText = supplier.isActive ? 'Activo' : 'Inactivo'
+                - const statusIcon = supplier.isActive ? 'fa-check-circle' : 'fa-times-circle'
+                - const searchData = ((supplier.businessName || '') + ' ' + (supplier.ruc || '') + ' ' + (supplier.email || '') + ' ' + (supplier.phone || '')).toLowerCase()
+
+                tr.sup-row(
+                  data-search=searchData
+                  data-status=supplier.isActive ? 'active' : 'inactive'
+                )
                   td
-                    .d-flex.align-items-center
-                      .bg-primary.bg-opacity-10.rounded-circle.me-3(
-                        style="width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"
-                      )
-                        i.fas.fa-truck.text-primary.fa-lg
-                      div
-                        a.text-decoration-none.fw-semibold.d-block.text-dark(
+                    .d-flex.align-items-center.gap-2
+                      .sup-avatar
+                        i.fas.fa-truck
+                      div.min-w-0
+                        a.text-decoration-none.fw-semibold.text-dark.text-truncate.d-block(
                           href=`/suppliers/${supplier._id}`
-                        ) #{supplier.businessName}
+                        )= supplier.businessName
                         small.text-muted
                           i.fas.fa-hashtag.me-1
                           | #{supplier._id.toString().slice(-6).toUpperCase()}
+
                   td
                     if supplier.ruc
-                      div.fw-semibold #{supplier.ruc}
+                      div.small.fw-semibold= supplier.ruc
                       small.text-muted RUC
                     else
-                      span.text-muted.fst-italic Sin RUC
+                      span.text-muted.fst-italic.small Sin RUC
+
                   td
                     if supplier.phone
-                      div
+                      div.small
                         i.fas.fa-phone.text-success.me-1
                         | #{supplier.phone}
                     if supplier.email
-                      div
-                        small.text-muted
-                          i.fas.fa-envelope.me-1
-                          | #{supplier.email}
+                      div.small.text-muted.text-truncate
+                        i.fas.fa-envelope.me-1
+                        | #{supplier.email}
                     if !supplier.phone && !supplier.email
-                      span.text-muted.fst-italic Sin contacto
+                      span.text-muted.fst-italic.small Sin contacto
+
                   td.text-center
-                    if supplier.isActive
-                      span.badge.bg-success-subtle.text-success.px-3.py-2.rounded-pill.border.border-success-subtle
-                        i.fas.fa-check-circle.me-1
-                        | Activo
-                    else
-                      span.badge.bg-danger-subtle.text-danger.px-3.py-2.rounded-pill.border.border-danger-subtle
-                        i.fas.fa-times-circle.me-1
-                        | Inactivo
-                  td
-                    .d-flex.justify-content-center.gap-1
-                      a.btn.btn-sm.btn-outline-primary.rounded-circle.action-btn(
+                    span.sup-badge(class=statusClass)
+                      i.fas(class=statusIcon)
+                      span= statusText
+
+                  td.text-end
+                    .btn-group.btn-group-sm
+                      a.btn.btn-outline-info.sup-action-btn(
                         href=`/suppliers/${supplier._id}`
-                        title="Ver detalle"
+                        title="Ver"
                       )
                         i.fas.fa-eye
-                      a.btn.btn-sm.btn-outline-warning.rounded-circle.action-btn(
+                      a.btn.btn-outline-warning.sup-action-btn(
                         href=`/suppliers/${supplier._id}/edit`
                         title="Editar"
                       )
                         i.fas.fa-pen
-                      button.btn.btn-sm.btn-outline-danger.rounded-circle.action-btn.btn-delete-supplier(
+                      button.btn.btn-outline-danger.sup-action-btn.btn-delete-supplier(
                         type="button"
                         title="Eliminar"
                         data-supplier-id=supplier._id
@@ -174,15 +182,97 @@ block content
                       )
                         i.fas.fa-trash
             else
-              tr#emptyRow
+              tr
                 td(colspan="5").text-center.py-5
-                  .mb-3
-                    i.fas.fa-handshake.fa-3x.text-muted.opacity-25
-                  h5.text-muted.fw-semibold No hay proveedores registrados
-                  p.text-muted.mb-4 Comienza agregando tu primer proveedor
-                  a.btn.btn-primary.rounded-pill.px-4(href="/suppliers/create")
-                    i.fas.fa-plus-circle.me-1
-                    | Crear Primer Proveedor
+                  .sup-empty
+                    i.fas.fa-handshake.fa-3x.mb-3.opacity-25.d-block
+                    p.text-muted.mb-3 No hay proveedores registrados
+                    a.btn.btn-sm.btn-primary.rounded-pill(href="/suppliers/create")
+                      i.fas.fa-plus-circle.me-1
+                      | Crear primer proveedor
+
+  //- ============================================
+  //- CARDS (móvil)
+  //- ============================================
+  .d-md-none#cardsView
+    if suppliers && suppliers.length
+      each supplier in suppliers
+        - const statusClass = supplier.isActive ? 'sup-badge-success' : 'sup-badge-danger'
+        - const statusText = supplier.isActive ? 'Activo' : 'Inactivo'
+        - const statusIcon = supplier.isActive ? 'fa-check-circle' : 'fa-times-circle'
+        - const searchData = ((supplier.businessName || '') + ' ' + (supplier.ruc || '') + ' ' + (supplier.email || '') + ' ' + (supplier.phone || '')).toLowerCase()
+
+        .card.sup-mobile-card.border-0.shadow-sm.rounded-4.mb-2.sup-row(
+          data-search=searchData
+          data-status=supplier.isActive ? 'active' : 'inactive'
+        )
+          .card-body.p-3
+
+            .d-flex.justify-content-between.align-items-start.gap-2.mb-2
+              .d-flex.align-items-center.gap-2.min-w-0
+                .sup-avatar.sup-avatar-lg
+                  i.fas.fa-truck
+                div.min-w-0
+                  .fw-bold.text-dark.text-truncate= supplier.businessName
+                  small.text-muted
+                    i.fas.fa-hashtag.me-1
+                    | #{supplier._id.toString().slice(-6).toUpperCase()}
+
+              span.sup-badge.flex-shrink-0(class=statusClass)
+                i.fas(class=statusIcon)
+                span= statusText
+
+            .sup-mobile-info.mb-3
+              if supplier.ruc
+                .d-flex.align-items-center.gap-2.mb-1
+                  i.fas.fa-id-card.text-primary.fa-sm
+                  small.text-muted= supplier.ruc
+              if supplier.phone
+                .d-flex.align-items-center.gap-2.mb-1
+                  i.fas.fa-phone.text-primary.fa-sm
+                  small.text-muted= supplier.phone
+              if supplier.email
+                .d-flex.align-items-center.gap-2
+                  i.fas.fa-envelope.text-primary.fa-sm
+                  small.text-muted.text-truncate= supplier.email
+              if !supplier.ruc && !supplier.phone && !supplier.email
+                small.text-muted.fst-italic Sin datos de contacto
+
+            .d-flex.gap-2
+              a.btn.btn-sm.btn-outline-info.flex-fill.rounded-pill(
+                href=`/suppliers/${supplier._id}`
+              )
+                i.fas.fa-eye.me-1
+                | Ver
+              a.btn.btn-sm.btn-outline-warning.flex-fill.rounded-pill(
+                href=`/suppliers/${supplier._id}/edit`
+              )
+                i.fas.fa-pen.me-1
+                | Editar
+              button.btn.btn-sm.btn-outline-danger.flex-fill.rounded-pill.btn-delete-supplier(
+                type="button"
+                data-supplier-id=supplier._id
+                data-supplier-name=supplier.businessName
+              )
+                i.fas.fa-trash.me-1
+                | Borrar
+    else
+      .card.border-0.shadow-sm.rounded-4
+        .card-body.text-center.py-5
+          .sup-empty
+            i.fas.fa-handshake.fa-3x.mb-3.opacity-25.d-block
+            p.text-muted.mb-3 No hay proveedores registrados
+            a.btn.btn-primary.rounded-pill(href="/suppliers/create")
+              i.fas.fa-plus-circle.me-1
+              | Crear primer proveedor
+
+  //- ============================================
+  //- SIN RESULTADOS
+  //- ============================================
+  .card.border-0.shadow-sm.rounded-3.d-none#noResultsCard
+    .card-body.text-center.py-5
+      i.fas.fa-search.fa-3x.mb-3.opacity-25.d-block.text-muted
+      p.text-muted.mb-0 No se encontraron proveedores con esos filtros
 
   //- ============================================
   //- MODAL CONFIRMAR ELIMINACIÓN
@@ -236,85 +326,139 @@ block content
   //- ESTILOS
   //- ============================================
   style.
-    .stat-card {
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .stat-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 24px rgba(0,0,0,0.08) !important;
-    }
-    .stat-icon {
-      width: 52px;
-      height: 52px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
+    .sup-page-header { padding-bottom: 0; }
+    .sup-new-btn { white-space: nowrap; }
 
-    .table th {
-      font-weight: 600;
-      font-size: 0.75rem;
+    /* ---- Stats ---- */
+    .sup-stat-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .sup-stat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.08) !important;
+    }
+    .sup-stat-label {
+      font-size: 0.72rem;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      background: #f8fafc;
-      color: #64748b;
-      padding: 1rem 0.75rem;
-      border-bottom: 2px solid #e2e8f0;
-      white-space: nowrap;
+      font-weight: 700;
+      margin: 0;
     }
-    .table td {
-      vertical-align: middle;
-      padding: 0.9rem 0.75rem;
+    .sup-stat-value {
+      font-size: 1.5rem;
+      line-height: 1.1;
+      font-weight: 700;
     }
-    .table tbody tr {
-      transition: background 0.15s ease;
-    }
-    .table tbody tr:hover {
-      background: #f8fafc;
-    }
-
-    .badge {
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.2px;
-    }
-
-    .action-btn {
-      width: 34px;
-      height: 34px;
-      padding: 0;
+    .sup-stat-icon {
+      width: 44px; height: 44px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      border-radius: 12px;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .sup-stat-icon-primary { background: #e0e7ff; color: #4f46e5; }
+    .sup-stat-icon-success { background: #dcfce7; color: #15803d; }
+    .sup-stat-icon-danger  { background: #fee2e2; color: #b91c1c; }
+    .sup-stat-icon-info    { background: #cffafe; color: #0e7490; }
+
+    /* ---- Contador ---- */
+    .sup-count-badge { font-size: 0.85rem; font-weight: 700; }
+
+    /* ---- Avatar ---- */
+    .sup-avatar {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      background: #eff6ff;
+      color: #2563eb;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+    .sup-avatar-lg {
+      width: 46px; height: 46px;
+      font-size: 1.05rem;
+    }
+
+    /* ---- Tabla ---- */
+    .sup-table thead th {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      font-weight: 700;
+      color: #64748b;
+      border-bottom: 2px solid #e2e8f0;
+      padding: 0.9rem 0.75rem;
+      white-space: nowrap;
+    }
+    .sup-table tbody td {
+      padding: 0.85rem 0.75rem;
+      vertical-align: middle;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .sup-table tbody tr:hover { background: #f8fafc; }
+    .sup-table tbody tr:last-child td { border-bottom: none; }
+
+    /* ---- Action buttons ---- */
+    .sup-action-btn {
+      width: 34px; height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px !important;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+    .sup-action-btn:hover { transform: translateY(-1px); }
+
+    /* ---- Badges ---- */
+    .sup-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .sup-badge i { font-size: 0.7rem; }
+    .sup-badge-success { background: #dcfce7; color: #15803d; }
+    .sup-badge-danger  { background: #fee2e2; color: #b91c1c; }
+
+    /* ---- Empty ---- */
+    .sup-empty i { color: #cbd5e1; }
+
+    /* ---- Mobile cards ---- */
+    .sup-mobile-card {
       transition: all 0.2s ease;
+      border: 1px solid #eef2f7 !important;
     }
-    .action-btn:hover {
-      transform: scale(1.1);
+    .sup-mobile-card:active {
+      transform: scale(0.99);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
     }
-
-    .input-group-text {
-      background-color: #fff !important;
-    }
-    .input-group:focus-within .input-group-text,
-    .input-group:focus-within .form-control {
-      border-color: #86b7fe;
-      box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.1);
+    .sup-mobile-info {
+      background: #f8fafc;
+      border-radius: 10px;
+      padding: 0.6rem 0.75rem;
     }
 
-    .form-select:focus, .form-control:focus {
-      border-color: #86b7fe;
-      box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.1);
+    /* ---- Responsive ---- */
+    @media (max-width: 575.98px) {
+      .sup-page-header h1 { font-size: 1.15rem; }
+      .sup-new-btn { padding: 0.5rem 0.9rem; font-size: 0.85rem; }
+      .sup-mobile-card .card-body { padding: 0.85rem !important; }
+      .sup-badge { font-size: 0.7rem; padding: 0.3rem 0.6rem; }
+      .sup-stat-value { font-size: 1.25rem; }
+      .sup-stat-icon { width: 38px; height: 38px; font-size: 0.9rem; }
     }
 
-    @media (max-width: 768px) {
-      .table-responsive {
-        font-size: 0.85rem;
-      }
-      .stat-icon {
-        width: 44px;
-        height: 44px;
-      }
+    @media (min-width: 768px) and (max-width: 991.98px) {
+      .sup-table thead th,
+      .sup-table tbody td { padding: 0.7rem 0.5rem; }
+      .sup-table { font-size: 0.85rem; }
     }
 
   //- ============================================
@@ -322,35 +466,47 @@ block content
   //- ============================================
   script.
     document.addEventListener('DOMContentLoaded', function() {
-      const searchInput = document.getElementById('searchSupplier');
-      const filterStatus = document.getElementById('filterStatus');
-      const table = document.getElementById('suppliersTable');
-      const resultsCount = document.getElementById('resultsCount');
+      var searchInput = document.getElementById('searchSupplier');
+      var filterStatus = document.getElementById('filterStatus');
+      var resultsCount = document.getElementById('resultsCount');
+      var tableCard = document.getElementById('tableCard');
+      var cardsView = document.getElementById('cardsView');
+      var noResultsCard = document.getElementById('noResultsCard');
 
       // ============================================
       // FILTROS
       // ============================================
       function filterTable() {
-        const term = searchInput.value.toLowerCase().trim();
-        const status = filterStatus.value;
-        const rows = table.querySelectorAll('tbody tr');
-        let visible = 0;
+        var term = searchInput ? searchInput.value.toLowerCase().trim() : '';
+        var status = filterStatus ? filterStatus.value : '';
+        var rows = document.querySelectorAll('.sup-row');
+        var visible = 0;
 
-        rows.forEach(row => {
-          if (row.id === 'emptyRow') return;
+        rows.forEach(function(row) {
+          var searchData = row.getAttribute('data-search') || '';
+          var rowStatus = row.getAttribute('data-status') || '';
 
-          const text = row.textContent.toLowerCase();
-          const rowStatus = row.dataset.status || '';
+          var matchSearch = !term || searchData.indexOf(term) !== -1;
+          var matchStatus = !status || rowStatus === status;
 
-          let show = text.includes(term);
-          if (status) show = show && (rowStatus === status);
-
-          row.style.display = show ? '' : 'none';
-          if (show) visible++;
+          if (matchSearch && matchStatus) {
+            row.style.display = '';
+            visible++;
+          } else {
+            row.style.display = 'none';
+          }
         });
 
-        if (resultsCount) {
-          resultsCount.textContent = visible + (visible === 1 ? ' resultado' : ' resultados');
+        if (resultsCount) resultsCount.textContent = visible;
+
+        if (visible === 0) {
+          if (tableCard) tableCard.classList.add('d-none');
+          if (cardsView) cardsView.classList.add('d-none');
+          if (noResultsCard) noResultsCard.classList.remove('d-none');
+        } else {
+          if (noResultsCard) noResultsCard.classList.add('d-none');
+          if (tableCard) tableCard.classList.remove('d-none');
+          if (cardsView) cardsView.classList.remove('d-none');
         }
       }
 
@@ -360,27 +516,38 @@ block content
       // ============================================
       // ELIMINAR PROVEEDOR
       // ============================================
-      const modalDelete = new bootstrap.Modal(document.getElementById('modalDeleteSupplier'));
-      const deleteSupplierName = document.getElementById('deleteSupplierName');
-      const formDeleteSupplier = document.getElementById('formDeleteSupplier');
-      const btnConfirmarDelete = document.getElementById('btnConfirmarDelete');
+      var modalEl = document.getElementById('modalDeleteSupplier');
+      var modalDelete = modalEl ? new bootstrap.Modal(modalEl) : null;
+      var deleteSupplierName = document.getElementById('deleteSupplierName');
+      var formDeleteSupplier = document.getElementById('formDeleteSupplier');
+      var btnConfirmarDelete = document.getElementById('btnConfirmarDelete');
 
-      document.querySelectorAll('.btn-delete-supplier').forEach(btn => {
+      document.querySelectorAll('.btn-delete-supplier').forEach(function(btn) {
         btn.addEventListener('click', function() {
-          const supplierId = this.dataset.supplierId;
-          const supplierName = this.dataset.supplierName;
+          var supplierId = this.dataset.supplierId;
+          var supplierName = this.dataset.supplierName;
 
-          deleteSupplierName.textContent = supplierName;
-          formDeleteSupplier.action = `/suppliers/${supplierId}?_method=DELETE`;
+          if (deleteSupplierName) deleteSupplierName.textContent = supplierName;
+          if (formDeleteSupplier) formDeleteSupplier.action = '/suppliers/' + supplierId + '?_method=DELETE';
 
-          modalDelete.show();
+          if (modalDelete) modalDelete.show();
         });
       });
 
       if (formDeleteSupplier) {
         formDeleteSupplier.addEventListener('submit', function() {
-          btnConfirmarDelete.disabled = true;
-          btnConfirmarDelete.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Eliminando...';
+          if (btnConfirmarDelete) {
+            btnConfirmarDelete.disabled = true;
+            btnConfirmarDelete.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Eliminando...';
+          }
         });
       }
+
+      // Atajo Ctrl+K
+      document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+          e.preventDefault();
+          if (searchInput) searchInput.focus();
+        }
+      });
     });
