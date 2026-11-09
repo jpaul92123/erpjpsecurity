@@ -5,6 +5,22 @@ html(lang="es")
     meta(name="viewport" content="width=device-width, initial-scale=1.0")
 
     //- ============================================
+    //- DETECCIÓN DE ROL (funciona con ObjectId o populado)
+    //- ============================================
+    //- Si el backend popula el rol => user.role.name = 'admin'
+    //- Si NO popula => user.role es un ObjectId, y comparamos contra el ID del rol admin
+    - const ADMIN_ROLE_ID = (typeof adminRoleId !== 'undefined' && adminRoleId) ? String(adminRoleId) : null
+    - let roleName = ''
+    - if (user && user.role) {
+    -   if (typeof user.role === 'object' && user.role.name) {
+    -     roleName = user.role.name
+    -   } else if (ADMIN_ROLE_ID && String(user.role) === ADMIN_ROLE_ID) {
+    -     roleName = 'admin'
+    -   }
+    - }
+    - const isAdmin = roleName === 'admin'
+
+    //- ============================================
     //- SEO
     //- ============================================
     - const pageTitle = (typeof title !== 'undefined' && title) ? (title + ' | ' + (setting && setting.siteName ? setting.siteName : 'JP Security')) : ((setting && setting.siteName) ? setting.siteName : 'JP Security')
@@ -89,7 +105,6 @@ html(lang="es")
         max-width: 200px;
       }
 
-      /* Botón hamburguesa */
       .btn-hamburger {
         width: 42px; height: 42px;
         border-radius: 10px;
@@ -131,7 +146,6 @@ html(lang="es")
       }
       .btn-nav-ghost:hover { background: var(--brand); color: #fff; }
 
-      /* Campana de notificaciones */
       .btn-icon-nav {
         position: relative;
         width: 42px; height: 42px;
@@ -158,7 +172,6 @@ html(lang="es")
         border: 2px solid #0f172a;
       }
 
-      /* Avatar navbar */
       .avatar-nav {
         width: 38px; height: 38px;
         border-radius: 50%;
@@ -337,7 +350,6 @@ html(lang="es")
         text-align: center;
       }
 
-      /* Footer del drawer */
       .drawer-footer {
         flex-shrink: 0;
         border-top: 1px solid rgba(255,255,255,0.08);
@@ -443,14 +455,8 @@ html(lang="es")
         margin-top: 2rem;
       }
 
-      /* ================================================
-         FLASH MESSAGES
-         ================================================ */
       .flash-wrapper { padding-top: calc(var(--navbar-height) + 16px); }
 
-      /* ================================================
-         RESPONSIVE
-         ================================================ */
       @media (max-width: 991px) {
         .navbar-admin .brand-name { max-width: 140px; }
       }
@@ -473,7 +479,6 @@ html(lang="es")
     nav.navbar.navbar-dark.navbar-admin.fixed-top
       .container-fluid.px-2.px-md-3
 
-        //- Hamburguesa
         button.btn-hamburger#drawerToggle(
           type="button"
           aria-label="Abrir menú"
@@ -482,7 +487,6 @@ html(lang="es")
         )
           i.fas.fa-bars
 
-        //- Logo
         a.navbar-brand.ms-2(href="/")
           if setting && setting.logo
             img(src=setting.logo alt=(setting.siteName || 'Logo'))
@@ -490,10 +494,8 @@ html(lang="es")
             i.fas.fa-shield-alt.me-2
           span.brand-name.d-none.d-sm-inline= setting && setting.siteName ? setting.siteName : 'JP Security'
 
-        //- Acciones
         .navbar-actions
 
-          //- Ver tienda
           a.btn-nav-ghost.d-none.d-md-inline-flex(
             href="/landing"
             target="_blank"
@@ -564,10 +566,14 @@ html(lang="es")
                   a.dropdown-item(href="/landing" target="_blank")
                     i.fas.fa-store.me-2.text-primary
                     | Ver tienda
-                li
-                  a.dropdown-item(href="/settings")
-                    i.fas.fa-cog.me-2.text-primary
-                    | Configuración
+
+                //- Configuración solo admin
+                if isAdmin
+                  li
+                    a.dropdown-item(href="/settings")
+                      i.fas.fa-cog.me-2.text-primary
+                      | Configuración
+
                 li: hr.dropdown-divider
                 li
                   a.dropdown-item.text-danger(href="/logout")
@@ -575,12 +581,11 @@ html(lang="es")
                     | Cerrar Sesión
 
     //- ============================================
-    //- DRAWER LATERAL (IZQUIERDA)
+    //- DRAWER LATERAL
     //- ============================================
     .drawer-backdrop#drawerBackdrop
     aside.side-drawer#sideDrawer(aria-hidden="true" role="navigation")
 
-      //- Header del drawer
       .drawer-header
         a.drawer-brand(href="/")
           if setting && setting.logo
@@ -592,7 +597,6 @@ html(lang="es")
         button.drawer-close#drawerClose(type="button" aria-label="Cerrar menú")
           i.fas.fa-times
 
-      //- Body scrolleable
       .drawer-body
 
         .drawer-section-label Principal
@@ -601,63 +605,67 @@ html(lang="es")
             a.drawer-link(href="/")
               i.fas.fa-home.drawer-icon
               span.drawer-label Dashboard
-
           li
             a.drawer-link(href="/landing" target="_blank")
               i.fas.fa-store.drawer-icon
               span.drawer-label Ver Tienda
 
-        //- SEGURIDAD
-        .drawer-section-label Seguridad
-        ul.drawer-nav
-          li
-            a.drawer-link(href="/users")
-              i.fas.fa-users.drawer-icon
-              span.drawer-label Usuarios
-          li
-            a.drawer-link(href="/clients")
-              i.fas.fa-building.drawer-icon
-              span.drawer-label Clientes
-          li
-            a.drawer-link(href="/suppliers")
-              i.fas.fa-handshake.drawer-icon
-              span.drawer-label Proveedores
+        //- ============================================
+        //- SEGURIDAD (solo admin)
+        //- ============================================
+        if isAdmin
+          .drawer-section-label Seguridad
+          ul.drawer-nav
+            li
+              a.drawer-link(href="/users")
+                i.fas.fa-users.drawer-icon
+                span.drawer-label Usuarios
+            li
+              a.drawer-link(href="/clients")
+                i.fas.fa-building.drawer-icon
+                span.drawer-label Clientes
+            li
+              a.drawer-link(href="/suppliers")
+                i.fas.fa-handshake.drawer-icon
+                span.drawer-label Proveedores
 
-        //- INVENTARIO (colapsable)
-        .drawer-section-label Inventario
-        ul.drawer-nav
-          li
-            button.drawer-link(
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#drawerInv"
-              aria-expanded="false"
-              aria-controls="drawerInv"
-            )
-              i.fas.fa-boxes-stacked.drawer-icon
-              span.drawer-label Inventario
-              i.fas.fa-chevron-right.drawer-chevron
+          //- INVENTARIO (solo admin)
+          .drawer-section-label Inventario
+          ul.drawer-nav
+            li
+              button.drawer-link(
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#drawerInv"
+                aria-expanded="false"
+                aria-controls="drawerInv"
+              )
+                i.fas.fa-boxes-stacked.drawer-icon
+                span.drawer-label Inventario
+                i.fas.fa-chevron-right.drawer-chevron
 
-            .collapse#drawerInv
-              ul.drawer-submenu
-                li
-                  a.drawer-sub-link(href="/products")
-                    i.fas.fa-box
-                    span Productos
-                li
-                  a.drawer-sub-link(href="/categories")
-                    i.fas.fa-tags
-                    span Categorías
-                li
-                  a.drawer-sub-link(href="/brands")
-                    i.fas.fa-trademark
-                    span Marcas
-                li
-                  a.drawer-sub-link(href="/warehouses")
-                    i.fas.fa-warehouse
-                    span Almacenes
+              .collapse#drawerInv
+                ul.drawer-submenu
+                  li
+                    a.drawer-sub-link(href="/products")
+                      i.fas.fa-box
+                      span Productos
+                  li
+                    a.drawer-sub-link(href="/categories")
+                      i.fas.fa-tags
+                      span Categorías
+                  li
+                    a.drawer-sub-link(href="/brands")
+                      i.fas.fa-trademark
+                      span Marcas
+                  li
+                    a.drawer-sub-link(href="/warehouses")
+                      i.fas.fa-warehouse
+                      span Almacenes
 
-        //- VENTAS (colapsable)
+        //- ============================================
+        //- VENTAS (TODOS los roles)
+        //- ============================================
         .drawer-section-label Ventas
         ul.drawer-nav
           li
@@ -691,7 +699,9 @@ html(lang="es")
                     i.fas.fa-file-pdf
                     span Comprobantes
 
-        //- SERVICIOS (colapsable)
+        //- ============================================
+        //- SERVICIOS (TODOS los roles)
+        //- ============================================
         .drawer-section-label Servicios
         ul.drawer-nav
           li
@@ -729,27 +739,28 @@ html(lang="es")
                     i.fas.fa-project-diagram
                     span Proyectos
 
-        //- ANALÍTICA
-        .drawer-section-label Analítica
-        ul.drawer-nav
-          li
-            a.drawer-link(href="/reports/sales")
-              i.fas.fa-chart-line.drawer-icon
-              span.drawer-label Reportes
+        //- ============================================
+        //- ANALÍTICA + SISTEMA (solo admin)
+        //- ============================================
+        if isAdmin
+          .drawer-section-label Analítica
+          ul.drawer-nav
+            li
+              a.drawer-link(href="/reports/sales")
+                i.fas.fa-chart-line.drawer-icon
+                span.drawer-label Reportes
 
-        //- SISTEMA
-        .drawer-section-label Sistema
-        ul.drawer-nav
-          li
-            a.drawer-link(href="/settings")
-              i.fas.fa-cog.drawer-icon
-              span.drawer-label Configuración
-          li
-            a.drawer-link(href="/about/admin")
-              i.fas.fa-building.drawer-icon
-              span.drawer-label Nosotros
+          .drawer-section-label Sistema
+          ul.drawer-nav
+            li
+              a.drawer-link(href="/settings")
+                i.fas.fa-cog.drawer-icon
+                span.drawer-label Configuración
+            li
+              a.drawer-link(href="/about/admin")
+                i.fas.fa-building.drawer-icon
+                span.drawer-label Nosotros
 
-      //- Footer del drawer
       .drawer-footer
         if user
           .drawer-user
@@ -817,14 +828,19 @@ html(lang="es")
             h6 Enlaces
             ul.list-unstyled.mb-0
               li.mb-2: a(href="/") Dashboard
-              li.mb-2: a(href="/products") Catálogo
-              li.mb-2: a(href="/reports/sales") Reportes
+              if isAdmin
+                li.mb-2: a(href="/products") Catálogo
+                li.mb-2: a(href="/reports/sales") Reportes
+              else
+                li.mb-2: a(href="/orders") Pedidos
+                li.mb-2: a(href="/installations") Instalaciones
 
           .col-md-2.col-6
             h6 Cuenta
             ul.list-unstyled.mb-0
               li.mb-2: a(href="/profile") Mi Perfil
-              li.mb-2: a(href="/settings") Configuración
+              if isAdmin
+                li.mb-2: a(href="/settings") Configuración
               li.mb-2: a(href="/logout") Cerrar Sesión
 
           .col-md-4
@@ -930,7 +946,6 @@ html(lang="es")
             notificationBadge.textContent = count;
             notificationBadge.classList.toggle('d-none', count === 0);
           }
-
           if (notifSubtitle) {
             notifSubtitle.textContent = count + ' pedidos pendientes';
           }
@@ -943,7 +958,7 @@ html(lang="es")
                 </div>
                 <div class="flex-grow-1 min-w-0">
                   <div class="d-flex justify-content-between align-items-center mb-1 gap-2">
-                    <span class="fw-bold text-primary text-truncate">${order.orderNumber}</span>                  
+                    <span class="fw-bold text-primary text-truncate">${order.orderNumber}</span>
                     <small class="text-muted flex-shrink-0">${new Date(order.createdAt).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</small>
                   </div>
                   <div class="small fw-semibold text-truncate">${order.customerName}</div>
@@ -986,7 +1001,6 @@ html(lang="es")
             .catch(err => console.error('Error notificaciones:', err));
         }
 
-        // Primera carga inmediata y luego cada 30s
         checkNotifications();
         setInterval(checkNotifications, 30000);
 
@@ -1036,8 +1050,6 @@ html(lang="es")
             gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
             oscillator.start(audioCtx.currentTime);
             oscillator.stop(audioCtx.currentTime + 0.5);
-          } catch (e) {
-            // Silencioso: navegadores requieren interacción previa
-          }
+          } catch (e) {}
         }
       })();
