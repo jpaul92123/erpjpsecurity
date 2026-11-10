@@ -23,14 +23,9 @@ html(lang="es")
     //- ============================================
     link(rel="stylesheet" href="/bootstrap/css/bootstrap.min.css")
 
-    //- 🔑 FONT AWESOME LOCAL (no depende de CDN)
+    //- 🔑 FONT AWESOME LOCAL
     link(rel="stylesheet" href="/fontawesome/css/all.min.css")
     
-
-    //- Fallback: si la local no existe, intenta CDN
-    //- (descomenta si quieres tener los dos)
-    link(rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css")
-
     link(rel="stylesheet" href="/css/styles.css")
 
     //- ============================================
@@ -41,6 +36,51 @@ html(lang="es")
     - const brandAccent = (setting && setting.colors && setting.colors.accent) ? setting.colors.accent : '#ffc107'
 
     style.
+      /* ================================================
+         FIX DEFINITIVO: FORZAR FUENTE LOCAL
+         ================================================ */
+      @font-face {
+        font-family: "Font Awesome 6 Free";
+        font-style: normal;
+        font-weight: 900;
+        font-display: block;
+        src: url("/fontawesome/webfonts/fa-solid-900.woff2") format("woff2"),
+             url("/fontawesome/webfonts/fa-solid-900.ttf") format("truetype");
+      }
+      @font-face {
+        font-family: "Font Awesome 6 Brands";
+        font-style: normal;
+        font-weight: 400;
+        font-display: block;
+        src: url("/fontawesome/webfonts/fa-brands-400.woff2") format("woff2"),
+             url("/fontawesome/webfonts/fa-brands-400.ttf") format("truetype");
+      }
+      @font-face {
+        font-family: "Font Awesome 6 Free";
+        font-style: normal;
+        font-weight: 400;
+        font-display: block;
+        src: url("/fontawesome/webfonts/fa-regular-400.woff2") format("woff2"),
+             url("/fontawesome/webfonts/fa-regular-400.ttf") format("truetype");
+      }
+
+      .fa, .fas, .far, .fal, .fad, .fab,
+      .fa-solid, .fa-regular, .fa-brands {
+        font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", "Font Awesome 5 Free", "FontAwesome" !important;
+        font-style: normal !important;
+        font-variant: normal !important;
+        text-rendering: auto !important;
+        -webkit-font-smoothing: antialiased !important;
+        -moz-osx-font-smoothing: grayscale !important;
+        display: inline-block !important;
+      }
+      .fas, .fa-solid { font-weight: 900 !important; }
+      .far, .fa-regular { font-weight: 400 !important; }
+      .fab, .fa-brands { font-weight: 400 !important; }
+
+      /* ================================================
+         VARIABLES GLOBALES
+         ================================================ */
       :root {
         --brand: #{brandPrimary};
         --brand-dark: #{brandSecondary};
@@ -66,23 +106,6 @@ html(lang="es")
         padding-top: calc(var(--navbar-height) + 24px);
         padding-bottom: 40px;
       }
-
-      /* ================================================
-         FIX: FORZAR FONT AWESOME EN ICONOS
-         ================================================ */
-      .fa, .fas, .far, .fal, .fad, .fab,
-      .fa-solid, .fa-regular, .fa-brands {
-        font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", "Font Awesome 5 Free", "FontAwesome" !important;
-        font-style: normal !important;
-        font-variant: normal !important;
-        text-rendering: auto !important;
-        -webkit-font-smoothing: antialiased !important;
-        -moz-osx-font-smoothing: grayscale !important;
-        display: inline-block !important;
-      }
-      .fas, .fa-solid { font-weight: 900 !important; }
-      .far, .fa-regular { font-weight: 400 !important; }
-      .fab, .fa-brands { font-weight: 400 !important; }
 
       /* ================================================
          NAVBAR
