@@ -63,7 +63,15 @@ router.post('/:id/addresses', checkPermission('edit_client'), clientController.s
 router.delete('/:id/addresses/:addressId', checkPermission('edit_client'), clientController.destroyAddress);
 
 // ============================================================
-// 5️⃣ DETALLE DEL CLIENTE (SIEMPRE AL FINAL)
+// 5️⃣ HISTORIAL DE TRABAJOS
+// ⚠️ Van ANTES de GET /:id
+// ============================================================
+
+router.post('/:id/historial', checkPermission('edit_client'), clientController.addHistorial);
+router.post('/:id/historial/:historialId/delete', checkPermission('edit_client'), clientController.deleteHistorial);
+
+// ============================================================
+// 6️⃣ DETALLE DEL CLIENTE (SIEMPRE AL FINAL)
 // ⚠️ Atrapa cualquier :id
 // ============================================================
 

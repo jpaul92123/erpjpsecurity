@@ -445,3 +445,57 @@ exports.getClientData = async (req, res) => {
     res.status(500).json({ error: 'Error al obtener cliente' });
   }
 };
+// ============================================================
+// HISTORIAL: AGREGAR TRABAJO
+// ============================================================
+exports.addHistorial = async (req, res) => {
+  try {
+    const { descripcion, tipo, monto, fecha } = req.body;
+    const client = await Client.findById(req.params.id);
+
+    if (!client) {
+      req.flash('error', 'Cliente no encontrado');
+      return res.redirect('/clients');
+    }
+
+    client.historial.push({
+      fecha: fecha ? new Date(fecha) : new Date(),
+      descripcion,
+      tipo: tipo || 'Venta',
+      monto: parseFloat(monto) || 0
+    });
+
+    await client.save();
+
+    req.flash('success', 'Trabajo agregado al historial correctamente');
+    res.redirect(`/clients/${client._id}`);
+  } catch (error) {
+    console.error('❌ Error al agregar historial:', error);
+    req.flash('error', 'Error al agregar el trabajo al historial');
+    res.redirect(`/clients/${req.params.id}`);
+  }
+};
+
+// ============================================================
+// HISTORIAL: ELIMINAR TRABAJO
+// ============================================================
+exports.deleteHistorial = async (req, res) => {
+  try {
+    const client = await Client.findById(req.params.id);
+    if (!client) {
+      req.flash('error', 'Cliente no encontrado');
+      return res.redirect('/clients');
+    }
+
+    // Elimina el elemento del array por su ID interno
+    client.historial.pull(req.params.historialId);
+    await client.save();
+
+    req.flash('success', 'Registro eliminado del historial');
+    res.redirect(`/clients/${client._id}`);
+  } catch (error) {
+    console.error('❌ Error al eliminar historial:', error);
+    req.flash('error', 'Error al eliminar el registro');
+    res.redirect(`/clients/${req.params.id}`);
+  }
+};

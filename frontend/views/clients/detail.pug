@@ -245,12 +245,12 @@ block content
               i.bi.bi-geo-alt.fs-1.text-muted.opacity-25.d-block.mb-2
               p.text-muted.mb-0 Sin direcciones registradas
 
-      //- HISTORIAL (opcional - si tienes ventas/cotizaciones)
+      //- ACTIVIDAD RECIENTE (RESUMEN)
       .card.border-0.shadow-sm.rounded-3
         .card-header.bg-white.border-bottom.py-3
           h6.mb-0.fw-bold
-            i.bi.bi-clock-history.me-2.text-primary
-            | Actividad Reciente
+            i.bi.bi-bar-chart.me-2.text-primary
+            | Resumen de Actividad
         .card-body.p-4
 
           .row.g-3
@@ -268,6 +268,88 @@ block content
                 div
                   small.text-muted.d-block Cotizaciones
                   h5.mb-0.fw-bold= client.quotationsCount || 0
+
+  //- ============================================
+  //- HISTORIAL DE TRABAJOS (NUEVA SECCIÓN)
+  //- ============================================
+  .row.mt-4
+    .col-12
+      .card.border-0.shadow-sm.rounded-3
+        .card-header.bg-white.border-bottom.py-3.d-flex.justify-content-between.align-items-center
+          h6.mb-0.fw-bold
+            i.bi.bi-clock-history.me-2.text-primary
+            | Historial de Trabajos
+            span.badge.bg-primary-subtle.text-primary.ms-2 #{client.historial ? client.historial.length : 0}
+
+        .card-body.p-4
+
+          //- FORMULARIO PARA AGREGAR NUEVO TRABAJO
+          form(method="POST" action=`/clients/${client._id}/historial`).mb-4
+            .row.g-2.align-items-end
+              .col-12.col-md-3
+                label.form-label.small.fw-semibold Fecha
+                input.form-control.form-control-sm(type="date" name="fecha" value=new Date().toISOString().split('T')[0])
+              
+              .col-12.col-md-4
+                label.form-label.small.fw-semibold Descripción del trabajo
+                input.form-control.form-control-sm(type="text" name="descripcion" placeholder="Ej: Instalación de cámaras" required)
+              
+              .col-6.col-md-2
+                label.form-label.small.fw-semibold Tipo
+                select.form-select.form-select-sm(name="tipo")
+                  option(value="Venta") Venta
+                  option(value="Servicio") Servicio
+                  option(value="Mantenimiento") Mantenimiento
+                  option(value="Instalación") Instalación
+                  option(value="Otro") Otro
+              
+              .col-6.col-md-2
+                label.form-label.small.fw-semibold Monto (S/.)
+                input.form-control.form-control-sm(type="number" name="monto" step="0.01" placeholder="0.00" value="0")
+              
+              .col-12.col-md-1
+                button.btn.btn-primary.btn-sm.w-100(type="submit" title="Agregar")
+                  i.bi.bi-plus-lg
+
+          //- LISTA DE TRABAJOS
+          if client.historial && client.historial.length
+            .table-responsive
+              table.table.table-sm.table-hover.align-middle.mb-0
+                thead.table-light
+                  tr
+                    th Fecha
+                    th Descripción
+                    th Tipo
+                    th.text-end Monto
+                    th.text-end Acciones
+                tbody
+                  each item in client.historial
+                    tr
+                      td
+                        small= new Date(item.fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
+                      td
+                        div.small.fw-semibold= item.descripcion
+                      td
+                        if item.tipo === 'Venta'
+                          span.badge.bg-success-subtle.text-success.rounded-pill= item.tipo
+                        else if item.tipo === 'Servicio'
+                          span.badge.bg-primary-subtle.text-primary.rounded-pill= item.tipo
+                        else if item.tipo === 'Mantenimiento'
+                          span.badge.bg-warning-subtle.text-warning.rounded-pill= item.tipo
+                        else if item.tipo === 'Instalación'
+                          span.badge.bg-info-subtle.text-info.rounded-pill= item.tipo
+                        else
+                          span.badge.bg-secondary-subtle.text-secondary.rounded-pill= item.tipo
+                      td.text-end
+                        span.fw-bold.text-success S/. #{item.monto.toFixed(2)}
+                      td.text-end
+                        form.d-inline(method="POST" action=`/clients/${client._id}/historial/${item._id}/delete` onsubmit="return confirm('¿Eliminar este registro del historial?')")
+                          button.btn.btn-sm.btn-outline-danger(type="submit" title="Eliminar")
+                            i.bi.bi-trash
+          else
+            .text-center.py-4.text-muted
+              i.bi.bi-inbox.fs-1.mb-2.d-block.opacity-25
+              p.mb-0 No hay trabajos registrados para este cliente.
 
   //- ============================================
   //- ESTILOS

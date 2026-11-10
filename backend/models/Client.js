@@ -1,6 +1,3 @@
-// ============================================================
-// models/Client.js
-// ============================================================
 const mongoose = require('mongoose');
 
 const clientSchema = new mongoose.Schema({
@@ -46,6 +43,30 @@ const clientSchema = new mongoose.Schema({
   },
 
   // ==========================================
+  // 🆕 HISTORIAL DE TRABAJOS
+  // ==========================================
+  historial: [{
+    fecha: {
+      type: Date,
+      default: Date.now
+    },
+    descripcion: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    tipo: {
+      type: String,
+      enum: ['Venta', 'Servicio', 'Mantenimiento', 'Instalación', 'Otro'],
+      default: 'Venta'
+    },
+    monto: {
+      type: Number,
+      default: 0
+    }
+  }],
+
+  // ==========================================
   // ESTADO
   // ==========================================
   isActive: {
@@ -86,20 +107,15 @@ clientSchema.index({ businessName: 1 });
 clientSchema.index({ ruc: 1 });
 clientSchema.index({ isActive: 1 });
 clientSchema.index({ type: 1 });
-// Búsqueda por texto
 clientSchema.index({ businessName: 'text', ruc: 'text', email: 'text' });
 
 // ============================================================
 // VIRTUALS
 // ============================================================
-
-// Nombre corto para mostrar
 clientSchema.virtual('displayName').get(function() {
-  if (this.type === 'Jurídico') return this.businessName;
   return this.businessName;
 });
 
-// Inicial del nombre (para avatares)
 clientSchema.virtual('initial').get(function() {
   if (!this.businessName) return '?';
   return this.businessName.charAt(0).toUpperCase();
@@ -108,8 +124,6 @@ clientSchema.virtual('initial').get(function() {
 // ============================================================
 // MÉTODOS
 // ============================================================
-
-// Verificar si tiene ventas o cotizaciones
 clientSchema.methods.hasTransactions = async function() {
   const Sale = mongoose.model('Sale');
   const Quotation = mongoose.model('Quotation');
@@ -122,7 +136,6 @@ clientSchema.methods.hasTransactions = async function() {
   return !!(hasSales || hasQuotations);
 };
 
-// Contar ventas y cotizaciones
 clientSchema.methods.getStats = async function() {
   const Sale = mongoose.model('Sale');
   const Quotation = mongoose.model('Quotation');
@@ -143,7 +156,4 @@ clientSchema.methods.getStats = async function() {
   };
 };
 
-// ============================================================
-// EXPORTAR
-// ============================================================
 module.exports = mongoose.model('Client', clientSchema);
