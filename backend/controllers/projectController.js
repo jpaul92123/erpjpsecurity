@@ -1,8 +1,8 @@
 const Project = require('../models/Project');
 const Client = require('../models/Client');
-const Task = require('../models/Task'); 
-const InstalledEquipment = require('../models/InstalledEquipment');
-const Progress = require('../models/Progress');
+// const Task = require('../models/Task'); 
+// const InstalledEquipment = require('../models/InstalledEquipment');
+// const Progress = require('../models/Progress');
 
 // ============================================================
 // LISTADO
