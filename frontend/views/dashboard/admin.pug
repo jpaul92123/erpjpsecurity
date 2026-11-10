@@ -118,7 +118,7 @@ block content
                 h4.fw-bold.mb-0.text-truncate ¡Hola, #{user.name}!
 
           .col-lg-4.d-none.d-lg-flex.justify-content-end
-            i.fas.fa-shield-alt.welcome-icon
+            i.fas.fa-shield-halved.welcome-icon
 
   //- ============================================
   //- ALERTA DE PEDIDOS PENDIENTES
@@ -210,7 +210,7 @@ block content
         .card.border-0.shadow-sm.rounded-3.overflow-hidden.brands-carousel-card
           .card-header.bg-white.border-bottom.py-3.d-flex.justify-content-between.align-items-center
             h6.mb-0.fw-bold
-              i.fas.fa-bookmark.me-2.text-primary
+              i.fas.fa-trademark.me-2.text-primary
               | Nuestras Marcas
               span.badge.bg-primary-subtle.text-primary.ms-2 #{brands.length}
             a.btn.btn-sm.btn-link.text-decoration-none.fw-semibold(href="/brands")
@@ -235,7 +235,7 @@ block content
                           onerror="this.style.display='none'; this.parentElement.classList.add('no-logo');"
                         )
                       else
-                        i.fas.fa-bookmark
+                        i.fas.fa-trademark
 
                     .brand-chip-info
                       span.brand-chip-name= brand.name
@@ -254,7 +254,7 @@ block content
                           onerror="this.style.display='none'; this.parentElement.classList.add('no-logo');"
                         )
                       else
-                        i.fas.fa-bookmark
+                        i.fas.fa-trademark
 
                     .brand-chip-info
                       span.brand-chip-name= brand.name
@@ -275,7 +275,7 @@ block content
       .card.border-0.shadow-sm.rounded-3.h-100
         .card-header.bg-transparent.border-0.py-3.d-flex.justify-content-between.align-items-center
           h6.mb-0.fw-bold
-            i.fas.fa-history.me-2.text-primary
+            i.fas.fa-clock-rotate-left.me-2.text-primary
             | Pedidos recientes
           a.btn.btn-sm.btn-link.text-decoration-none.fw-semibold(href="/orders")
             | Ver todos
@@ -301,7 +301,7 @@ block content
                         span.fw-bold.text-primary S/. #{order.total.toFixed(2)}
                       td.text-end.d-none.d-md-table-cell
                         span.badge.bg-warning-subtle.text-warning.rounded-pill
-                          i.fas.fa-clock-o.me-1
+                          i.fas.fa-clock.me-1
                           | Pendiente
           else
             .text-center.py-4.text-muted
@@ -312,7 +312,7 @@ block content
       .card.border-0.shadow-sm.rounded-3.h-100
         .card-header.bg-transparent.border-0.py-3
           h6.mb-0.fw-bold
-            i.fas.fa-line-chart.me-2.text-success
+            i.fas.fa-chart-line.me-2.text-success
             | Ventas de hoy
 
         .card-body.pt-0
@@ -328,6 +328,9 @@ block content
             )
               i.fas.fa-list.me-1
               | Ver pedidos de hoy
+
+  //- ============================================
+ 
 
   //- ============================================
   //- MÓDULOS DEL SISTEMA (admin ve TODOS)
@@ -358,7 +361,7 @@ block content
     .col-12
       .d-flex.align-items-center.mb-2
         span.badge.bg-primary-subtle.text-primary.me-2
-          i.fas.fa-shield.me-1
+          i.fas.fa-shield-alt.me-1
           | Seguridad
         .flex-grow-1.border-bottom
   .row.g-2.g-md-3.mb-3.mb-md-4
@@ -373,14 +376,14 @@ block content
     .col-12
       .d-flex.align-items-center.mb-2
         span.badge.bg-warning-subtle.text-warning.me-2
-          i.fas.fa-archive.me-1
+          i.fas.fa-boxes-stacked.me-1
           | Inventario
         .flex-grow-1.border-bottom
   .row.g-2.g-md-3.mb-3.mb-md-4
-    +moduleCard('/products', 'fas.fa-cube', 'Productos', 'danger', 'Inventario')
+    +moduleCard('/products', 'fas.fa-box', 'Productos', 'danger', 'Inventario')
     +moduleCard('/categories', 'fas.fa-tags', 'Categorías', 'purple', 'Inventario')
-    +moduleCard('/brands', 'fas.fa-bookmark', 'Marcas', 'slate', 'Inventario')
-    +moduleCard('/warehouses', 'fas.fa-home', 'Almacenes', 'amber', 'Inventario')
+    +moduleCard('/brands', 'fas.fa-trademark', 'Marcas', 'slate', 'Inventario')
+    +moduleCard('/warehouses', 'fas.fa-warehouse', 'Almacenes', 'amber', 'Inventario')
 
   //- ============================================
   //- VENTAS
@@ -393,10 +396,10 @@ block content
           | Ventas
         .flex-grow-1.border-bottom
   .row.g-2.g-md-3.mb-3.mb-md-4
-    +moduleCard('/quotations', 'fas.fa-file-text', 'Cotizaciones', 'blue', 'Ventas')
-    +moduleCard('/orders', 'fas.fa-list', 'Pedidos', 'orange', 'Ventas')
-    +moduleCard('/sales', 'fas.fa-shopping-bag', 'Ventas', 'emerald', 'Ventas')
-    +moduleCard('/vouchers', 'fas.fa-file', 'Comprobantes', 'rose', 'Ventas')
+    +moduleCard('/quotations', 'fas.fa-file-invoice-dollar', 'Cotizaciones', 'blue', 'Ventas')
+    +moduleCard('/orders', 'fas.fa-clipboard-list', 'Pedidos', 'orange', 'Ventas')
+    +moduleCard('/sales', 'fas.fa-cash-register', 'Ventas', 'emerald', 'Ventas')
+    +moduleCard('/vouchers', 'fas.fa-receipt', 'Comprobantes', 'rose', 'Ventas')
 
   //- ============================================
   //- SERVICIOS
@@ -405,15 +408,15 @@ block content
     .col-12
       .d-flex.align-items-center.mb-2
         span.badge.bg-info-subtle.text-info.me-2
-          i.fas.fa-wrench.me-1
+          i.fas.fa-tools.me-1
           | Servicios
         .flex-grow-1.border-bottom
   .row.g-2.g-md-3.mb-3.mb-md-4
-    +moduleCard('/installations', 'fas.fa-cogs', 'Instalaciones', 'cyan', 'Servicios')
-    +moduleCard('/maintenances', 'fas.fa-refresh', 'Mantenimientos', 'amber', 'Servicios')
-    +moduleCard('/visits', 'fas.fa-calendar', 'Visitas', 'teal', 'Servicios')
-    +moduleCard('/work-orders', 'fas.fa-check-square', 'Órdenes Trabajo', 'red', 'Servicios')
-    +moduleCard('/projects', 'fas.fa-folder-open', 'Proyectos', 'violet', 'Servicios')
+    +moduleCard('/installations', 'fas.fa-screwdriver-wrench', 'Instalaciones', 'cyan', 'Servicios')
+    +moduleCard('/maintenances', 'fas.fa-gears', 'Mantenimientos', 'amber', 'Servicios')
+    +moduleCard('/visits', 'fas.fa-clipboard-check', 'Visitas', 'teal', 'Servicios')
+    +moduleCard('/work-orders', 'fas.fa-list-check', 'Órdenes Trabajo', 'red', 'Servicios')
+    +moduleCard('/projects', 'fas.fa-diagram-project', 'Proyectos', 'violet', 'Servicios')
 
   //- ============================================
   //- ANALÍTICA
@@ -422,11 +425,11 @@ block content
     .col-12
       .d-flex.align-items-center.mb-2
         span.badge.bg-secondary-subtle.text-secondary.me-2
-          i.fas.fa-bar-chart.me-1
+          i.fas.fa-chart-line.me-1
           | Analítica
         .flex-grow-1.border-bottom
   .row.g-2.g-md-3.mb-3.mb-md-4
-    +moduleCard('/reports/sales', 'fas.fa-line-chart', 'Reportes', 'indigo', 'Reportes')
+    +moduleCard('/reports/sales', 'fas.fa-chart-simple', 'Reportes', 'indigo', 'Reportes')
 
   //- ============================================
   //- SISTEMA
@@ -440,7 +443,7 @@ block content
         .flex-grow-1.border-bottom
   .row.g-2.g-md-3.mb-3.mb-md-4
     +moduleCard('/settings', 'fas.fa-cog', 'Configuración', 'slate', 'Sistema')
-    +moduleCard('/about/admin', 'fas.fa-info-circle', 'Nosotros', 'slate', 'Sistema')
+    +moduleCard('/about/admin', 'fas.fa-circle-info', 'Nosotros', 'slate', 'Sistema')
 
   //- ============================================
   //- CTA LANDING
@@ -457,7 +460,7 @@ block content
               p.text-muted.mb-0.small Muestra tu catálogo de productos a tus clientes
             a.btn.btn-primary.rounded-pill.px-4.w-100.w-sm-auto(href="/landing" target="_blank")
               | Visitar Landing
-              i.fas.fa-external-link.ms-2
+              i.fas.fa-arrow-up-right-from-square.ms-2
 
   //- ============================================
   //- ESTILOS
@@ -583,7 +586,7 @@ block content
     .brand-chip:hover .brand-chip-logo { background: #dbeafe; color: #0d6efd; }
     .brand-chip-logo img { width: 100%; height: 100%; object-fit: contain; padding: 4px; }
     .brand-chip-logo.no-logo::before {
-      content: '\f02b'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+      content: '\f1f8'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
     }
     .brand-chip-info { display: flex; flex-direction: column; min-width: 0; flex: 1; }
     .brand-chip-name {
