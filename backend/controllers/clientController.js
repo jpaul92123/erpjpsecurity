@@ -56,6 +56,9 @@ exports.store = async (req, res) => {
       return res.redirect('/clients/create');
     }
 
+    // 🔑 CORRECCIÓN AQUÍ: Usar req.session.user._id o req.session.user.id
+    const userId = req.session.user._id || req.session.user.id;
+
     const client = new Client({
       businessName: businessName.trim(),
       ruc: (ruc || '').trim(),
@@ -64,7 +67,7 @@ exports.store = async (req, res) => {
       address: (address || '').trim(),
       type: type || 'Natural',
       isActive: true,
-      createdBy: req.session.user.id
+      createdBy: userId // <-- Ahora sí guarda el ID correcto
     });
 
     await client.save();

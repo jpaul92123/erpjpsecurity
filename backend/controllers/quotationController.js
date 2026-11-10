@@ -61,6 +61,9 @@ exports.store = async (req, res) => {
       includeIgv
     } = req.body;
 
+    // 🔑 Tomar el ID del usuario logueado correctamente
+    const userId = req.session.user._id || req.session.user.id;
+
     let clientId = client;
 
     // Cliente anónimo
@@ -73,7 +76,7 @@ exports.store = async (req, res) => {
           email: 'anonimo@jpsecurity.com',
           phone: '000000000',
           type: 'Natural',
-          createdBy: req.session.user.id,
+          createdBy: userId, // <-- Corregido
           isActive: true
         },
         { upsert: true, new: true, setDefaultsOnInsert: true }
@@ -114,7 +117,7 @@ exports.store = async (req, res) => {
       modalidadPago: modalidadPago || 'Contado',
       garantiaMeses: parseInt(garantiaMeses) || 0,
       notas: notas || '',
-      createdBy: req.session.user.id
+      createdBy: userId // <-- Corregido
     });
 
     await quotation.save();
@@ -203,6 +206,8 @@ exports.update = async (req, res) => {
       includeIgv
     } = req.body;
 
+    const userId = req.session.user._id || req.session.user.id; // <-- Corregido
+
     let clientId = client;
 
     if (!clientId || clientId === '') {
@@ -214,7 +219,7 @@ exports.update = async (req, res) => {
           email: 'anonimo@jpsecurity.com',
           phone: '000000000',
           type: 'Natural',
-          createdBy: req.session.user.id,
+          createdBy: userId,
           isActive: true
         },
         { upsert: true, new: true, setDefaultsOnInsert: true }
@@ -322,13 +327,15 @@ exports.searchProducts = async (req, res) => {
 exports.createClient = async (req, res) => {
   try {
     const { businessName, ruc, email, phone, type } = req.body;
+    const userId = req.session.user._id || req.session.user.id; // <-- Corregido
+
     const client = new Client({
       businessName,
       ruc: ruc || '',
       email: email || '',
       phone: phone || '',
       type: type || 'Natural',
-      createdBy: req.session.user.id
+      createdBy: userId
     });
     await client.save();
     res.json({ success: true, client });
@@ -344,6 +351,8 @@ exports.createClient = async (req, res) => {
 exports.createProduct = async (req, res) => {
   try {
     const { name, model, customerPrice, category } = req.body;
+    const userId = req.session.user._id || req.session.user.id; // <-- Corregido
+
     const product = new Product({
       name,
       model: model || '',
@@ -351,7 +360,7 @@ exports.createProduct = async (req, res) => {
       supplierPrice: 0,
       category: category || null,
       isActive: true,
-      createdBy: req.session.user.id
+      createdBy: userId
     });
     await product.save();
     res.json({ success: true, product });
@@ -374,9 +383,6 @@ exports.testApi = (req, res) => {
 };
 
 // ============================================================
-// CREAR VENTA DESDE COTIZACIÓN (CON LOGS DE DIAGNÓSTICO)
-// ============================================================
-// ============================================================
 // CREAR VENTA DESDE COTIZACIÓN
 // ============================================================
 exports.createSaleFromQuotation = async (req, res) => {
@@ -393,6 +399,8 @@ exports.createSaleFromQuotation = async (req, res) => {
       phone,
       type
     } = req.body;
+
+    const userId = req.session.user._id || req.session.user.id; // <-- Corregido
 
     console.log('\n🛒 ═══════════════════════════════════════');
     console.log('   INICIANDO CREACIÓN DE VENTA');
@@ -450,7 +458,7 @@ exports.createSaleFromQuotation = async (req, res) => {
         email: (email || '').trim(),
         phone: (phone || '').trim(),
         type: type || 'Natural',
-        createdBy: req.session.user.id,
+        createdBy: userId,
         isActive: true
       });
       await newClient.save();
@@ -485,7 +493,7 @@ exports.createSaleFromQuotation = async (req, res) => {
             email: 'anonimo@jpsecurity.com',
             phone: '000000000',
             type: 'Natural',
-            createdBy: req.session.user.id,
+            createdBy: userId,
             isActive: true
           },
           { upsert: true, new: true, setDefaultsOnInsert: true }
@@ -521,7 +529,7 @@ exports.createSaleFromQuotation = async (req, res) => {
       paymentMethod: paymentMethod || 'Efectivo',
       status: 'Pendiente',
       notes: notes || `Venta generada desde cotización ${quotation.number}`,
-      createdBy: req.session.user.id,
+      createdBy: userId,
       convertedFromQuotation: quotation._id
     });
 

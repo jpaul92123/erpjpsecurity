@@ -3,7 +3,6 @@
 // ============================================================
 const Brand = require('../models/Brand');
 const Product = require('../models/Product');
-// Ya no necesitamos fs ni path para manejar archivos locales
 
 // ============================================================
 // Helper: eliminar imagen (DESHABILITADO PARA CLOUDINARY)
@@ -57,9 +56,11 @@ exports.store = async (req, res) => {
   try {
     const { name, description } = req.body;
 
+    // 🔑 Tomar el ID del usuario logueado correctamente
+    const userId = req.session.user._id || req.session.user.id;
+
     console.log('\n🆕 [brandController.store] Creando marca...');
     console.log('   name:', name);
-    // Ahora mostramos el path (URL) que nos da Cloudinary
     console.log('   req.file:', req.file ? req.file.path : 'sin archivo');
 
     if (!name || !name.trim()) {
@@ -78,7 +79,7 @@ exports.store = async (req, res) => {
       description: (description || '').trim(),
       logo: logoPath,
       isActive: true,
-      createdBy: req.session.user.id
+      createdBy: userId // <-- Corregido
     });
 
     console.log('✅ Marca creada:', brand._id, brand.name);
@@ -92,7 +93,6 @@ exports.store = async (req, res) => {
     console.error('   Mensaje:', error.message);
 
     if (error.code === 11000) {
-      // Si hay duplicado, la imagen ya se subió a Cloudinary (quedará huérfana allí, pero no rompe la app)
       req.flash('error', 'Ya existe una marca con ese nombre');
     } else {
       req.flash('error', 'Error al crear marca: ' + error.message);
@@ -178,10 +178,8 @@ exports.update = async (req, res) => {
 
     // ✅ Si subieron nueva imagen
     if (req.file) {
-      // (Opcional) Aquí podrías llamar a la API de Cloudinary para borrar la imagen vieja
-      deleteImage(brand.logo); 
-      
-      updateData.logo = req.file.path; // Guarda la URL de Cloudinary
+      deleteImage(brand.logo); // Ignorado porque está en Cloudinary
+      updateData.logo = req.file.path;
       console.log('   Nuevo logo (Cloudinary):', updateData.logo);
     } else if (removeLogo === 'on') {
       deleteImage(brand.logo);

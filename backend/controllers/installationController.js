@@ -2,6 +2,9 @@ const Installation = require('../models/Installation');
 const Client = require('../models/Client');
 const Project = require('../models/Project');
 
+// ============================================================
+// LISTADO
+// ============================================================
 exports.index = async (req, res) => {
   try {
     const installations = await Installation.find()
@@ -9,27 +12,56 @@ exports.index = async (req, res) => {
       .populate('project', 'name')
       .populate('createdBy', 'name')
       .sort({ installationDate: -1 });
-    res.render('installations/index', { title: 'Instalaciones', installations });
+
+    res.render('installations/index', { 
+      title: 'Instalaciones', 
+      installations 
+    });
   } catch (error) {
+    console.error('❌ Error index instalaciones:', error);
     req.flash('error', 'Error al cargar instalaciones');
     res.redirect('/');
   }
 };
 
+// ============================================================
+// CREAR (formulario)
+// ============================================================
 exports.create = async (req, res) => {
   try {
     const clients = await Client.find({ isActive: true });
     const projects = await Project.find({ status: { $ne: 'Completado' } });
-    res.render('installations/create', { title: 'Nueva Instalación', clients, projects });
+
+    res.render('installations/create', { 
+      title: 'Nueva Instalación', 
+      clients, 
+      projects 
+    });
   } catch (error) {
+    console.error('❌ Error create instalación:', error);
     req.flash('error', 'Error al cargar datos');
     res.redirect('/installations');
   }
 };
 
+// ============================================================
+// GUARDAR
+// ============================================================
 exports.store = async (req, res) => {
   try {
-    const { client, project, equipment, serialNumber, installationDate, technician, notes } = req.body;
+    const { 
+      client, 
+      project, 
+      equipment, 
+      serialNumber, 
+      installationDate, 
+      technician, 
+      notes 
+    } = req.body;
+
+    // 🔑 Tomar el ID del usuario logueado correctamente
+    const userId = req.session.user._id || req.session.user.id;
+
     await Installation.create({
       client,
       project: project || null,
@@ -38,33 +70,47 @@ exports.store = async (req, res) => {
       installationDate: new Date(installationDate),
       technician,
       notes: notes || '',
-      createdBy: req.session.user.id
+      createdBy: userId // <-- Corregido
     });
+
     req.flash('success', 'Instalación registrada correctamente');
     res.redirect('/installations');
   } catch (error) {
+    console.error('❌ Error al guardar instalación:', error);
     req.flash('error', 'Error al registrar instalación: ' + error.message);
     res.redirect('/installations/create');
   }
 };
 
+// ============================================================
+// MOSTRAR DETALLE
+// ============================================================
 exports.show = async (req, res) => {
   try {
     const installation = await Installation.findById(req.params.id)
       .populate('client', 'businessName ruc email phone')
       .populate('project', 'name')
       .populate('createdBy', 'name');
+
     if (!installation) {
       req.flash('error', 'Instalación no encontrada');
       return res.redirect('/installations');
     }
-    res.render('installations/detail', { title: 'Detalle Instalación', installation });
+
+    res.render('installations/detail', { 
+      title: 'Detalle Instalación', 
+      installation 
+    });
   } catch (error) {
+    console.error('❌ Error show instalación:', error);
     req.flash('error', 'Error al cargar instalación');
     res.redirect('/installations');
   }
 };
 
+// ============================================================
+// EDITAR (formulario)
+// ============================================================
 exports.edit = async (req, res) => {
   try {
     const installation = await Installation.findById(req.params.id);
@@ -72,18 +118,39 @@ exports.edit = async (req, res) => {
       req.flash('error', 'Instalación no encontrada');
       return res.redirect('/installations');
     }
+
     const clients = await Client.find({ isActive: true });
     const projects = await Project.find({ status: { $ne: 'Completado' } });
-    res.render('installations/edit', { title: 'Editar Instalación', installation, clients, projects });
+
+    res.render('installations/edit', { 
+      title: 'Editar Instalación', 
+      installation, 
+      clients, 
+      projects 
+    });
   } catch (error) {
+    console.error('❌ Error edit instalación:', error);
     req.flash('error', 'Error al cargar instalación');
     res.redirect('/installations');
   }
 };
 
+// ============================================================
+// ACTUALIZAR
+// ============================================================
 exports.update = async (req, res) => {
   try {
-    const { client, project, equipment, serialNumber, installationDate, technician, status, notes } = req.body;
+    const { 
+      client, 
+      project, 
+      equipment, 
+      serialNumber, 
+      installationDate, 
+      technician, 
+      status, 
+      notes 
+    } = req.body;
+
     await Installation.findByIdAndUpdate(req.params.id, {
       client,
       project: project || null,
@@ -94,20 +161,26 @@ exports.update = async (req, res) => {
       status,
       notes: notes || ''
     });
+
     req.flash('success', 'Instalación actualizada');
     res.redirect('/installations');
   } catch (error) {
+    console.error('❌ Error update instalación:', error);
     req.flash('error', 'Error al actualizar instalación');
     res.redirect(`/installations/${req.params.id}/edit`);
   }
 };
 
+// ============================================================
+// ELIMINAR
+// ============================================================
 exports.destroy = async (req, res) => {
   try {
     await Installation.findByIdAndDelete(req.params.id);
     req.flash('success', 'Instalación eliminada');
     res.redirect('/installations');
   } catch (error) {
+    console.error('❌ Error destroy instalación:', error);
     req.flash('error', 'Error al eliminar instalación');
     res.redirect('/installations');
   }

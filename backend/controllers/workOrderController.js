@@ -11,12 +11,13 @@ exports.index = async (req, res) => {
       .populate('client', 'businessName')
       .populate('project', 'name')
       .populate('createdBy', 'name');
+
     res.render('work-orders/index', {
       title: 'Órdenes de Trabajo',
       workOrders
     });
   } catch (error) {
-    console.error('Error index WorkOrder:', error);
+    console.error('❌ Error index WorkOrder:', error);
     req.flash('error', 'Error al cargar órdenes de trabajo');
     res.redirect('/');
   }
@@ -29,13 +30,14 @@ exports.create = async (req, res) => {
   try {
     const clients = await Client.find({ isActive: true });
     const projects = await Project.find({ status: { $ne: 'Completado' } });
+
     res.render('work-orders/create', {
       title: 'Nueva Orden de Trabajo',
       clients,
       projects
     });
   } catch (error) {
-    console.error('Error create WorkOrder:', error);
+    console.error('❌ Error create WorkOrder:', error);
     req.flash('error', 'Error al cargar datos');
     res.redirect('/work-orders');
   }
@@ -51,6 +53,9 @@ exports.store = async (req, res) => {
       assignedTo, startDate, endDate, notes
     } = req.body;
 
+    // 🔑 Tomar el ID del usuario logueado correctamente
+    const userId = req.session.user._id || req.session.user.id;
+
     await WorkOrder.create({
       client,
       project: project || null,
@@ -60,13 +65,13 @@ exports.store = async (req, res) => {
       startDate: new Date(startDate),
       endDate: endDate ? new Date(endDate) : null,
       notes,
-      createdBy: req.session.user.id
+      createdBy: userId // <-- Corregido
     });
 
     req.flash('success', 'Orden de trabajo creada correctamente');
     res.redirect('/work-orders');
   } catch (error) {
-    console.error('Error store WorkOrder:', error);
+    console.error('❌ Error store WorkOrder:', error);
     req.flash('error', 'Error al crear orden de trabajo');
     res.redirect('/work-orders/create');
   }
@@ -92,7 +97,7 @@ exports.show = async (req, res) => {
       workOrder
     });
   } catch (error) {
-    console.error('Error show WorkOrder:', error);
+    console.error('❌ Error show WorkOrder:', error);
     req.flash('error', 'Error al cargar orden de trabajo');
     res.redirect('/work-orders');
   }
@@ -119,7 +124,7 @@ exports.edit = async (req, res) => {
       projects
     });
   } catch (error) {
-    console.error('Error edit WorkOrder:', error);
+    console.error('❌ Error edit WorkOrder:', error);
     req.flash('error', 'Error al cargar orden de trabajo');
     res.redirect('/work-orders');
   }
@@ -150,7 +155,7 @@ exports.update = async (req, res) => {
     req.flash('success', 'Orden de trabajo actualizada');
     res.redirect('/work-orders');
   } catch (error) {
-    console.error('Error update WorkOrder:', error);
+    console.error('❌ Error update WorkOrder:', error);
     req.flash('error', 'Error al actualizar orden de trabajo');
     res.redirect(`/work-orders/${req.params.id}/edit`);
   }
@@ -165,7 +170,7 @@ exports.destroy = async (req, res) => {
     req.flash('success', 'Orden de trabajo eliminada');
     res.redirect('/work-orders');
   } catch (error) {
-    console.error('Error destroy WorkOrder:', error);
+    console.error('❌ Error destroy WorkOrder:', error);
     req.flash('error', 'Error al eliminar orden de trabajo');
     res.redirect('/work-orders');
   }

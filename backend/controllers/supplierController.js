@@ -45,6 +45,9 @@ exports.store = async (req, res) => {
   try {
     const { businessName, ruc, email, phone, address, contactPerson } = req.body;
 
+    // 🔑 Tomar el ID del usuario logueado correctamente
+    const userId = req.session.user._id || req.session.user.id;
+
     console.log('🆕 [supplierController.store] Creando proveedor...');
     console.log('   businessName:', businessName);
     console.log('   ruc:', ruc);
@@ -63,7 +66,7 @@ exports.store = async (req, res) => {
       address: (address || '').trim(),
       contactPerson: (contactPerson || '').trim(),
       isActive: true,
-      createdBy: req.session.user.id
+      createdBy: userId // <-- Corregido
     });
 
     console.log('✅ Proveedor creado:', supplier._id, supplier.businessName);

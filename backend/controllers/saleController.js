@@ -87,6 +87,9 @@ exports.store = async (req, res) => {
       convertedFromQuotation
     } = req.body;
 
+    // 🔑 Tomar el ID del usuario logueado correctamente
+    const userId = req.session.user._id || req.session.user.id;
+
     console.log('\n🛒 ═══════════════════════════════════════');
     console.log('   GUARDANDO NUEVA VENTA');
     console.log('═══════════════════════════════════════');
@@ -132,7 +135,7 @@ exports.store = async (req, res) => {
           email: 'anonimo@jpsecurity.com',
           phone: '000000000',
           type: 'Natural',
-          createdBy: req.session.user.id,
+          createdBy: userId, // <-- Corregido
           isActive: true
         },
         { upsert: true, new: true, setDefaultsOnInsert: true }
@@ -166,7 +169,7 @@ exports.store = async (req, res) => {
       paymentMethod: paymentMethod || 'Efectivo',
       notes: notes || '',
       status: 'Pendiente',
-      createdBy: req.session.user.id,
+      createdBy: userId, // <-- Corregido
       convertedFromQuotation: convertedFromQuotation || null
     });
 
@@ -205,7 +208,6 @@ exports.store = async (req, res) => {
 // ============================================================
 // MOSTRAR
 // ============================================================
-// controllers/saleController.js
 exports.show = async (req, res) => {
   try {
     const id = req.params.id;

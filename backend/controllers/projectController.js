@@ -1,34 +1,56 @@
 const Project = require('../models/Project');
 const Client = require('../models/Client');
-// const Task = require('../models/Task');
-// const InstalledEquipment = require('../models/InstalledEquipment');
-// const Progress = require('../models/Progress');
+const Task = require('../models/Task'); 
+const InstalledEquipment = require('../models/InstalledEquipment');
+const Progress = require('../models/Progress');
 
+// ============================================================
+// LISTADO
+// ============================================================
 exports.index = async (req, res) => {
   try {
     const projects = await Project.find()
       .populate('client', 'businessName')
       .populate('createdBy', 'name');
-    res.render('projects/index', { title: 'Proyectos', projects });
+
+    res.render('projects/index', { 
+      title: 'Proyectos', 
+      projects 
+    });
   } catch (error) {
+    console.error('❌ Error index proyectos:', error);
     req.flash('error', 'Error al cargar proyectos');
     res.redirect('/');
   }
 };
 
+// ============================================================
+// CREAR (formulario)
+// ============================================================
 exports.create = async (req, res) => {
   try {
     const clients = await Client.find({ isActive: true });
-    res.render('projects/create', { title: 'Nuevo Proyecto', clients });
+    res.render('projects/create', { 
+      title: 'Nuevo Proyecto', 
+      clients 
+    });
   } catch (error) {
+    console.error('❌ Error create proyecto:', error);
     req.flash('error', 'Error al cargar datos');
     res.redirect('/projects');
   }
 };
 
+// ============================================================
+// GUARDAR
+// ============================================================
 exports.store = async (req, res) => {
   try {
     const { name, client, description, startDate, endDate, budget } = req.body;
+
+    // 🔑 Tomar el ID del usuario logueado correctamente
+    const userId = req.session.user._id || req.session.user.id;
+
     await Project.create({
       name,
       client,
@@ -36,35 +58,54 @@ exports.store = async (req, res) => {
       startDate: new Date(startDate),
       endDate: endDate ? new Date(endDate) : null,
       budget: budget || 0,
-      createdBy: req.session.user.id
+      createdBy: userId // <-- Corregido
     });
+
     req.flash('success', 'Proyecto creado correctamente');
     res.redirect('/projects');
   } catch (error) {
+    console.error('❌ Error store proyecto:', error);
     req.flash('error', 'Error al crear proyecto');
     res.redirect('/projects/create');
   }
 };
 
+// ============================================================
+// MOSTRAR DETALLE
+// ============================================================
 exports.show = async (req, res) => {
   try {
     const project = await Project.findById(req.params.id)
       .populate('client', 'businessName')
       .populate('createdBy', 'name');
+
     if (!project) {
       req.flash('error', 'Proyecto no encontrado');
       return res.redirect('/projects');
     }
+
+    // Cargar tareas, equipos y avances asociados
     const tasks = await Task.find({ project: project._id });
     const equipments = await InstalledEquipment.find({ project: project._id }).populate('product', 'name code');
     const progresses = await Progress.find({ project: project._id }).sort({ date: -1 });
-    res.render('projects/detail', { title: project.name, project, tasks, equipments, progresses });
+
+    res.render('projects/detail', { 
+      title: project.name, 
+      project, 
+      tasks, 
+      equipments, 
+      progresses 
+    });
   } catch (error) {
+    console.error('❌ Error show proyecto:', error);
     req.flash('error', 'Error al cargar proyecto');
     res.redirect('/projects');
   }
 };
 
+// ============================================================
+// EDITAR (formulario)
+// ============================================================
 exports.edit = async (req, res) => {
   try {
     const project = await Project.findById(req.params.id);
@@ -73,16 +114,26 @@ exports.edit = async (req, res) => {
       return res.redirect('/projects');
     }
     const clients = await Client.find({ isActive: true });
-    res.render('projects/edit', { title: 'Editar Proyecto', project, clients });
+
+    res.render('projects/edit', { 
+      title: 'Editar Proyecto', 
+      project, 
+      clients 
+    });
   } catch (error) {
+    console.error('❌ Error edit proyecto:', error);
     req.flash('error', 'Error al cargar proyecto');
     res.redirect('/projects');
   }
 };
 
+// ============================================================
+// ACTUALIZAR
+// ============================================================
 exports.update = async (req, res) => {
   try {
     const { name, client, description, startDate, endDate, status, progress, budget } = req.body;
+
     await Project.findByIdAndUpdate(req.params.id, {
       name,
       client,
@@ -93,14 +144,19 @@ exports.update = async (req, res) => {
       progress: progress || 0,
       budget: budget || 0
     });
+
     req.flash('success', 'Proyecto actualizado');
     res.redirect('/projects');
   } catch (error) {
+    console.error('❌ Error update proyecto:', error);
     req.flash('error', 'Error al actualizar proyecto');
     res.redirect(`/projects/${req.params.id}/edit`);
   }
 };
 
+// ============================================================
+// ELIMINAR
+// ============================================================
 exports.destroy = async (req, res) => {
   try {
     // Eliminar también tareas, equipos y avances asociados
@@ -108,23 +164,33 @@ exports.destroy = async (req, res) => {
     await InstalledEquipment.deleteMany({ project: req.params.id });
     await Progress.deleteMany({ project: req.params.id });
     await Project.findByIdAndDelete(req.params.id);
+
     req.flash('success', 'Proyecto eliminado');
     res.redirect('/projects');
   } catch (error) {
+    console.error('❌ Error destroy proyecto:', error);
     req.flash('error', 'Error al eliminar proyecto');
     res.redirect('/projects');
   }
 };
 
-// Métodos para tareas, equipos y avances (anidados)
+// ============================================================
+// MÉTODOS ANIDADOS (Tareas, Equipos, Avances)
+// ============================================================
+
 exports.storeTask = async (req, res) => {
   try {
     const { name, description, assignedTo, startDate, endDate } = req.body;
     const project = await Project.findById(req.params.id);
+
     if (!project) {
       req.flash('error', 'Proyecto no encontrado');
       return res.redirect('/projects');
     }
+
+    // 🔑 Tomar el ID del usuario logueado correctamente
+    const userId = req.session.user._id || req.session.user.id;
+
     await Task.create({
       project: project._id,
       name,
@@ -132,11 +198,13 @@ exports.storeTask = async (req, res) => {
       assignedTo,
       startDate: new Date(startDate),
       endDate: endDate ? new Date(endDate) : null,
-      createdBy: req.session.user.id
+      createdBy: userId // <-- Corregido
     });
+
     req.flash('success', 'Tarea agregada');
     res.redirect(`/projects/${project._id}`);
   } catch (error) {
+    console.error('❌ Error storeTask:', error);
     req.flash('error', 'Error al agregar tarea');
     res.redirect(`/projects/${req.params.id}`);
   }
@@ -148,6 +216,7 @@ exports.destroyTask = async (req, res) => {
     req.flash('success', 'Tarea eliminada');
     res.redirect(`/projects/${req.params.id}`);
   } catch (error) {
+    console.error('❌ Error destroyTask:', error);
     req.flash('error', 'Error al eliminar tarea');
     res.redirect(`/projects/${req.params.id}`);
   }
@@ -157,21 +226,28 @@ exports.storeEquipment = async (req, res) => {
   try {
     const { product, serialNumber, installationDate, warranty } = req.body;
     const project = await Project.findById(req.params.id);
+
     if (!project) {
       req.flash('error', 'Proyecto no encontrado');
       return res.redirect('/projects');
     }
+
+    // 🔑 Tomar el ID del usuario logueado correctamente
+    const userId = req.session.user._id || req.session.user.id;
+
     await InstalledEquipment.create({
       project: project._id,
       product,
       serialNumber,
       installationDate: new Date(installationDate),
       warranty: warranty ? new Date(warranty) : null,
-      createdBy: req.session.user.id
+      createdBy: userId // <-- Corregido
     });
+
     req.flash('success', 'Equipo agregado');
     res.redirect(`/projects/${project._id}`);
   } catch (error) {
+    console.error('❌ Error storeEquipment:', error);
     req.flash('error', 'Error al agregar equipo');
     res.redirect(`/projects/${req.params.id}`);
   }
@@ -183,6 +259,7 @@ exports.destroyEquipment = async (req, res) => {
     req.flash('success', 'Equipo eliminado');
     res.redirect(`/projects/${req.params.id}`);
   } catch (error) {
+    console.error('❌ Error destroyEquipment:', error);
     req.flash('error', 'Error al eliminar equipo');
     res.redirect(`/projects/${req.params.id}`);
   }
@@ -192,21 +269,29 @@ exports.storeProgress = async (req, res) => {
   try {
     const { description, percentage } = req.body;
     const project = await Project.findById(req.params.id);
+
     if (!project) {
       req.flash('error', 'Proyecto no encontrado');
       return res.redirect('/projects');
     }
+
+    // 🔑 Tomar el ID del usuario logueado correctamente
+    const userId = req.session.user._id || req.session.user.id;
+
     await Progress.create({
       project: project._id,
       description,
       percentage: parseFloat(percentage),
-      createdBy: req.session.user.id
+      createdBy: userId // <-- Corregido
     });
+
     // Actualizar progreso del proyecto (promedio o último registro)
     await Project.findByIdAndUpdate(project._id, { progress: parseFloat(percentage) });
+
     req.flash('success', 'Avance registrado');
     res.redirect(`/projects/${project._id}`);
   } catch (error) {
+    console.error('❌ Error storeProgress:', error);
     req.flash('error', 'Error al registrar avance');
     res.redirect(`/projects/${req.params.id}`);
   }
@@ -218,6 +303,7 @@ exports.destroyProgress = async (req, res) => {
     req.flash('success', 'Avance eliminado');
     res.redirect(`/projects/${req.params.id}`);
   } catch (error) {
+    console.error('❌ Error destroyProgress:', error);
     req.flash('error', 'Error al eliminar avance');
     res.redirect(`/projects/${req.params.id}`);
   }

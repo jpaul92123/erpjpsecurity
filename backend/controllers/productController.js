@@ -176,6 +176,9 @@ exports.store = async (req, res) => {
       description, techSheet, saveAndContinue
     } = req.body;
 
+    // 🔑 Tomar el ID del usuario logueado correctamente
+    const userId = req.session.user._id || req.session.user.id;
+
     await Product.create({
       name,
       model: model || '',
@@ -188,7 +191,8 @@ exports.store = async (req, res) => {
       discount: parseFloat(discount) || 0,
       description: description || '',
       techSheet: techSheet || '',
-      isActive: true
+      isActive: true,
+      createdBy: userId // <-- Corregido
     });
 
     req.flash('success', 'Producto creado correctamente');
@@ -199,6 +203,7 @@ exports.store = async (req, res) => {
       res.redirect('/products');
     }
   } catch (error) {
+    console.error('❌ Error store producto:', error);
     if (error.code === 11000) {
       req.flash('error', 'Ya existe un producto con ese nombre y modelo');
     } else {
@@ -289,7 +294,7 @@ exports.destroy = async (req, res) => {
 };
 
 // ============================================
-// DETALLE DE PRODUCTO (ACTUALIZADO CON RELACIONADOS)
+// DETALLE DE PRODUCTO (CON RELACIONADOS)
 // ============================================
 exports.detail = async (req, res) => {
   try {
@@ -303,10 +308,8 @@ exports.detail = async (req, res) => {
       return res.redirect('/products');
     }
 
-    // Normalizar con finalPrice
     const normalizedProduct = normalizeProduct(product);
 
-    // ✅ BUSCAR PRODUCTOS RELACIONADOS (misma categoría, excluyendo el actual)
     let relatedProducts = [];
     if (product.category) {
       const related = await Product.find({
@@ -354,10 +357,7 @@ exports.getSubcategories = async (req, res) => {
 exports.downloadCatalog = async (req, res) => {
   try {
     const categoryFilter = req.query.category || '';
-
-    // -------- Construir filtro --------
     const filter = { isActive: true };
-
     let categoryName = 'Todas las categorías';
     let categoryObj = null;
 
@@ -377,17 +377,14 @@ exports.downloadCatalog = async (req, res) => {
       }
     }
 
-    // -------- Query --------
     const products = await Product.find(filter)
       .populate('category', 'name')
       .populate('subcategory', 'name')
       .populate('brand', 'name')
       .sort({ category: 1, subcategory: 1, name: 1 });
 
-    // -------- Normalizar --------
     const normalizedProducts = products.map(normalizeProduct);
 
-    // -------- Agrupar por categoría → subcategoría --------
     const grouped = {};
     normalizedProducts.forEach(p => {
       const catId = p.category ? p.category._id.toString() : 'sin-categoria';
@@ -492,14 +489,12 @@ exports.searchProducts = async (req, res) => {
 // ============================================
 exports.home = async (req, res) => {
   try {
-    // 1. Categorías activas (padres) con sus subcategorías
     const categories = await Category.find({ parent: null, isActive: true }).sort({ name: 1 });
     const categoriesWithSubs = await Promise.all(categories.map(async (cat) => {
       const subs = await Category.find({ parent: cat._id, isActive: true }).sort({ name: 1 });
       return { ...cat.toObject(), subcategories: subs };
     }));
 
-    // 2. Últimos productos (para la sección "Últimos Productos")
     const latestRaw = await Product.find({ isActive: true })
       .populate('category', 'name')
       .populate('subcategory', 'name')
@@ -509,10 +504,8 @@ exports.home = async (req, res) => {
       .lean();
     const latestProducts = latestRaw.map(normalizeProduct);
 
-    // 3. 🆕 PRODUCTOS POR CATEGORÍA (mínimo 4, hasta 12 por categoría)
     const productsByCategory = await Promise.all(
       categoriesWithSubs.map(async (cat) => {
-        // Incluye productos de la categoría padre Y de sus subcategorías
         const subIds = (cat.subcategories || []).map(s => s._id);
         const catIds = [cat._id, ...subIds];
 
@@ -537,21 +530,18 @@ exports.home = async (req, res) => {
       })
     );
 
-    // Filtrar categorías sin productos (no tiene sentido mostrarlas)
     const productsByCategoryFiltered = productsByCategory.filter(
       (b) => b.products && b.products.length > 0
     );
 
-    // 4. Marcas activas (para el marquee de marcas)
     const brands = await Brand.find({ isActive: true }).sort({ name: 1 }).lean();
 
-    // 5. Render
     res.render('index', {
-      setting: res.locals.setting || null, // viene del middleware global si existe
+      setting: res.locals.setting || null,
       categories: categoriesWithSubs,
       latestProducts,
       brands,
-      productsByCategory: productsByCategoryFiltered, // 🆕
+      productsByCategory: productsByCategoryFiltered,
       user: req.user || null
     });
   } catch (error) {
