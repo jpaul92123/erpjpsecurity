@@ -5,7 +5,7 @@ html(lang="es")
     meta(name="viewport" content="width=device-width, initial-scale=1.0")
 
     //- ============================================
-    //- DETECCIÓN DE ROL (usa roleName de la sesión)
+    //- DETECCIÓN DE ROL
     //- ============================================
     - const isAdmin = user && user.roleName === 'admin'
 
@@ -22,10 +22,7 @@ html(lang="es")
     //- CSS GLOBAL
     //- ============================================
     link(rel="stylesheet" href="/bootstrap/css/bootstrap.min.css")
-
-    //- 🔑 FONT AWESOME LOCAL
     link(rel="stylesheet" href="/fontawesome/css/all.min.css")
-    
     link(rel="stylesheet" href="/css/styles.css")
 
     //- ============================================
@@ -37,7 +34,7 @@ html(lang="es")
 
     style.
       /* ================================================
-         FIX DEFINITIVO: FORZAR FUENTE LOCAL
+         DEFINICIÓN DIRECTA DE LAS FUENTES
          ================================================ */
       @font-face {
         font-family: "Font Awesome 6 Free";
@@ -64,6 +61,9 @@ html(lang="es")
              url("/fontawesome/webfonts/fa-regular-400.ttf") format("truetype");
       }
 
+      /* ================================================
+         FORZAR FONT AWESOME EN ICONOS
+         ================================================ */
       .fa, .fas, .far, .fal, .fad, .fab,
       .fa-solid, .fa-regular, .fa-brands {
         font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", "Font Awesome 5 Free", "FontAwesome" !important;
@@ -664,7 +664,7 @@ html(lang="es")
                 aria-expanded="false"
                 aria-controls="drawerInv"
               )
-                i.fas.fa-boxes-stacked.drawer-icon
+                i.fas.fa-archive.drawer-icon
                 span.drawer-label Inventario
                 i.fas.fa-chevron-right.drawer-chevron
 
@@ -672,7 +672,7 @@ html(lang="es")
                 ul.drawer-submenu
                   li
                     a.drawer-sub-link(href="/products")
-                      i.fas.fa-box
+                      i.fas.fa-cube
                       span Productos
                   li
                     a.drawer-sub-link(href="/categories")
@@ -680,11 +680,11 @@ html(lang="es")
                       span Categorías
                   li
                     a.drawer-sub-link(href="/brands")
-                      i.fas.fa-trademark
+                      i.fas.fa-bookmark
                       span Marcas
                   li
                     a.drawer-sub-link(href="/warehouses")
-                      i.fas.fa-warehouse
+                      i.fas.fa-home
                       span Almacenes
 
         //- VENTAS (TODOS)
@@ -706,19 +706,19 @@ html(lang="es")
               ul.drawer-submenu
                 li
                   a.drawer-sub-link(href="/quotations")
-                    i.fas.fa-file-invoice
+                    i.fas.fa-file-text
                     span Cotizaciones
                 li
                   a.drawer-sub-link(href="/orders")
-                    i.fas.fa-clipboard-list
+                    i.fas.fa-list
                     span Pedidos
                 li
                   a.drawer-sub-link(href="/sales")
-                    i.fas.fa-cart-plus
+                    i.fas.fa-shopping-bag
                     span Ventas
                 li
                   a.drawer-sub-link(href="/vouchers")
-                    i.fas.fa-file-pdf
+                    i.fas.fa-file
                     span Comprobantes
 
         //- SERVICIOS (TODOS)
@@ -732,7 +732,7 @@ html(lang="es")
               aria-expanded="false"
               aria-controls="drawerServ"
             )
-              i.fas.fa-tools.drawer-icon
+              i.fas.fa-wrench.drawer-icon
               span.drawer-label Servicios
               i.fas.fa-chevron-right.drawer-chevron
 
@@ -740,23 +740,23 @@ html(lang="es")
               ul.drawer-submenu
                 li
                   a.drawer-sub-link(href="/installations")
-                    i.fas.fa-wrench
+                    i.fas.fa-cogs
                     span Instalaciones
                 li
                   a.drawer-sub-link(href="/maintenances")
-                    i.fas.fa-sync-alt
+                    i.fas.fa-refresh
                     span Mantenimientos
                 li
                   a.drawer-sub-link(href="/visits")
-                    i.fas.fa-clipboard-check
+                    i.fas.fa-calendar
                     span Visitas
                 li
                   a.drawer-sub-link(href="/work-orders")
-                    i.fas.fa-tasks
+                    i.fas.fa-check-square
                     span Órdenes de Trabajo
                 li
                   a.drawer-sub-link(href="/projects")
-                    i.fas.fa-project-diagram
+                    i.fas.fa-folder-open
                     span Proyectos
 
         //- ANALÍTICA + SISTEMA (solo admin)
@@ -765,7 +765,7 @@ html(lang="es")
           ul.drawer-nav
             li
               a.drawer-link(href="/reports/sales")
-                i.fas.fa-chart-line.drawer-icon
+                i.fas.fa-line-chart.drawer-icon
                 span.drawer-label Reportes
 
           .drawer-section-label Sistema
@@ -825,7 +825,7 @@ html(lang="es")
               if setting && setting.icon
                 i.fas(class=setting.icon).me-2
               else
-                i.fas.fa-shield-halved.me-2
+                i.fas.fa-shield-alt.me-2
               = setting && setting.siteName ? setting.siteName : 'JP Security'
             p.small.mb-3= setting && setting.siteTagline ? setting.siteTagline : 'Soluciones integrales en seguridad electrónica.'
             .d-flex.gap-2
@@ -874,11 +874,11 @@ html(lang="es")
                   = setting.company.email
               if setting && setting.company && setting.company.address
                 li.mb-2
-                  i.fas.fa-map-location-dot.me-2
+                  i.fas.fa-map-marker.me-2
                   = setting.company.address
               if setting && setting.schedule && setting.schedule.weekdays
                 li.mb-2
-                  i.fas.fa-clock.me-2
+                  i.fas.fa-clock-o.me-2
                   | Lun - Vie: #{setting.schedule.weekdays}
 
         .footer-bottom
@@ -902,10 +902,10 @@ html(lang="es")
       // DRAWER LATERAL
       // ================================================
       (function() {
-        const drawer    = document.getElementById('sideDrawer');
-        const backdrop  = document.getElementById('drawerBackdrop');
-        const toggleBtn = document.getElementById('drawerToggle');
-        const closeBtn  = document.getElementById('drawerClose');
+        var drawer    = document.getElementById('sideDrawer');
+        var backdrop  = document.getElementById('drawerBackdrop');
+        var toggleBtn = document.getElementById('drawerToggle');
+        var closeBtn  = document.getElementById('drawerClose');
 
         function openDrawer() {
           if (!drawer) return;
@@ -949,16 +949,16 @@ html(lang="es")
       // NOTIFICACIONES
       // ================================================
       (function() {
-        const notificationBadge = document.getElementById('notificationBadge');
-        const notificationList  = document.getElementById('notificationList');
-        const notifSubtitle     = document.getElementById('notifSubtitle');
+        var notificationBadge = document.getElementById('notificationBadge');
+        var notificationList  = document.getElementById('notificationList');
+        var notifSubtitle     = document.getElementById('notifSubtitle');
         if (!notificationBadge && !notificationList) return;
 
-        let lastPendingCount = parseInt(notificationBadge ? notificationBadge.textContent : '0', 10) || 0;
+        var lastPendingCount = parseInt(notificationBadge ? notificationBadge.textContent : '0', 10) || 0;
 
         function renderNotifications(data) {
           if (!notificationList) return;
-          const count = data.pendingOrdersCount || 0;
+          var count = data.pendingOrdersCount || 0;
 
           if (notificationBadge) {
             notificationBadge.textContent = count;
@@ -969,46 +969,42 @@ html(lang="es")
           }
 
           if (data.pendingOrders && data.pendingOrders.length > 0) {
-            notificationList.innerHTML = data.pendingOrders.map(order => `
-              <a class="dropdown-item d-flex align-items-start gap-3 py-3 border-bottom text-wrap" href="/orders/${order._id}" style="white-space: normal;">
-                <div class="rounded-circle bg-warning-subtle text-warning d-flex align-items-center justify-content-center flex-shrink-0" style="width: 42px; height: 42px;">
-                  <i class="fas fa-shopping-bag"></i>
-                </div>
-                <div class="flex-grow-1 min-w-0">
-                  <div class="d-flex justify-content-between align-items-center mb-1 gap-2">
-                    <span class="fw-bold text-primary text-truncate">${order.orderNumber}</span>
-                    <small class="text-muted flex-shrink-0">${new Date(order.createdAt).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</small>
-                  </div>
-                  <div class="small fw-semibold text-truncate">${order.customerName}</div>
-                  <div class="small text-muted text-truncate">${order.customerPhone} · S/. ${order.total.toFixed(2)}</div>
-                  <div class="small text-muted">
-                    <i class="fas fa-box me-1"></i>${order.itemsCount} producto${order.itemsCount !== 1 ? 's' : ''}
-                  </div>
-                </div>
-              </a>
-            `).join('') + `
-              <li class="px-3 py-2 text-center border-top">
-                <a class="btn btn-sm btn-link text-decoration-none fw-semibold" href="/orders?status=pendiente">
-                  Ver todos los pedidos pendientes <i class="fas fa-arrow-right ms-1"></i>
-                </a>
-              </li>
-            `;
+            notificationList.innerHTML = data.pendingOrders.map(function(order) {
+              return '<a class="dropdown-item d-flex align-items-start gap-3 py-3 border-bottom text-wrap" href="/orders/' + order._id + '" style="white-space: normal;">' +
+                '<div class="rounded-circle bg-warning-subtle text-warning d-flex align-items-center justify-content-center flex-shrink-0" style="width: 42px; height: 42px;">' +
+                  '<i class="fas fa-shopping-bag"></i>' +
+                '</div>' +
+                '<div class="flex-grow-1 min-w-0">' +
+                  '<div class="d-flex justify-content-between align-items-center mb-1 gap-2">' +
+                    '<span class="fw-bold text-primary text-truncate">' + order.orderNumber + '</span>' +
+                    '<small class="text-muted flex-shrink-0">' + new Date(order.createdAt).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) + '</small>' +
+                  '</div>' +
+                  '<div class="small fw-semibold text-truncate">' + order.customerName + '</div>' +
+                  '<div class="small text-muted text-truncate">' + order.customerPhone + ' · S/. ' + order.total.toFixed(2) + '</div>' +
+                  '<div class="small text-muted"><i class="fas fa-box me-1"></i>' + order.itemsCount + ' producto' + (order.itemsCount !== 1 ? 's' : '') + '</div>' +
+                '</div>' +
+              '</a>';
+            }).join('') +
+            '<li class="px-3 py-2 text-center border-top">' +
+              '<a class="btn btn-sm btn-link text-decoration-none fw-semibold" href="/orders?status=pendiente">' +
+                'Ver todos los pedidos pendientes <i class="fas fa-arrow-right ms-1"></i>' +
+              '</a>' +
+            '</li>';
           } else {
-            notificationList.innerHTML = `
-              <li class="text-center py-5 text-muted">
-                <i class="fas fa-bell-slash fa-3x mb-3 opacity-25 d-block"></i>
-                <p class="mb-0">No hay pedidos pendientes</p>
-              </li>
-            `;
+            notificationList.innerHTML =
+              '<li class="text-center py-5 text-muted">' +
+                '<i class="fas fa-bell-slash fa-3x mb-3 opacity-25 d-block"></i>' +
+                '<p class="mb-0">No hay pedidos pendientes</p>' +
+              '</li>';
           }
         }
 
         function checkNotifications() {
           fetch('/api/notifications')
-            .then(r => r.json())
-            .then(data => {
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
               if (!data.success) return;
-              const newPendingCount = data.pendingOrdersCount || 0;
+              var newPendingCount = data.pendingOrdersCount || 0;
               if (newPendingCount > lastPendingCount) {
                 showNotificationToast(data.pendingOrders[0]);
                 playNotificationSound();
@@ -1016,7 +1012,7 @@ html(lang="es")
               lastPendingCount = newPendingCount;
               renderNotifications(data);
             })
-            .catch(err => console.error('Error notificaciones:', err));
+            .catch(function(err) { console.error('Error notificaciones:', err); });
         }
 
         checkNotifications();
@@ -1024,42 +1020,39 @@ html(lang="es")
 
         function showNotificationToast(order) {
           if (!order) return;
-          const toast = document.createElement('div');
+          var toast = document.createElement('div');
           toast.className = 'notification-toast';
-          toast.innerHTML = `
-            <div class="d-flex align-items-start gap-3">
-              <div class="rounded-circle bg-warning text-white d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px; font-size: 1.3rem;">
-                <i class="fas fa-bell animate-ring"></i>
-              </div>
-              <div class="flex-grow-1 min-w-0">
-                <div class="d-flex justify-content-between align-items-center mb-1">
-                  <strong class="text-dark">¡Nuevo pedido!</strong>
-                  <button type="button" class="btn-close btn-sm" onclick="this.closest('.notification-toast').remove()"></button>
-                </div>
-                <div class="small fw-semibold text-primary text-truncate">${order.orderNumber}</div>
-                <div class="small text-muted text-truncate">${order.customerName}</div>
-                <div class="small text-muted mb-2">S/. ${order.total.toFixed(2)}</div>
-                <a href="/orders/${order._id}" class="btn btn-sm btn-warning rounded-pill fw-semibold">
-                  Ver pedido
-                </a>
-              </div>
-            </div>
-          `;
+          toast.innerHTML =
+            '<div class="d-flex align-items-start gap-3">' +
+              '<div class="rounded-circle bg-warning text-white d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px; font-size: 1.3rem;">' +
+                '<i class="fas fa-bell animate-ring"></i>' +
+              '</div>' +
+              '<div class="flex-grow-1 min-w-0">' +
+                '<div class="d-flex justify-content-between align-items-center mb-1">' +
+                  '<strong class="text-dark">¡Nuevo pedido!</strong>' +
+                  '<button type="button" class="btn-close btn-sm" onclick="this.closest(\'.notification-toast\').remove()"></button>' +
+                '</div>' +
+                '<div class="small fw-semibold text-primary text-truncate">' + order.orderNumber + '</div>' +
+                '<div class="small text-muted text-truncate">' + order.customerName + '</div>' +
+                '<div class="small text-muted mb-2">S/. ' + order.total.toFixed(2) + '</div>' +
+                '<a href="/orders/' + order._id + '" class="btn btn-sm btn-warning rounded-pill fw-semibold">Ver pedido</a>' +
+              '</div>' +
+            '</div>';
           document.body.appendChild(toast);
-          setTimeout(() => {
+          setTimeout(function() {
             if (toast.parentNode) {
               toast.style.opacity = '0';
               toast.style.transform = 'translateX(120%)';
-              setTimeout(() => toast.remove(), 300);
+              setTimeout(function() { toast.remove(); }, 300);
             }
           }, 10000);
         }
 
         function playNotificationSound() {
           try {
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
+            var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            var oscillator = audioCtx.createOscillator();
+            var gainNode = audioCtx.createGain();
             oscillator.connect(gainNode);
             gainNode.connect(audioCtx.destination);
             oscillator.frequency.value = 800;
